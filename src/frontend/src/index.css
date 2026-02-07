@@ -1,0 +1,95 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: oklch(98% 0.01 320);
+    --foreground: oklch(20% 0.02 320);
+    --card: oklch(100% 0 0);
+    --card-foreground: oklch(20% 0.02 320);
+    --popover: oklch(100% 0 0);
+    --popover-foreground: oklch(20% 0.02 320);
+    --primary: oklch(65% 0.22 350);
+    --primary-foreground: oklch(98% 0.01 350);
+    --secondary: oklch(75% 0.15 330);
+    --secondary-foreground: oklch(20% 0.02 330);
+    --muted: oklch(95% 0.01 320);
+    --muted-foreground: oklch(50% 0.02 320);
+    --accent: oklch(70% 0.18 340);
+    --accent-foreground: oklch(98% 0.01 340);
+    --destructive: oklch(55% 0.22 25);
+    --destructive-foreground: oklch(98% 0.01 25);
+    --border: oklch(90% 0.02 320);
+    --input: oklch(90% 0.02 320);
+    --ring: oklch(65% 0.22 350);
+    --radius: 0.75rem;
+    --success: oklch(65% 0.18 145);
+    --success-foreground: oklch(98% 0.01 145);
+    --warning: oklch(70% 0.18 65);
+    --warning-foreground: oklch(20% 0.02 65);
+  }
+
+  .dark {
+    --background: oklch(15% 0.02 320);
+    --foreground: oklch(95% 0.01 320);
+    --card: oklch(18% 0.02 320);
+    --card-foreground: oklch(95% 0.01 320);
+    --popover: oklch(18% 0.02 320);
+    --popover-foreground: oklch(95% 0.01 320);
+    --primary: oklch(70% 0.22 350);
+    --primary-foreground: oklch(15% 0.02 350);
+    --secondary: oklch(30% 0.08 330);
+    --secondary-foreground: oklch(95% 0.01 330);
+    --muted: oklch(25% 0.02 320);
+    --muted-foreground: oklch(65% 0.02 320);
+    --accent: oklch(35% 0.12 340);
+    --accent-foreground: oklch(95% 0.01 340);
+    --destructive: oklch(50% 0.22 25);
+    --destructive-foreground: oklch(95% 0.01 25);
+    --border: oklch(30% 0.02 320);
+    --input: oklch(30% 0.02 320);
+    --ring: oklch(70% 0.22 350);
+    --success: oklch(60% 0.18 145);
+    --success-foreground: oklch(95% 0.01 145);
+    --warning: oklch(65% 0.18 65);
+    --warning-foreground: oklch(95% 0.01 65);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+@layer utilities {
+  .fade-in {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+  }
+
+  .fade-in.animate-in {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .fade-in {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+  }
+}
+
+.instagram-embed-container iframe,
+.instagram-embed-container blockquote {
+  max-width: 100% !important;
+  margin: 0 auto !important;
+}
