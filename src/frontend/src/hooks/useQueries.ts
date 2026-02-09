@@ -1,7 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useActor } from './useActor';
-import type { Product, Package, HowToOrderStep, UserProfile, SectionContentView, ContentBlockView, BlockType, InstagramFeedConfig } from '../backend';
+import type { Product, Package, HowToOrderStep, UserProfile, SectionContentView, ContentBlockView, BlockType, InstagramFeedConfig, UserRole } from '../backend';
 import { ExternalBlob } from '../backend';
+import { Principal } from '@dfinity/principal';
 
 // User Profile Queries
 export function useGetCallerUserProfile() {
@@ -11,7 +12,12 @@ export function useGetCallerUserProfile() {
     queryKey: ['currentUserProfile'],
     queryFn: async () => {
       if (!actor) throw new Error('Actor not available');
-      return actor.getCallerUserProfile();
+      try {
+        return await actor.getCallerUserProfile();
+      } catch (error: any) {
+        console.error('Error fetching user profile:', error);
+        throw error;
+      }
     },
     enabled: !!actor && !actorFetching,
     retry: false,
@@ -31,7 +37,12 @@ export function useSaveCallerUserProfile() {
   return useMutation({
     mutationFn: async (profile: UserProfile) => {
       if (!actor) throw new Error('Actor not available');
-      return actor.saveCallerUserProfile(profile);
+      try {
+        return await actor.saveCallerUserProfile(profile);
+      } catch (error: any) {
+        console.error('Error saving user profile:', error);
+        throw new Error(error?.message || 'Failed to save profile');
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['currentUserProfile'] });
@@ -47,9 +58,36 @@ export function useIsCallerAdmin() {
     queryKey: ['isAdmin'],
     queryFn: async () => {
       if (!actor) return false;
-      return actor.isCallerAdmin();
+      try {
+        return await actor.isCallerAdmin();
+      } catch (error: any) {
+        console.error('Error checking admin status:', error);
+        return false;
+      }
     },
     enabled: !!actor && !actorFetching,
+    retry: false,
+  });
+}
+
+// Admin Role Assignment
+export function useAssignCallerUserRole() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (data: { user: Principal; role: UserRole }) => {
+      if (!actor) throw new Error('Actor not available');
+      try {
+        return await actor.assignCallerUserRole(data.user, data.role);
+      } catch (error: any) {
+        console.error('Error assigning user role:', error);
+        throw new Error(error?.message || 'Failed to assign role');
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['isAdmin'] });
+    },
   });
 }
 
@@ -61,7 +99,12 @@ export function useGetAllProducts() {
     queryKey: ['products'],
     queryFn: async () => {
       if (!actor) return [];
-      return actor.getAllProducts();
+      try {
+        return await actor.getAllProducts();
+      } catch (error: any) {
+        console.error('Error fetching products:', error);
+        throw error;
+      }
     },
     enabled: !!actor && !isFetching,
   });
@@ -79,7 +122,12 @@ export function useAddProduct() {
       price: { english: string; spanish: string };
     }) => {
       if (!actor) throw new Error('Actor not available');
-      return actor.addProduct(data.title, data.description, data.image, data.price);
+      try {
+        return await actor.addProduct(data.title, data.description, data.image, data.price);
+      } catch (error: any) {
+        console.error('Error adding product:', error);
+        throw new Error(error?.message || 'Failed to add product');
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
@@ -100,7 +148,12 @@ export function useEditProduct() {
       price: { english: string; spanish: string };
     }) => {
       if (!actor) throw new Error('Actor not available');
-      return actor.editProduct(data.id, data.title, data.description, data.image, data.price);
+      try {
+        return await actor.editProduct(data.id, data.title, data.description, data.image, data.price);
+      } catch (error: any) {
+        console.error('Error editing product:', error);
+        throw new Error(error?.message || 'Failed to edit product');
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
@@ -115,7 +168,12 @@ export function useDeleteProduct() {
   return useMutation({
     mutationFn: async (id: string) => {
       if (!actor) throw new Error('Actor not available');
-      return actor.deleteProduct(id);
+      try {
+        return await actor.deleteProduct(id);
+      } catch (error: any) {
+        console.error('Error deleting product:', error);
+        throw new Error(error?.message || 'Failed to delete product');
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
@@ -131,7 +189,12 @@ export function useGetAllPackages() {
     queryKey: ['packages'],
     queryFn: async () => {
       if (!actor) return [];
-      return actor.getAllPackages();
+      try {
+        return await actor.getAllPackages();
+      } catch (error: any) {
+        console.error('Error fetching packages:', error);
+        throw error;
+      }
     },
     enabled: !!actor && !isFetching,
   });
@@ -149,7 +212,12 @@ export function useAddPackage() {
       price: { english: string; spanish: string };
     }) => {
       if (!actor) throw new Error('Actor not available');
-      return actor.addPackage(data.name, data.description, data.image, data.price);
+      try {
+        return await actor.addPackage(data.name, data.description, data.image, data.price);
+      } catch (error: any) {
+        console.error('Error adding package:', error);
+        throw new Error(error?.message || 'Failed to add package');
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['packages'] });
@@ -170,7 +238,12 @@ export function useEditPackage() {
       price: { english: string; spanish: string };
     }) => {
       if (!actor) throw new Error('Actor not available');
-      return actor.editPackage(data.id, data.name, data.description, data.image, data.price);
+      try {
+        return await actor.editPackage(data.id, data.name, data.description, data.image, data.price);
+      } catch (error: any) {
+        console.error('Error editing package:', error);
+        throw new Error(error?.message || 'Failed to edit package');
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['packages'] });
@@ -185,7 +258,12 @@ export function useDeletePackage() {
   return useMutation({
     mutationFn: async (id: string) => {
       if (!actor) throw new Error('Actor not available');
-      return actor.deletePackage(id);
+      try {
+        return await actor.deletePackage(id);
+      } catch (error: any) {
+        console.error('Error deleting package:', error);
+        throw new Error(error?.message || 'Failed to delete package');
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['packages'] });
@@ -193,7 +271,7 @@ export function useDeletePackage() {
   });
 }
 
-// How to Order Steps Queries
+// How To Order Steps Queries
 export function useGetAllHowToOrderSteps() {
   const { actor, isFetching } = useActor();
 
@@ -201,7 +279,12 @@ export function useGetAllHowToOrderSteps() {
     queryKey: ['howToOrderSteps'],
     queryFn: async () => {
       if (!actor) return [];
-      return actor.getAllHowToOrderSteps();
+      try {
+        return await actor.getAllHowToOrderSteps();
+      } catch (error: any) {
+        console.error('Error fetching how-to-order steps:', error);
+        throw error;
+      }
     },
     enabled: !!actor && !isFetching,
   });
@@ -219,7 +302,12 @@ export function useAddHowToOrderStep() {
       image: ExternalBlob | null;
     }) => {
       if (!actor) throw new Error('Actor not available');
-      return actor.addHowToOrderStep(data.stepNumber, data.title, data.description, data.image);
+      try {
+        return await actor.addHowToOrderStep(data.stepNumber, data.title, data.description, data.image);
+      } catch (error: any) {
+        console.error('Error adding how-to-order step:', error);
+        throw new Error(error?.message || 'Failed to add step');
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['howToOrderSteps'] });
@@ -239,7 +327,12 @@ export function useEditHowToOrderStep() {
       image: ExternalBlob | null;
     }) => {
       if (!actor) throw new Error('Actor not available');
-      return actor.editHowToOrderStep(data.stepNumber, data.title, data.description, data.image);
+      try {
+        return await actor.editHowToOrderStep(data.stepNumber, data.title, data.description, data.image);
+      } catch (error: any) {
+        console.error('Error editing how-to-order step:', error);
+        throw new Error(error?.message || 'Failed to edit step');
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['howToOrderSteps'] });
@@ -247,20 +340,26 @@ export function useEditHowToOrderStep() {
   });
 }
 
-// Dynamic Sections Queries
+// Public Sections Query (for DynamicSections component)
 export function useGetAllAdditionalSections() {
   const { actor, isFetching } = useActor();
 
   return useQuery<SectionContentView[]>({
-    queryKey: ['additionalSections'],
+    queryKey: ['sections'],
     queryFn: async () => {
       if (!actor) return [];
-      return actor.getAllAdditionalSections();
+      try {
+        return await actor.getAllAdditionalSections();
+      } catch (error: any) {
+        console.error('Error fetching sections:', error);
+        throw error;
+      }
     },
     enabled: !!actor && !isFetching,
   });
 }
 
+// Admin Sections Queries
 export function useGetAllSectionsAdmin() {
   const { actor, isFetching } = useActor();
 
@@ -268,7 +367,12 @@ export function useGetAllSectionsAdmin() {
     queryKey: ['sectionsAdmin'],
     queryFn: async () => {
       if (!actor) return [];
-      return actor.getAllSectionsAdmin();
+      try {
+        return await actor.getAllSectionsAdmin();
+      } catch (error: any) {
+        console.error('Error fetching sections:', error);
+        throw error;
+      }
     },
     enabled: !!actor && !isFetching,
   });
@@ -288,18 +392,23 @@ export function useCreateAdditionalSection() {
       isVisible: boolean;
     }) => {
       if (!actor) throw new Error('Actor not available');
-      return actor.createAdditionalSection(
-        data.title,
-        data.description,
-        data.image,
-        data.background,
-        data.order,
-        data.isVisible
-      );
+      try {
+        return await actor.createAdditionalSection(
+          data.title,
+          data.description,
+          data.image,
+          data.background,
+          data.order,
+          data.isVisible
+        );
+      } catch (error: any) {
+        console.error('Error creating section:', error);
+        throw new Error(error?.message || 'Failed to create section');
+      }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['additionalSections'] });
       queryClient.invalidateQueries({ queryKey: ['sectionsAdmin'] });
+      queryClient.invalidateQueries({ queryKey: ['sections'] });
     },
   });
 }
@@ -319,19 +428,24 @@ export function useUpdateAdditionalSection() {
       isVisible: boolean;
     }) => {
       if (!actor) throw new Error('Actor not available');
-      return actor.updateAdditionalSection(
-        data.id,
-        data.title,
-        data.description,
-        data.image,
-        data.background,
-        data.order,
-        data.isVisible
-      );
+      try {
+        return await actor.updateAdditionalSection(
+          data.id,
+          data.title,
+          data.description,
+          data.image,
+          data.background,
+          data.order,
+          data.isVisible
+        );
+      } catch (error: any) {
+        console.error('Error updating section:', error);
+        throw new Error(error?.message || 'Failed to update section');
+      }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['additionalSections'] });
       queryClient.invalidateQueries({ queryKey: ['sectionsAdmin'] });
+      queryClient.invalidateQueries({ queryKey: ['sections'] });
     },
   });
 }
@@ -343,27 +457,21 @@ export function useDeleteAdditionalSection() {
   return useMutation({
     mutationFn: async (id: string) => {
       if (!actor) throw new Error('Actor not available');
-      return actor.deleteAdditionalSection(id);
+      try {
+        return await actor.deleteAdditionalSection(id);
+      } catch (error: any) {
+        console.error('Error deleting section:', error);
+        throw new Error(error?.message || 'Failed to delete section');
+      }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['additionalSections'] });
       queryClient.invalidateQueries({ queryKey: ['sectionsAdmin'] });
+      queryClient.invalidateQueries({ queryKey: ['sections'] });
     },
   });
 }
 
 // Content Blocks Queries
-export function useGetAllContentBlocksAdmin() {
-  const { actor } = useActor();
-
-  return useMutation({
-    mutationFn: async (sectionId: string) => {
-      if (!actor) throw new Error('Actor not available');
-      return actor.getAllContentBlocksAdmin(sectionId);
-    },
-  });
-}
-
 export function useAddContentBlock() {
   const { actor } = useActor();
   const queryClient = useQueryClient();
@@ -379,19 +487,24 @@ export function useAddContentBlock() {
       isVisible: boolean;
     }) => {
       if (!actor) throw new Error('Actor not available');
-      return actor.addContentBlock(
-        data.sectionId,
-        data.title,
-        data.content,
-        data.image,
-        data.blockType,
-        data.order,
-        data.isVisible
-      );
+      try {
+        return await actor.addContentBlock(
+          data.sectionId,
+          data.title,
+          data.content,
+          data.image,
+          data.blockType,
+          data.order,
+          data.isVisible
+        );
+      } catch (error: any) {
+        console.error('Error adding content block:', error);
+        throw new Error(error?.message || 'Failed to add content block');
+      }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['additionalSections'] });
       queryClient.invalidateQueries({ queryKey: ['sectionsAdmin'] });
+      queryClient.invalidateQueries({ queryKey: ['sections'] });
     },
   });
 }
@@ -404,7 +517,12 @@ export function useGetInstagramFeedConfig() {
     queryKey: ['instagramFeedConfig'],
     queryFn: async () => {
       if (!actor) return null;
-      return actor.getInstagramFeedConfig();
+      try {
+        return await actor.getInstagramFeedConfig();
+      } catch (error: any) {
+        console.error('Error fetching Instagram feed config:', error);
+        throw error;
+      }
     },
     enabled: !!actor && !isFetching,
   });
@@ -424,14 +542,19 @@ export function useUpdateInstagramFeedConfig() {
       isVisible: boolean;
     }) => {
       if (!actor) throw new Error('Actor not available');
-      return actor.updateInstagramFeedConfig(
-        data.instagramHandle,
-        data.instagramEmbedCode,
-        data.title,
-        data.description,
-        data.displayOrder,
-        data.isVisible
-      );
+      try {
+        return await actor.updateInstagramFeedConfig(
+          data.instagramHandle,
+          data.instagramEmbedCode,
+          data.title,
+          data.description,
+          data.displayOrder,
+          data.isVisible
+        );
+      } catch (error: any) {
+        console.error('Error updating Instagram feed config:', error);
+        throw new Error(error?.message || 'Failed to update Instagram feed config');
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['instagramFeedConfig'] });

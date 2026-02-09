@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { LogOut, Package, ShoppingBag, ListOrdered, Loader2, LayoutGrid, Blocks, Instagram } from 'lucide-react';
+import { LogOut, Package, ShoppingBag, ListOrdered, Loader2, LayoutGrid, Blocks, Instagram, Activity } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { toast } from 'sonner';
 import ProductsManager from '../components/admin/ProductsManager';
@@ -17,6 +17,7 @@ import HowToOrderManager from '../components/admin/HowToOrderManager';
 import SectionsManager from '../components/admin/SectionsManager';
 import ContentBlocksManager from '../components/admin/ContentBlocksManager';
 import InstagramFeedManager from '../components/admin/InstagramFeedManager';
+import DiagnosticsPanel from '../components/admin/DiagnosticsPanel';
 import { useQueryClient } from '@tanstack/react-query';
 import { Language } from '../backend';
 
@@ -34,19 +35,22 @@ export default function AdminDashboard() {
 
   const isAuthenticated = !!identity;
 
+  // Redirect to login if not authenticated
   useEffect(() => {
     if (!isCheckingAdmin && !isAuthenticated) {
       navigate({ to: '/admin/login' });
     }
   }, [isAuthenticated, isCheckingAdmin, navigate]);
 
+  // Redirect to home if authenticated but not admin
   useEffect(() => {
     if (!isCheckingAdmin && isAuthenticated && isAdmin === false) {
       toast.error('Access denied. Admin privileges required.');
-      navigate({ to: '/' });
+      navigate({ to: '/admin/login' });
     }
   }, [isAdmin, isAuthenticated, isCheckingAdmin, navigate]);
 
+  // Show profile setup if needed
   useEffect(() => {
     if (isAuthenticated && !profileLoading && isFetched && userProfile === null) {
       setShowProfileSetup(true);
@@ -54,9 +58,15 @@ export default function AdminDashboard() {
   }, [isAuthenticated, profileLoading, isFetched, userProfile]);
 
   const handleLogout = async () => {
-    await clear();
-    queryClient.clear();
-    navigate({ to: '/' });
+    try {
+      await clear();
+      queryClient.clear();
+      navigate({ to: '/' });
+      toast.success('Logged out successfully');
+    } catch (error) {
+      console.error('Logout error:', error);
+      toast.error('Error during logout');
+    }
   };
 
   const handleSaveProfile = async () => {
@@ -73,12 +83,14 @@ export default function AdminDashboard() {
       });
       setShowProfileSetup(false);
       toast.success('Profile created successfully!');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving profile:', error);
-      toast.error('Failed to save profile');
+      const errorMessage = error?.message || 'Failed to save profile';
+      toast.error(errorMessage);
     }
   };
 
+  // Loading state
   if (isCheckingAdmin || profileLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-rose-50 via-pink-50 to-purple-50 dark:from-rose-950/20 dark:via-pink-950/20 dark:to-purple-950/20 flex items-center justify-center">
@@ -90,6 +102,7 @@ export default function AdminDashboard() {
     );
   }
 
+  // Don't render if not authenticated or not admin
   if (!isAuthenticated || !isAdmin) {
     return null;
   }
@@ -103,7 +116,7 @@ export default function AdminDashboard() {
               <img
                 src="/assets/PHOTO-2025-04-04-00-07-02.jpg"
                 alt="A&A Boxes"
-                className="h-12 w-12 object-contain"
+                className="h-12 w-12 object-contain rounded-full"
               />
               <div>
                 <h1 className="text-2xl font-bold bg-gradient-to-r from-rose-400 to-pink-600 bg-clip-text text-transparent">
@@ -140,30 +153,34 @@ export default function AdminDashboard() {
         </Card>
 
         <Tabs defaultValue="products" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6 lg:w-auto lg:inline-grid">
+          <TabsList className="grid w-full grid-cols-7 lg:w-auto lg:inline-grid">
             <TabsTrigger value="products" className="space-x-2">
               <ShoppingBag className="h-4 w-4" />
-              <span>Products</span>
+              <span className="hidden sm:inline">Products</span>
             </TabsTrigger>
             <TabsTrigger value="packages" className="space-x-2">
               <Package className="h-4 w-4" />
-              <span>Packages</span>
+              <span className="hidden sm:inline">Packages</span>
             </TabsTrigger>
             <TabsTrigger value="howtoorder" className="space-x-2">
               <ListOrdered className="h-4 w-4" />
-              <span>How to Order</span>
+              <span className="hidden sm:inline">How to Order</span>
             </TabsTrigger>
             <TabsTrigger value="instagram" className="space-x-2">
               <Instagram className="h-4 w-4" />
-              <span>Instagram</span>
+              <span className="hidden sm:inline">Instagram</span>
             </TabsTrigger>
             <TabsTrigger value="sections" className="space-x-2">
               <LayoutGrid className="h-4 w-4" />
-              <span>Sections</span>
+              <span className="hidden sm:inline">Sections</span>
             </TabsTrigger>
             <TabsTrigger value="blocks" className="space-x-2">
               <Blocks className="h-4 w-4" />
-              <span>Content Blocks</span>
+              <span className="hidden sm:inline">Content Blocks</span>
+            </TabsTrigger>
+            <TabsTrigger value="diagnostics" className="space-x-2">
+              <Activity className="h-4 w-4" />
+              <span className="hidden sm:inline">Diagnostics</span>
             </TabsTrigger>
           </TabsList>
 
@@ -189,6 +206,10 @@ export default function AdminDashboard() {
 
           <TabsContent value="blocks">
             <ContentBlocksManager />
+          </TabsContent>
+
+          <TabsContent value="diagnostics">
+            <DiagnosticsPanel />
           </TabsContent>
         </Tabs>
       </main>

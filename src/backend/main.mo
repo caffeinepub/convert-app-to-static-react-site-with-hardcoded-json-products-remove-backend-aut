@@ -9,13 +9,14 @@ import Time "mo:core/Time";
 import VarArray "mo:core/VarArray";
 import MixinAuthorization "authorization/MixinAuthorization";
 import MixinStorage "blob-storage/Mixin";
-import Migration "migration";
 
-(with migration = Migration.run)
+
+
 actor {
   include MixinStorage();
 
   let accessControlState = AccessControl.initState();
+
   include MixinAuthorization(accessControlState);
 
   type Language = {

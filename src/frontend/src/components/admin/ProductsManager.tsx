@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { Plus, Edit, Trash2, Loader2, Upload } from 'lucide-react';
+import { Plus, Edit, Trash2, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { ExternalBlob } from '../../backend';
 import type { Product } from '../../backend';
@@ -92,6 +92,7 @@ export default function ProductsManager() {
           setUploadProgress(percentage);
         });
       } else if (editingProduct) {
+        // Retain existing image
         imageBlob = editingProduct.image;
       } else {
         toast.error('Please select an image');
@@ -115,9 +116,10 @@ export default function ProductsManager() {
 
       setShowDialog(false);
       resetForm();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving product:', error);
-      toast.error('Failed to save product');
+      const errorMessage = error?.message || 'Failed to save product';
+      toast.error(errorMessage);
     }
   };
 
@@ -126,9 +128,10 @@ export default function ProductsManager() {
       await deleteProduct.mutateAsync(id);
       toast.success('Product deleted successfully!');
       setDeleteConfirm(null);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error deleting product:', error);
-      toast.error('Failed to delete product');
+      const errorMessage = error?.message || 'Failed to delete product';
+      toast.error(errorMessage);
     }
   };
 
@@ -234,6 +237,11 @@ export default function ProductsManager() {
                       Uploading: {uploadProgress}%
                     </p>
                   )}
+                  {editingProduct && !formData.imageFile && (
+                    <p className="text-xs text-muted-foreground mt-2">
+                      Leave empty to keep existing image
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
@@ -245,7 +253,7 @@ export default function ProductsManager() {
                   id="titleEn"
                   value={formData.titleEn}
                   onChange={(e) => setFormData({ ...formData, titleEn: e.target.value })}
-                  placeholder="Product name in English"
+                  placeholder="Product title in English"
                 />
               </div>
               <div className="space-y-2">
@@ -254,7 +262,7 @@ export default function ProductsManager() {
                   id="titleEs"
                   value={formData.titleEs}
                   onChange={(e) => setFormData({ ...formData, titleEs: e.target.value })}
-                  placeholder="Nombre del producto en español"
+                  placeholder="Título del producto en español"
                 />
               </div>
             </div>

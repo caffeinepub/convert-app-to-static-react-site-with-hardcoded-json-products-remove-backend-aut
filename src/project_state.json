@@ -1,0 +1,91 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectStateVersion": 3,
+  "summary": "Restore and stabilize an Internet Computer app architecture with backend services, Internet Identity authentication, and a functional admin panel for product CRUD, including admin-only permissions and verification tests.",
+  "architectural_notes": [
+    "App uses Internet Computer backend services with Internet Identity (II) authentication.",
+    "Admin-only authorization required for product management (CRUD) via admin panel.",
+    "Designate an admin principal based on the identity associated with hernan@zerma-la.com."
+  ],
+  "known_issues": [
+    "Admin panel is currently not functioning correctly and blocks requested changes; requires detailed review and stabilization."
+  ],
+  "isFixRequest": true,
+  "existing_features": [
+    {
+      "id": "feature-restore-internet-identity-ii-as-the-primary-authentication-method-and-ensure-the-frontend-uses-an-authenticated-backend-actor-after-login-no-anonymous-placeholder-actor-for-admin-actions-admin-routes-must-reliably-redirect-unauthenticated-users-to-the-admin-login-page-and-prevent-access-when-authentication-is-missing",
+      "title": "Restore Internet Identity (II) as the primary authentication method and ensure the frontend uses an authenticated backend actor after login (no anonymous/placeholder actor for admin actions). Admin routes must reliably redirect unauthenticated users to the Admin Login page and prevent access when authentication is missing.",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-restore-the-admin-panel-to-its-previously-functional-state-by-ensuring-all-existing-admin-ui-modules-load-and-operate-correctly-dashboard-tabs-managers-dialogs-without-runtime-errors-and-with-correct-data-fetching-mutations-via-react-query",
+      "title": "Restore the Admin Panel to its previously functional state by ensuring all existing admin UI modules load and operate correctly (Dashboard, tabs, managers, dialogs) without runtime errors and with correct data fetching/mutations via React Query.",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-an-admin-permissions-bootstrap-flow-to-set-up-an-admin-principal-for-the-internet-identity-account-associated-with-hernan-zerma-la-com-because-the-backend-only-receives-principals-not-emails-provide-a-safe-way-to-register-the-first-desired-admin-principal-after-that-user-logs-in-with-ii-and-persist-that-principal-in-backend-authorization-state-so-subsequent-sessions-are-recognized-as-admin",
+      "title": "Implement an admin-permissions bootstrap flow to set up an Admin Principal for the Internet Identity account associated with hernan@zerma-la.com. Because the backend only receives Principals (not emails), provide a safe way to register the first/desired admin Principal after that user logs in with II, and persist that Principal in backend authorization state so subsequent sessions are recognized as admin.",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-ensure-product-editing-create-update-delete-and-list-is-fully-operational-end-to-end-and-strictly-restricted-to-admin-role-at-the-backend-boundary-all-product-mutations-must-trap-deny-for-non-admin-callers",
+      "title": "Ensure Product Editing (create, update, delete, and list) is fully operational end-to-end and strictly restricted to Admin role at the backend boundary (all product mutations must trap/deny for non-admin callers).",
+      "reqIds": [
+        "REQ-4"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-diagnostic-verification-workflow-to-validate-stability-of-1-internet-identity-authentication-flow-2-admin-authorization-check-and-3-product-crud-operations-against-the-backend-expose-results-as-a-simple-pass-fail-report-accessible-from-the-admin-panel",
+      "title": "Add a diagnostic/verification workflow to validate stability of (1) Internet Identity authentication flow, (2) admin authorization check, and (3) product CRUD operations against the backend. Expose results as a simple pass/fail report accessible from the Admin Panel.",
+      "reqIds": [
+        "REQ-5"
+      ],
+      "version": 1
+    }
+  ],
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Re-integrate backend services and restore Internet Identity (II) authentication as primary login method",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "Restore the Admin Panel to its previous functional state with original UI components and logic intact",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "Configure an Admin Principal user for the identity linked to hernan@zerma-la.com",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-4",
+      "summary": "Ensure Product Editing (product CRUD) is fully operational and restricted to the Admin role",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-5",
+      "summary": "Run diagnostic checks/tests for authentication flow and product database CRUD operations to ensure stability",
+      "reqIds": [],
+      "status": "pending"
+    }
+  ],
+  "projectName": "Restore backend + Internet Identity auth and fully working admin-only product management",
+  "clarification_mode": "instant",
+  "clarification_rounds": 0
+}
