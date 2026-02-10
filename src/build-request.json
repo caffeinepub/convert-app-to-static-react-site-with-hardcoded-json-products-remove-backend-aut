@@ -1,113 +1,72 @@
 {
   "kind": "build_request",
-  "title": "Restore backend + Internet Identity auth and fully working admin-only product management",
-  "priority": "high",
+  "title": "Fix admin panel access and grant admin role to hernan@zerma-la.com (principal ix7jl-…-6ae)",
+  "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Restore Internet Identity (II) as the primary authentication method and ensure the frontend uses an authenticated backend actor after login (no anonymous/placeholder actor for admin actions). Admin routes must reliably redirect unauthenticated users to the Admin Login page and prevent access when authentication is missing.",
-      "target": "both",
+      "text": "Guarantee that the Internet Identity principal `ix7jl-xlknv-uwyet-3fsxh-x7nqh-zkhvg-keqsk-zs4hv-ihh5p-uytti-6ae` (user email reference: `hernan@zerma-la.com`) is granted admin privileges in the backend so that this user can access the admin dashboard.",
+      "target": "backend",
       "source": {
         "messageIds": [
           "msg-1"
         ],
         "quotes": [
-          "Authentication & Backend: Re-integrate the backend services and restore Internet Identity (II) Authentication as the primary login method."
+          "revisa que el panel admin funcione correctamente y agrega a hernan@zerma-la.com como admin"
         ]
       },
       "acceptanceCriteria": [
-        "Visiting /admin while logged out redirects to /admin/login.",
-        "Clicking “Login with Internet Identity” successfully authenticates and returns the user to /admin for authorized accounts.",
-        "After login, backend calls used by the admin panel (e.g., isCallerAdmin, product CRUD) are executed with the logged-in identity (no anonymous identity).",
-        "Logging out clears the II session and React Query cache and returns the user to the public site."
+        "Calling the backend admin-check method (used by the frontend `useIsCallerAdmin` hook) returns `true` for principal `ix7jl-xlknv-uwyet-3fsxh-x7nqh-zkhvg-keqsk-zs4hv-ihh5p-uytti-6ae`.",
+        "Admin-only backend methods (e.g., product CRUD) succeed for this principal and continue to reject non-admin principals.",
+        "If the canister is upgraded and existing state is present, the change is applied without wiping existing content/state (profiles/products/packages/sections/etc.)."
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Restore the Admin Panel to its previously functional state by ensuring all existing admin UI modules load and operate correctly (Dashboard, tabs, managers, dialogs) without runtime errors and with correct data fetching/mutations via React Query.",
+      "text": "Review and fix the admin panel end-to-end flow so it works reliably: Internet Identity login, admin role check, navigation to `/admin`, and a clear non-admin experience without silent loops or no-op behavior.",
       "target": "frontend",
       "source": {
         "messageIds": [
           "msg-1"
         ],
         "quotes": [
-          "Admin Panel Restoration: Revert the Admin Panel to its previous functional state. Ensure all original UI components and logic are intact."
+          "revisa que el panel admin funcione correctamente"
         ]
       },
       "acceptanceCriteria": [
-        "Admin Dashboard loads successfully for an authorized admin without blank screen or uncaught exceptions.",
-        "All existing admin tabs render their manager components (Products, Packages, How to Order, Instagram, Sections, Content Blocks).",
-        "Each manager can fetch its data and perform its save/update/delete operations (subject to authorization) and refreshes UI state after mutations.",
-        "User-facing admin messages remain in English (e.g., errors/toasts, labels, buttons)."
+        "After logging in with Internet Identity as an admin, the app navigates to `/admin` and renders the Admin Dashboard (no blank screen).",
+        "If a logged-in user is not an admin, `/admin` and `/admin/login` show a clear message indicating access is denied (and do not get stuck in a redirect loop).",
+        "The Admin Diagnostics panel can be executed by an admin without errors and completes product CRUD validation successfully (create/read/update/delete of the temporary test product)."
       ]
     },
     {
       "id": "REQ-3",
-      "text": "Implement an admin-permissions bootstrap flow to set up an Admin Principal for the Internet Identity account associated with hernan@zerma-la.com. Because the backend only receives Principals (not emails), provide a safe way to register the first/desired admin Principal after that user logs in with II, and persist that Principal in backend authorization state so subsequent sessions are recognized as admin.",
+      "text": "If the project currently supports a 'bootstrap admin' action from the Admin Login page, ensure it fails gracefully with a clear error message when unauthorized, and ensure it is not required for the configured admin principal in REQ-1 to access the admin dashboard.",
       "target": "both",
       "source": {
         "messageIds": [
           "msg-1"
         ],
         "quotes": [
-          "Permissions: Set up an Admin Principal user using the identity linked to: hernan@zerma-la.com."
+          "revisa que el panel admin funcione correctamente y agrega a hernan@zerma-la.com como admin"
         ]
       },
       "acceptanceCriteria": [
-        "There is a clear, in-app way to bind the logged-in Principal (from the II session that the user knows is hernan@zerma-la.com) as an admin Principal (e.g., “Make this Principal Admin” gated by an explicit bootstrap rule).",
-        "After admin bootstrap, isCallerAdmin returns true for that Principal across page reloads and future logins.",
-        "Non-admin Principals cannot grant themselves admin privileges.",
-        "Admin authorization state persists across canister upgrades according to the project’s existing authorization/mixin storage approach."
-      ]
-    },
-    {
-      "id": "REQ-4",
-      "text": "Ensure Product Editing (create, update, delete, and list) is fully operational end-to-end and strictly restricted to Admin role at the backend boundary (all product mutations must trap/deny for non-admin callers).",
-      "target": "both",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ],
-        "quotes": [
-          "Product Management: Ensure the \"Product Editing\" functionality is fully operational and restricted to the Admin role."
-        ]
-      },
-      "acceptanceCriteria": [
-        "Admin can create a product with bilingual title/description, price, and image upload; the new product appears in the admin list and public product display where applicable.",
-        "Admin can edit an existing product (including optionally keeping existing image) and see updates reflected after save.",
-        "Admin can delete a product and it is removed from subsequent fetches.",
-        "Non-admin users attempting add/edit/delete receive an authorization error from the backend and no mutation occurs."
-      ]
-    },
-    {
-      "id": "REQ-5",
-      "text": "Add a diagnostic/verification workflow to validate stability of (1) Internet Identity authentication flow, (2) admin authorization check, and (3) product CRUD operations against the backend. Expose results as a simple pass/fail report accessible from the Admin Panel.",
-      "target": "both",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ],
-        "quotes": [
-          "Verification: Run a diagnostic check on the authentication flow and the database CRUD operations for products to ensure stability."
-        ]
-      },
-      "acceptanceCriteria": [
-        "Admin UI includes a “Diagnostics” section that runs checks and displays clear results in English.",
-        "Diagnostics verifies: current authentication state (logged-in Principal present), isCallerAdmin result, and successful product list fetch.",
-        "Diagnostics can perform a safe CRUD validation cycle (e.g., create a temporary test product, verify it exists, update it, verify update, delete it, verify removal) without leaving orphaned test data.",
-        "If any step fails, the UI reports which step failed and includes the error message returned by the backend."
+        "When the bootstrap action is unauthorized, the UI shows an actionable error message (no silent failure) and remains on the same page.",
+        "For principal `ix7jl-xlknv-uwyet-3fsxh-x7nqh-zkhvg-keqsk-zs4hv-ihh5p-uytti-6ae`, the bootstrap option is not needed to access `/admin` (admin is recognized via backend role configuration)."
       ]
     }
   ],
   "constraints": [
-    "Backend must remain a single Motoko actor in backend/main.mo (no additional backend services).",
-    "Do not edit files in frontend immutablePaths (compose existing hooks/components instead of modifying those files).",
-    "Use English for all user-facing text in admin/auth/diagnostics UI."
+    "Backend must remain a single Motoko actor in `backend/main.mo` (no new backend services).",
+    "Only add `backend/migration.mo` changes if needed to preserve/upgrade existing stable state; follow the conditional migration policy.",
+    "Do not modify any files under `frontend/src/components/ui` or any paths listed as immutable in SYSTEM_CONTEXT (compose instead).",
+    "Use English for any user-facing text added/changed in the UI."
   ],
   "nonGoals": [
     "Adding third-party authentication providers (only Internet Identity).",
-    "Integrating external databases or off-chain storage services.",
-    "Real-time features (websockets/push)."
+    "Adding external databases or non-IC storage systems.",
+    "Building real-time features (WebSockets/push notifications/chat)."
   ],
   "imageRequirements": {
     "required": [],

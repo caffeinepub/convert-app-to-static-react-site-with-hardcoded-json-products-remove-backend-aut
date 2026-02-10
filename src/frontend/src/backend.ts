@@ -208,6 +208,7 @@ export interface backendInterface {
     addSocialMediaLink(platform: string, url: string, icon: ExternalBlob | null): Promise<SocialMediaLink>;
     adminDeleteContentBlock(sectionId: string, blockId: bigint): Promise<void>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
+    bootstrapAdmin(): Promise<void>;
     createAdditionalSection(title: TextContent, description: TextContent, image: ExternalBlob | null, background: ExternalBlob | null, order: bigint, isVisible: boolean): Promise<string>;
     deleteAdditionalSection(id: string): Promise<void>;
     deletePackage(id: string): Promise<void>;
@@ -230,6 +231,7 @@ export interface backendInterface {
     getInstagramFeedConfig(): Promise<InstagramFeedConfig | null>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
     getVisibleContentBlockAdmin(sectionId: string): Promise<Array<ContentBlockView>>;
+    isAdmin(): Promise<boolean>;
     isCallerAdmin(): Promise<boolean>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
     updateAdditionalSection(id: string, title: TextContent, description: TextContent, image: ExternalBlob | null, background: ExternalBlob | null, order: bigint, isVisible: boolean): Promise<void>;
@@ -431,6 +433,20 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.assignCallerUserRole(arg0, to_candid_UserRole_n26(this._uploadFile, this._downloadFile, arg1));
+            return result;
+        }
+    }
+    async bootstrapAdmin(): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.bootstrapAdmin();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.bootstrapAdmin();
             return result;
         }
     }
@@ -740,6 +756,20 @@ export class Backend implements backendInterface {
         } else {
             const result = await this.actor.getVisibleContentBlockAdmin(arg0);
             return from_candid_vec_n32(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async isAdmin(): Promise<boolean> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.isAdmin();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.isAdmin();
+            return result;
         }
     }
     async isCallerAdmin(): Promise<boolean> {

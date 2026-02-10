@@ -18,6 +18,7 @@ import SectionsManager from '../components/admin/SectionsManager';
 import ContentBlocksManager from '../components/admin/ContentBlocksManager';
 import InstagramFeedManager from '../components/admin/InstagramFeedManager';
 import DiagnosticsPanel from '../components/admin/DiagnosticsPanel';
+import AccessDeniedScreen from '../components/admin/AccessDeniedScreen';
 import { useQueryClient } from '@tanstack/react-query';
 import { Language } from '../backend';
 
@@ -25,8 +26,8 @@ export default function AdminDashboard() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { clear, identity } = useInternetIdentity();
-  const { data: isAdmin, isLoading: isCheckingAdmin } = useIsCallerAdmin();
-  const { data: userProfile, isLoading: profileLoading, isFetched } = useGetCallerUserProfile();
+  const { data: isAdmin, isLoading: isCheckingAdmin, isFetched } = useIsCallerAdmin();
+  const { data: userProfile, isLoading: profileLoading, isFetched: profileFetched } = useGetCallerUserProfile();
   const saveProfile = useSaveCallerUserProfile();
   const { t } = useLanguage();
 
@@ -35,27 +36,12 @@ export default function AdminDashboard() {
 
   const isAuthenticated = !!identity;
 
-  // Redirect to login if not authenticated
-  useEffect(() => {
-    if (!isCheckingAdmin && !isAuthenticated) {
-      navigate({ to: '/admin/login' });
-    }
-  }, [isAuthenticated, isCheckingAdmin, navigate]);
-
-  // Redirect to home if authenticated but not admin
-  useEffect(() => {
-    if (!isCheckingAdmin && isAuthenticated && isAdmin === false) {
-      toast.error('Access denied. Admin privileges required.');
-      navigate({ to: '/admin/login' });
-    }
-  }, [isAdmin, isAuthenticated, isCheckingAdmin, navigate]);
-
   // Show profile setup if needed
   useEffect(() => {
-    if (isAuthenticated && !profileLoading && isFetched && userProfile === null) {
+    if (isAuthenticated && !profileLoading && profileFetched && userProfile === null && isAdmin === true) {
       setShowProfileSetup(true);
     }
-  }, [isAuthenticated, profileLoading, isFetched, userProfile]);
+  }, [isAuthenticated, profileLoading, profileFetched, userProfile, isAdmin]);
 
   const handleLogout = async () => {
     try {
@@ -90,8 +76,8 @@ export default function AdminDashboard() {
     }
   };
 
-  // Loading state
-  if (isCheckingAdmin || profileLoading) {
+  // Show loading while checking authentication and admin status
+  if (isCheckingAdmin || (isAuthenticated && !isFetched)) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-rose-50 via-pink-50 to-purple-50 dark:from-rose-950/20 dark:via-pink-950/20 dark:to-purple-950/20 flex items-center justify-center">
         <div className="text-center space-y-4">
@@ -102,8 +88,41 @@ export default function AdminDashboard() {
     );
   }
 
-  // Don't render if not authenticated or not admin
-  if (!isAuthenticated || !isAdmin) {
+  // Redirect to login if not authenticated
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-rose-50 via-pink-50 to-purple-50 dark:from-rose-950/20 dark:via-pink-950/20 dark:to-purple-950/20 flex items-center justify-center">
+        <Card className="w-full max-w-md shadow-2xl">
+          <CardHeader className="text-center">
+            <CardTitle>Authentication Required</CardTitle>
+            <CardDescription>Please sign in to access the admin panel</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button
+              onClick={() => navigate({ to: '/admin/login' })}
+              className="w-full bg-gradient-to-r from-rose-400 to-pink-600 hover:from-rose-500 hover:to-pink-700 text-white"
+              size="lg"
+            >
+              Go to Login
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Show access denied if authenticated but not admin
+  if (isAuthenticated && isFetched && isAdmin === false) {
+    return (
+      <AccessDeniedScreen 
+        message="You do not have admin privileges. This area is restricted to administrators only."
+        showHomeButton={true}
+      />
+    );
+  }
+
+  // Don't render dashboard if admin check hasn't completed
+  if (!isAdmin) {
     return null;
   }
 

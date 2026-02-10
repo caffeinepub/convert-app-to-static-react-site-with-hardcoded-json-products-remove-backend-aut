@@ -1,70 +1,73 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-08T01:45:06.437Z",
-  "summary": "Diff adds an Admin Diagnostics panel and updates admin login/dashboard and product manager UI, plus expands React Query hooks and Internet Identity hook. However, the required safe admin-bootstrap rule/persistence and backend-side admin enforcement for product mutations are not evidenced, and there are multiple unrelated public-site content/UI changes not requested.",
+  "generatedAt": "2026-02-10T21:19:10.673Z",
+  "summary": "Diff adds a hardcoded admin principal in the Motoko backend and introduces an explicit AccessDenied UI plus updated admin login/dashboard flow. However, the diff evidence is insufficient to confirm that all admin-only backend methods enforce authorization correctly, that the change is upgrade-safe without wiping state, that Admin Diagnostics CRUD validation works, or that any existing 'bootstrap admin' action fails gracefully when unauthorized. The diff also includes many unrelated frontend content/styling changes not requested in the BuildRequest.",
   "missing_requirements": [
     {
       "id": "REQ-1",
-      "requirement": "Ensure the frontend uses an authenticated backend actor after II login (no anonymous/placeholder actor for admin actions).",
-      "reason": "The diff shows updated II context and admin pages using it, but does not include changes/evidence for how the backend actor is created/bound to the logged-in identity (e.g., in useActor).",
+      "requirement": "Admin-only backend methods (e.g., product CRUD) succeed for the configured admin principal and continue to reject non-admin principals.",
+      "reason": "The diff shows the admin principal added to a `hardcodedAdmins` list, but does not show (in the provided truncated snippet) how `isAdmin` or admin guards are implemented/enforced across admin-only methods, so enforcement cannot be verified from the diff summary.",
       "evidence": [
-        "frontend/src/hooks/useInternetIdentity.ts (modified, truncated)",
-        "frontend/src/hooks/useQueries.ts (modified, uses useActor but useActor not shown/changed in diff)"
+        "backend/main.mo (truncated)"
+      ]
+    },
+    {
+      "id": "REQ-1",
+      "requirement": "If the canister is upgraded and existing state is present, the change is applied without wiping existing content/state.",
+      "reason": "The backend change includes a comment explicitly stating no migration is used, and the diff summary provides no evidence of stable-state upgrade handling or a conditional migration that preserves existing state while applying the admin allowlist change.",
+      "evidence": [
+        "backend/main.mo (truncated)"
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "requirement": "The Admin Diagnostics panel can be executed by an admin without errors and completes product CRUD validation successfully (create/read/update/delete of the temporary test product).",
+      "reason": "Admin pages import `DiagnosticsPanel`, but the diff summary does not show any implementation or changes to the diagnostics flow itself, nor any evidence it runs end-to-end without errors.",
+      "evidence": [
+        "frontend/src/pages/AdminDashboard.tsx (truncated)",
+        "frontend-file-summaries.txt (mentions DiagnosticsPanel but no diff evidence of its behavior)"
       ]
     },
     {
       "id": "REQ-3",
-      "requirement": "Provide a safe admin-permissions bootstrap flow gated by an explicit bootstrap rule so non-admin principals cannot grant themselves admin, and persist admin authorization across upgrades.",
-      "reason": "AdminLogin exposes a bootstrap action that assigns admin role to the currently logged-in principal when they are authenticated but not admin; there is no evidence of a backend-enforced one-time/first-admin rule or any restriction preventing arbitrary users from self-assigning admin, nor evidence of upgrade-safe persistence for the admin principal state.",
+      "requirement": "If a 'bootstrap admin' action exists, it fails gracefully with a clear actionable error message when unauthorized and is not required for the configured admin principal to access /admin.",
+      "reason": "The diff summary indicates the Admin Login page has access denied handling and states it is 'without bootstrap functionality', but provides no evidence of how an existing bootstrap action (if present in the project) behaves when unauthorized (e.g., UI error messaging and staying on the same page).",
       "evidence": [
-        "frontend/src/pages/AdminLogin.tsx (modified: handleBootstrapAdmin assigns UserRole.admin to identity.getPrincipal())",
-        "backend/main.mo (modified, truncated: no visible bootstrap gating/persistence details)",
-        "frontend/src/hooks/useQueries.ts (modified: calls actor.assignCallerUserRole)"
-      ]
-    },
-    {
-      "id": "REQ-4",
-      "requirement": "Strictly restrict all product mutations (create/update/delete) to Admin role at the backend boundary (deny/trap for non-admin callers).",
-      "reason": "Frontend product CRUD hooks and UI are present, but the diff does not show the backend methods for product CRUD or explicit admin checks/denials around them; backend/main.mo is truncated before any such logic is evidenced.",
-      "evidence": [
-        "frontend/src/hooks/useQueries.ts (modified: useAddProduct/useEditProduct/useDeleteProduct call actor.*)",
-        "frontend/src/components/admin/ProductsManager.tsx (modified: performs mutations)",
-        "backend/main.mo (modified, truncated: no visible admin-guarded product mutation implementations)"
-      ]
-    },
-    {
-      "id": "REQ-5",
-      "requirement": "Diagnostics CRUD cycle must be safe and not leave orphaned test data (create, verify, update, verify, delete, verify removal).",
-      "reason": "DiagnosticsPanel is added and begins implementing steps, but the file is truncated before demonstrating completion of the full safe CRUD cycle including cleanup/verification of removal.",
-      "evidence": [
-        "frontend/src/components/admin/DiagnosticsPanel.tsx (added, truncated)"
+        "frontend/src/pages/AdminLogin.tsx (truncated)",
+        "frontend-file-summaries.txt (\"Admin login... clear access denied ... without bootstrap functionality\")"
       ]
     }
   ],
   "hallucinated_features": [
     {
-      "description": "Major public-site content and UI changes (updated product catalog entries, new/updated sections like Packages and How to Order, revised contact info/footer/header/hero styling, Instagram feed placement).",
-      "reason": "BuildRequest focuses on restoring II auth and admin-only product management + diagnostics; it does not request redesigning or rewriting public landing page content/sections.",
+      "description": "Unrequested landing-page/marketing content updates across multiple sections (Hero/Header/Footer/About/Products/Contact), including updated product catalog content and updated contact details.",
+      "reason": "BuildRequest is focused on fixing admin access/flow and granting admin role; these content changes are not requested.",
       "evidence": [
-        "frontend-file-summaries.txt (entries for frontend/src/components/Products.tsx, Header.tsx, Hero.tsx, About.tsx, Contact.tsx, Footer.tsx, Packages.tsx, HowToOrder.tsx, App.tsx)"
+        "frontend-file-summaries.txt (entries for Header.tsx, Hero.tsx, Products.tsx, About.tsx, Contact.tsx, Footer.tsx)"
       ]
     },
     {
-      "description": "Addition of project_state.json tracking/metadata file.",
-      "reason": "Not requested by any REQ; appears to be internal project tracking rather than app functionality required by the BuildRequest.",
+      "description": "Unrequested UI theming/styling changes (soft-glam OKLCH palette, animations, Instagram embed container styling).",
+      "reason": "Not part of admin access/flow or backend admin role requirements.",
       "evidence": [
-        "project_state.json (added)"
+        "frontend-file-summaries.txt (frontend/src/index.css summary)"
+      ]
+    },
+    {
+      "description": "Unrequested addition/expansion of non-admin features such as Instagram Feed section positioning and new Packages/HowToOrder sections content.",
+      "reason": "Not requested by the BuildRequest, which is limited to admin access and admin panel flow fixes.",
+      "evidence": [
+        "frontend-file-summaries.txt (App.tsx summary: Instagram Feed section positioning)",
+        "frontend-file-summaries.txt (components/Packages.tsx, components/HowToOrder.tsx summaries)"
       ]
     }
   ],
-  "confidence": 0.66,
+  "confidence": 0.62,
   "changed_files": [
     "backend/main.mo",
     "frontend-file-summaries.txt",
-    "frontend/src/components/admin/DiagnosticsPanel.tsx",
-    "frontend/src/components/admin/ProductsManager.tsx",
-    "frontend/src/hooks/useInternetIdentity.ts",
+    "frontend/src/components/admin/AccessDeniedScreen.tsx",
     "frontend/src/hooks/useQueries.ts",
     "frontend/src/pages/AdminDashboard.tsx",
     "frontend/src/pages/AdminLogin.tsx",

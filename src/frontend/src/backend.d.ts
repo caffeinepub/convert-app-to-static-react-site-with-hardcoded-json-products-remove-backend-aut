@@ -115,6 +115,7 @@ export interface backendInterface {
     addSocialMediaLink(platform: string, url: string, icon: ExternalBlob | null): Promise<SocialMediaLink>;
     adminDeleteContentBlock(sectionId: string, blockId: bigint): Promise<void>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
+    bootstrapAdmin(): Promise<void>;
     createAdditionalSection(title: TextContent, description: TextContent, image: ExternalBlob | null, background: ExternalBlob | null, order: bigint, isVisible: boolean): Promise<string>;
     deleteAdditionalSection(id: string): Promise<void>;
     deletePackage(id: string): Promise<void>;
@@ -137,6 +138,7 @@ export interface backendInterface {
     getInstagramFeedConfig(): Promise<InstagramFeedConfig | null>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
     getVisibleContentBlockAdmin(sectionId: string): Promise<Array<ContentBlockView>>;
+    isAdmin(): Promise<boolean>;
     isCallerAdmin(): Promise<boolean>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
     updateAdditionalSection(id: string, title: TextContent, description: TextContent, image: ExternalBlob | null, background: ExternalBlob | null, order: bigint, isVisible: boolean): Promise<void>;

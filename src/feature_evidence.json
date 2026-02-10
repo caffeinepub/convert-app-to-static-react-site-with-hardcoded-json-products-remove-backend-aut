@@ -2,32 +2,12 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-restore-internet-identity-ii-as-the-primary-authentication-method-and-ensure-the-frontend-uses-an-authenticated-backend-actor-after-login-no-anonymous-placeholder-actor-for-admin-actions-admin-routes-must-reliably-redirect-unauthenticated-users-to-the-admin-login-page-and-prevent-access-when-authentication-is-missing",
-      "featureTitle": "Restore Internet Identity (II) as the primary authentication method and ensure the frontend uses an authenticated backend actor after login (no anonymous/placeholder actor for admin actions). Admin routes must reliably redirect unauthenticated users to the Admin Login page and prevent access when authentication is missing.",
+      "featureId": "feature-review-and-fix-the-admin-panel-end-to-end-flow-so-it-works-reliably-internet-identity-login-admin-role-check-navigation-to-admin-and-a-clear-non-admin-experience-without-silent-loops-or-no-op-behavior",
+      "featureTitle": "Review and fix the admin panel end-to-end flow so it works reliably: Internet Identity login, admin role check, navigation to `/admin`, and a clear non-admin experience without silent loops or no-op behavior.",
       "files": [
+        "frontend/src/components/admin/AccessDeniedScreen.tsx",
         "frontend/src/pages/AdminDashboard.tsx",
         "frontend/src/pages/AdminLogin.tsx"
-      ],
-      "components": [
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "blob-storage@4.0.0",
-        "authorization@4.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-1"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-restore-the-admin-panel-to-its-previously-functional-state-by-ensuring-all-existing-admin-ui-modules-load-and-operate-correctly-dashboard-tabs-managers-dialogs-without-runtime-errors-and-with-correct-data-fetching-mutations-via-react-query",
-      "featureTitle": "Restore the Admin Panel to its previously functional state by ensuring all existing admin UI modules load and operate correctly (Dashboard, tabs, managers, dialogs) without runtime errors and with correct data fetching/mutations via React Query.",
-      "files": [
-        "frontend/src/hooks/useQueries.ts",
-        "frontend/src/pages/AdminDashboard.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -44,8 +24,8 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-implement-an-admin-permissions-bootstrap-flow-to-set-up-an-admin-principal-for-the-internet-identity-account-associated-with-hernan-zerma-la-com-because-the-backend-only-receives-principals-not-emails-provide-a-safe-way-to-register-the-first-desired-admin-principal-after-that-user-logs-in-with-ii-and-persist-that-principal-in-backend-authorization-state-so-subsequent-sessions-are-recognized-as-admin",
-      "featureTitle": "Implement an admin-permissions bootstrap flow to set up an Admin Principal for the Internet Identity account associated with hernan@zerma-la.com. Because the backend only receives Principals (not emails), provide a safe way to register the first/desired admin Principal after that user logs in with II, and persist that Principal in backend authorization state so subsequent sessions are recognized as admin.",
+      "featureId": "feature-if-the-project-currently-supports-a-bootstrap-admin-action-from-the-admin-login-page-ensure-it-fails-gracefully-with-a-clear-error-message-when-unauthorized-and-ensure-it-is-not-required-for-the-configured-admin-principal-in-req-1-to-access-the-admin-dashboard",
+      "featureTitle": "If the project currently supports a 'bootstrap admin' action from the Admin Login page, ensure it fails gracefully with a clear error message when unauthorized, and ensure it is not required for the configured admin principal in REQ-1 to access the admin dashboard.",
       "files": [
         "frontend/src/hooks/useQueries.ts",
         "frontend/src/pages/AdminLogin.tsx"
@@ -61,49 +41,6 @@
       ],
       "testIds": [
         "REQ-3"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-ensure-product-editing-create-update-delete-and-list-is-fully-operational-end-to-end-and-strictly-restricted-to-admin-role-at-the-backend-boundary-all-product-mutations-must-trap-deny-for-non-admin-callers",
-      "featureTitle": "Ensure Product Editing (create, update, delete, and list) is fully operational end-to-end and strictly restricted to Admin role at the backend boundary (all product mutations must trap/deny for non-admin callers).",
-      "files": [
-        "frontend/src/components/admin/ProductsManager.tsx",
-        "frontend/src/hooks/useQueries.ts"
-      ],
-      "components": [
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "blob-storage@4.0.0",
-        "authorization@4.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-4"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-add-a-diagnostic-verification-workflow-to-validate-stability-of-1-internet-identity-authentication-flow-2-admin-authorization-check-and-3-product-crud-operations-against-the-backend-expose-results-as-a-simple-pass-fail-report-accessible-from-the-admin-panel",
-      "featureTitle": "Add a diagnostic/verification workflow to validate stability of (1) Internet Identity authentication flow, (2) admin authorization check, and (3) product CRUD operations against the backend. Expose results as a simple pass/fail report accessible from the Admin Panel.",
-      "files": [
-        "frontend/src/components/admin/DiagnosticsPanel.tsx",
-        "frontend/src/hooks/useQueries.ts",
-        "frontend/src/pages/AdminDashboard.tsx"
-      ],
-      "components": [
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "blob-storage@4.0.0",
-        "authorization@4.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-5"
       ],
       "confidence": "high"
     }

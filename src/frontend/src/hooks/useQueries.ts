@@ -1,8 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useActor } from './useActor';
-import type { Product, Package, HowToOrderStep, UserProfile, SectionContentView, ContentBlockView, BlockType, InstagramFeedConfig, UserRole } from '../backend';
+import type { Product, Package, HowToOrderStep, UserProfile, SectionContentView, ContentBlockView, BlockType, InstagramFeedConfig } from '../backend';
 import { ExternalBlob } from '../backend';
-import { Principal } from '@dfinity/principal';
 
 // User Profile Queries
 export function useGetCallerUserProfile() {
@@ -40,7 +39,7 @@ export function useSaveCallerUserProfile() {
       try {
         return await actor.saveCallerUserProfile(profile);
       } catch (error: any) {
-        console.error('Error saving user profile:', error);
+        console.error('Error saving profile:', error);
         throw new Error(error?.message || 'Failed to save profile');
       }
     },
@@ -50,16 +49,16 @@ export function useSaveCallerUserProfile() {
   });
 }
 
-// Admin Check
+// Admin Check Query
 export function useIsCallerAdmin() {
   const { actor, isFetching: actorFetching } = useActor();
 
-  return useQuery<boolean>({
-    queryKey: ['isAdmin'],
+  const query = useQuery<boolean>({
+    queryKey: ['isCallerAdmin'],
     queryFn: async () => {
       if (!actor) return false;
       try {
-        return await actor.isCallerAdmin();
+        return await actor.isAdmin();
       } catch (error: any) {
         console.error('Error checking admin status:', error);
         return false;
@@ -67,28 +66,14 @@ export function useIsCallerAdmin() {
     },
     enabled: !!actor && !actorFetching,
     retry: false,
+    staleTime: 30000, // Cache for 30 seconds
   });
-}
 
-// Admin Role Assignment
-export function useAssignCallerUserRole() {
-  const { actor } = useActor();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (data: { user: Principal; role: UserRole }) => {
-      if (!actor) throw new Error('Actor not available');
-      try {
-        return await actor.assignCallerUserRole(data.user, data.role);
-      } catch (error: any) {
-        console.error('Error assigning user role:', error);
-        throw new Error(error?.message || 'Failed to assign role');
-      }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['isAdmin'] });
-    },
-  });
+  return {
+    ...query,
+    isLoading: actorFetching || query.isLoading,
+    isFetched: !!actor && query.isFetched,
+  };
 }
 
 // Products Queries
@@ -115,15 +100,10 @@ export function useAddProduct() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (data: {
-      title: { english: string; spanish: string };
-      description: { english: string; spanish: string };
-      image: ExternalBlob;
-      price: { english: string; spanish: string };
-    }) => {
+    mutationFn: async (product: { title: { english: string; spanish: string }; description: { english: string; spanish: string }; image: ExternalBlob; price: { english: string; spanish: string } }) => {
       if (!actor) throw new Error('Actor not available');
       try {
-        return await actor.addProduct(data.title, data.description, data.image, data.price);
+        return await actor.addProduct(product.title, product.description, product.image, product.price);
       } catch (error: any) {
         console.error('Error adding product:', error);
         throw new Error(error?.message || 'Failed to add product');
@@ -140,16 +120,10 @@ export function useEditProduct() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (data: {
-      id: string;
-      title: { english: string; spanish: string };
-      description: { english: string; spanish: string };
-      image: ExternalBlob;
-      price: { english: string; spanish: string };
-    }) => {
+    mutationFn: async (product: { id: string; title: { english: string; spanish: string }; description: { english: string; spanish: string }; image: ExternalBlob; price: { english: string; spanish: string } }) => {
       if (!actor) throw new Error('Actor not available');
       try {
-        return await actor.editProduct(data.id, data.title, data.description, data.image, data.price);
+        return await actor.editProduct(product.id, product.title, product.description, product.image, product.price);
       } catch (error: any) {
         console.error('Error editing product:', error);
         throw new Error(error?.message || 'Failed to edit product');
@@ -205,15 +179,10 @@ export function useAddPackage() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (data: {
-      name: { english: string; spanish: string };
-      description: { english: string; spanish: string };
-      image: ExternalBlob;
-      price: { english: string; spanish: string };
-    }) => {
+    mutationFn: async (pkg: { name: { english: string; spanish: string }; description: { english: string; spanish: string }; image: ExternalBlob; price: { english: string; spanish: string } }) => {
       if (!actor) throw new Error('Actor not available');
       try {
-        return await actor.addPackage(data.name, data.description, data.image, data.price);
+        return await actor.addPackage(pkg.name, pkg.description, pkg.image, pkg.price);
       } catch (error: any) {
         console.error('Error adding package:', error);
         throw new Error(error?.message || 'Failed to add package');
@@ -230,16 +199,10 @@ export function useEditPackage() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (data: {
-      id: string;
-      name: { english: string; spanish: string };
-      description: { english: string; spanish: string };
-      image: ExternalBlob;
-      price: { english: string; spanish: string };
-    }) => {
+    mutationFn: async (pkg: { id: string; name: { english: string; spanish: string }; description: { english: string; spanish: string }; image: ExternalBlob; price: { english: string; spanish: string } }) => {
       if (!actor) throw new Error('Actor not available');
       try {
-        return await actor.editPackage(data.id, data.name, data.description, data.image, data.price);
+        return await actor.editPackage(pkg.id, pkg.name, pkg.description, pkg.image, pkg.price);
       } catch (error: any) {
         console.error('Error editing package:', error);
         throw new Error(error?.message || 'Failed to edit package');
@@ -271,7 +234,7 @@ export function useDeletePackage() {
   });
 }
 
-// How To Order Steps Queries
+// How To Order Queries
 export function useGetAllHowToOrderSteps() {
   const { actor, isFetching } = useActor();
 
@@ -295,15 +258,10 @@ export function useAddHowToOrderStep() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (data: {
-      stepNumber: bigint;
-      title: { english: string; spanish: string };
-      description: { english: string; spanish: string };
-      image: ExternalBlob | null;
-    }) => {
+    mutationFn: async (step: { stepNumber: bigint; title: { english: string; spanish: string }; description: { english: string; spanish: string }; image: ExternalBlob | null }) => {
       if (!actor) throw new Error('Actor not available');
       try {
-        return await actor.addHowToOrderStep(data.stepNumber, data.title, data.description, data.image);
+        return await actor.addHowToOrderStep(step.stepNumber, step.title, step.description, step.image);
       } catch (error: any) {
         console.error('Error adding how-to-order step:', error);
         throw new Error(error?.message || 'Failed to add step');
@@ -320,15 +278,10 @@ export function useEditHowToOrderStep() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (data: {
-      stepNumber: bigint;
-      title: { english: string; spanish: string };
-      description: { english: string; spanish: string };
-      image: ExternalBlob | null;
-    }) => {
+    mutationFn: async (step: { stepNumber: bigint; title: { english: string; spanish: string }; description: { english: string; spanish: string }; image: ExternalBlob | null }) => {
       if (!actor) throw new Error('Actor not available');
       try {
-        return await actor.editHowToOrderStep(data.stepNumber, data.title, data.description, data.image);
+        return await actor.editHowToOrderStep(step.stepNumber, step.title, step.description, step.image);
       } catch (error: any) {
         console.error('Error editing how-to-order step:', error);
         throw new Error(error?.message || 'Failed to edit step');
@@ -340,12 +293,12 @@ export function useEditHowToOrderStep() {
   });
 }
 
-// Public Sections Query (for DynamicSections component)
+// Sections Queries
 export function useGetAllAdditionalSections() {
   const { actor, isFetching } = useActor();
 
   return useQuery<SectionContentView[]>({
-    queryKey: ['sections'],
+    queryKey: ['additionalSections'],
     queryFn: async () => {
       if (!actor) return [];
       try {
@@ -359,7 +312,6 @@ export function useGetAllAdditionalSections() {
   });
 }
 
-// Admin Sections Queries
 export function useGetAllSectionsAdmin() {
   const { actor, isFetching } = useActor();
 
@@ -370,7 +322,7 @@ export function useGetAllSectionsAdmin() {
       try {
         return await actor.getAllSectionsAdmin();
       } catch (error: any) {
-        console.error('Error fetching sections:', error);
+        console.error('Error fetching admin sections:', error);
         throw error;
       }
     },
@@ -383,32 +335,18 @@ export function useCreateAdditionalSection() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (data: {
-      title: { english: string; spanish: string };
-      description: { english: string; spanish: string };
-      image: ExternalBlob | null;
-      background: ExternalBlob | null;
-      order: bigint;
-      isVisible: boolean;
-    }) => {
+    mutationFn: async (section: { title: { english: string; spanish: string }; description: { english: string; spanish: string }; image: ExternalBlob | null; background: ExternalBlob | null; order: bigint; isVisible: boolean }) => {
       if (!actor) throw new Error('Actor not available');
       try {
-        return await actor.createAdditionalSection(
-          data.title,
-          data.description,
-          data.image,
-          data.background,
-          data.order,
-          data.isVisible
-        );
+        return await actor.createAdditionalSection(section.title, section.description, section.image, section.background, section.order, section.isVisible);
       } catch (error: any) {
         console.error('Error creating section:', error);
         throw new Error(error?.message || 'Failed to create section');
       }
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['additionalSections'] });
       queryClient.invalidateQueries({ queryKey: ['sectionsAdmin'] });
-      queryClient.invalidateQueries({ queryKey: ['sections'] });
     },
   });
 }
@@ -418,34 +356,18 @@ export function useUpdateAdditionalSection() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (data: {
-      id: string;
-      title: { english: string; spanish: string };
-      description: { english: string; spanish: string };
-      image: ExternalBlob | null;
-      background: ExternalBlob | null;
-      order: bigint;
-      isVisible: boolean;
-    }) => {
+    mutationFn: async (section: { id: string; title: { english: string; spanish: string }; description: { english: string; spanish: string }; image: ExternalBlob | null; background: ExternalBlob | null; order: bigint; isVisible: boolean }) => {
       if (!actor) throw new Error('Actor not available');
       try {
-        return await actor.updateAdditionalSection(
-          data.id,
-          data.title,
-          data.description,
-          data.image,
-          data.background,
-          data.order,
-          data.isVisible
-        );
+        return await actor.updateAdditionalSection(section.id, section.title, section.description, section.image, section.background, section.order, section.isVisible);
       } catch (error: any) {
         console.error('Error updating section:', error);
         throw new Error(error?.message || 'Failed to update section');
       }
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['additionalSections'] });
       queryClient.invalidateQueries({ queryKey: ['sectionsAdmin'] });
-      queryClient.invalidateQueries({ queryKey: ['sections'] });
     },
   });
 }
@@ -465,46 +387,46 @@ export function useDeleteAdditionalSection() {
       }
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['additionalSections'] });
       queryClient.invalidateQueries({ queryKey: ['sectionsAdmin'] });
-      queryClient.invalidateQueries({ queryKey: ['sections'] });
     },
   });
 }
 
 // Content Blocks Queries
+export function useGetAllContentBlocksAdmin() {
+  const { actor, isFetching } = useActor();
+
+  return useMutation({
+    mutationFn: async (sectionId: string) => {
+      if (!actor) throw new Error('Actor not available');
+      try {
+        return await actor.getAllContentBlocksAdmin(sectionId);
+      } catch (error: any) {
+        console.error('Error fetching content blocks:', error);
+        throw new Error(error?.message || 'Failed to fetch content blocks');
+      }
+    },
+  });
+}
+
 export function useAddContentBlock() {
   const { actor } = useActor();
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (data: {
-      sectionId: string;
-      title: { english: string; spanish: string };
-      content: { english: string; spanish: string };
-      image: ExternalBlob | null;
-      blockType: BlockType;
-      order: bigint;
-      isVisible: boolean;
-    }) => {
+    mutationFn: async (block: { sectionId: string; title: { english: string; spanish: string }; content: { english: string; spanish: string }; image: ExternalBlob | null; blockType: BlockType; order: bigint; isVisible: boolean }) => {
       if (!actor) throw new Error('Actor not available');
       try {
-        return await actor.addContentBlock(
-          data.sectionId,
-          data.title,
-          data.content,
-          data.image,
-          data.blockType,
-          data.order,
-          data.isVisible
-        );
+        return await actor.addContentBlock(block.sectionId, block.title, block.content, block.image, block.blockType, block.order, block.isVisible);
       } catch (error: any) {
         console.error('Error adding content block:', error);
         throw new Error(error?.message || 'Failed to add content block');
       }
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['additionalSections'] });
       queryClient.invalidateQueries({ queryKey: ['sectionsAdmin'] });
-      queryClient.invalidateQueries({ queryKey: ['sections'] });
     },
   });
 }
@@ -533,24 +455,10 @@ export function useUpdateInstagramFeedConfig() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (data: {
-      instagramHandle: string;
-      instagramEmbedCode: string;
-      title: { english: string; spanish: string };
-      description: { english: string; spanish: string };
-      displayOrder: bigint;
-      isVisible: boolean;
-    }) => {
+    mutationFn: async (config: { instagramHandle: string; instagramEmbedCode: string; title: { english: string; spanish: string }; description: { english: string; spanish: string }; displayOrder: bigint; isVisible: boolean }) => {
       if (!actor) throw new Error('Actor not available');
       try {
-        return await actor.updateInstagramFeedConfig(
-          data.instagramHandle,
-          data.instagramEmbedCode,
-          data.title,
-          data.description,
-          data.displayOrder,
-          data.isVisible
-        );
+        return await actor.updateInstagramFeedConfig(config.instagramHandle, config.instagramEmbedCode, config.title, config.description, config.displayOrder, config.isVisible);
       } catch (error: any) {
         console.error('Error updating Instagram feed config:', error);
         throw new Error(error?.message || 'Failed to update Instagram feed config');

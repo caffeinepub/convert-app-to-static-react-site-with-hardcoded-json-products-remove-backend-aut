@@ -177,6 +177,7 @@ export const idlService = IDL.Service({
     ),
   'adminDeleteContentBlock' : IDL.Func([IDL.Text, IDL.Nat], [], ['query']),
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
+  'bootstrapAdmin' : IDL.Func([], [], []),
   'createAdditionalSection' : IDL.Func(
       [
         TextContent,
@@ -254,6 +255,7 @@ export const idlService = IDL.Service({
       [IDL.Vec(ContentBlockView)],
       ['query'],
     ),
+  'isAdmin' : IDL.Func([], [IDL.Bool], ['query']),
   'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
   'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
   'updateAdditionalSection' : IDL.Func(
@@ -445,6 +447,7 @@ export const idlFactory = ({ IDL }) => {
       ),
     'adminDeleteContentBlock' : IDL.Func([IDL.Text, IDL.Nat], [], ['query']),
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
+    'bootstrapAdmin' : IDL.Func([], [], []),
     'createAdditionalSection' : IDL.Func(
         [
           TextContent,
@@ -526,6 +529,7 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Vec(ContentBlockView)],
         ['query'],
       ),
+    'isAdmin' : IDL.Func([], [IDL.Bool], ['query']),
     'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
     'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
     'updateAdditionalSection' : IDL.Func(

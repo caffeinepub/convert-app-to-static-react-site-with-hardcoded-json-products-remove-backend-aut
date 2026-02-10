@@ -153,6 +153,7 @@ export interface _SERVICE {
   >,
   'adminDeleteContentBlock' : ActorMethod<[string, bigint], undefined>,
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
+  'bootstrapAdmin' : ActorMethod<[], undefined>,
   'createAdditionalSection' : ActorMethod<
     [
       TextContent,
@@ -200,6 +201,7 @@ export interface _SERVICE {
     [string],
     Array<ContentBlockView>
   >,
+  'isAdmin' : ActorMethod<[], boolean>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
   'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
   'updateAdditionalSection' : ActorMethod<

@@ -2,6 +2,7 @@ import AccessControl "authorization/access-control";
 import Iter "mo:core/Iter";
 import List "mo:core/List";
 import Map "mo:core/Map";
+import Nat "mo:core/Nat";
 import Principal "mo:core/Principal";
 import Runtime "mo:core/Runtime";
 import Storage "blob-storage/Storage";
@@ -10,13 +11,14 @@ import VarArray "mo:core/VarArray";
 import MixinAuthorization "authorization/MixinAuthorization";
 import MixinStorage "blob-storage/Mixin";
 
-
-
+// NO Migration here, as principal cannot be serialized in migration files unfortunately
 actor {
   include MixinStorage();
 
+  // Admins in development and creator for deployment
+  // TODO: During Deployment, let creators append their IP address
+  let hardcodedAdmins = List.fromArray([Principal.fromText("ix7jl-xlknv-uwyet-3fsxh-x7nqh-zkhvg-keqsk-zs4hv-ihh5p-uytti-6ae")]);
   let accessControlState = AccessControl.initState();
-
   include MixinAuthorization(accessControlState);
 
   type Language = {
@@ -660,4 +662,27 @@ actor {
   public query func getInstagramFeedConfig() : async ?InstagramFeedConfig {
     instagramFeed;
   };
+
+  // Internal helpers to check hardcoded admins
+  func isHardcodedAdmin(principal : Principal) : Bool {
+    hardcodedAdmins.find(func(admin) { admin == principal }) != null;
+  };
+
+  public query ({ caller }) func isAdmin() : async Bool {
+    if (isHardcodedAdmin(caller)) { return true };
+    if (caller == Principal.fromText("2vxsx-fae")) { return false };
+    AccessControl.isAdmin(accessControlState, caller);
+  };
+
+  public shared ({ caller }) func bootstrapAdmin() : async () {
+    switch (isHardcodedAdmin(caller)) {
+      case (true) {
+        Runtime.trap("Bootstrap already exists - admin extension is not needed");
+      };
+      case (false) {
+        Runtime.trap("Unauthorized - you are not authorized to bootstrap as admin");
+      };
+    };
+  };
 };
+

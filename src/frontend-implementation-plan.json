@@ -1,160 +1,56 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Frontend restoration: Internet Identity auth, admin gating, admin bootstrap, product CRUD, and diagnostics",
+  "title": "Repair admin panel flow (II login, role check, /admin access) and improve bootstrap admin UX",
   "requirements": [
     {
-      "id": "REQ-1",
-      "summary": "Restore II login flow and ensure admin pages/actions always run with an authenticated backend actor, with reliable redirects/guards and clean logout cache/session clearing.",
+      "id": "REQ-2",
+      "summary": "Fix the admin panel end-to-end flow so admins reliably reach /admin and non-admins see a clear access denied experience without loops or blank screens.",
       "acceptanceCriteria": [
-        "Visiting /admin while logged out redirects to /admin/login.",
-        "Clicking “Login with Internet Identity” successfully authenticates and returns the user to /admin for authorized accounts.",
-        "After login, backend calls used by the admin panel (e.g., isCallerAdmin, product CRUD) are executed with the logged-in identity (no anonymous identity).",
-        "Logging out clears the II session and React Query cache and returns the user to the public site."
+        "After logging in with Internet Identity as an admin, the app navigates to `/admin` and renders the Admin Dashboard (no blank screen).",
+        "If a logged-in user is not an admin, `/admin` and `/admin/login` show a clear message indicating access is denied (and do not get stuck in a redirect loop).",
+        "The Admin Diagnostics panel can be executed by an admin without errors and completes product CRUD validation successfully (create/read/update/delete of the temporary test product)."
       ],
       "file_operations": [
         {
           "path": "frontend/src/hooks/useActor.ts",
           "operation": "modify",
-          "description": "Harden actor creation so admin flows never rely on an anonymous/placeholder actor: expose explicit authenticated-actor state (e.g., return null/disabled for admin-only calls until identity is present), and guard any access-control initialization calls so missing backend functions cannot cause runtime errors. Use the selected authorization component patterns for authenticated actor usage; verify the component's usage instructions before implementing."
+          "description": "Harden actor initialization so admin-panel queries don't fail due to secret-based access-control initialization (e.g., wrap the access-control initialization call in safe error handling, and ensure the actor is still returned for authenticated sessions). This improves reliability for admin checks and admin diagnostics."
+        },
+        {
+          "path": "frontend/src/components/admin/AccessDeniedScreen.tsx",
+          "operation": "create",
+          "description": "Create a reusable admin access denial UI (clear English messaging + primary/secondary actions) for use on /admin and /admin/login. Use shadcn-ui components (Card/Alert/Button) to keep styling consistent. Verify the component's usage instructions before implementing."
         },
         {
           "path": "frontend/src/pages/AdminDashboard.tsx",
           "operation": "modify",
-          "description": "Make the /admin guard fully deterministic: redirect unauthenticated users to /admin/login immediately, avoid rendering/admin-query execution until authenticated actor + admin check are ready, and ensure Logout clears II session + React Query cache and navigates to /. Use shadcn-ui components already in use for consistent UI; verify the component's usage instructions before implementing."
+          "description": "Remove blank-screen behavior when not authenticated or not admin. Replace redirect-only behavior with explicit UI states: (1) not authenticated -> render a clear sign-in required message with a button to `/admin/login`; (2) authenticated but not admin -> render AccessDeniedScreen without redirect loops; (3) authenticated admin -> render dashboard as before. Use the new AccessDeniedScreen (shadcn-ui composition). Verify the component's usage instructions before implementing."
         },
         {
           "path": "frontend/src/pages/AdminLogin.tsx",
           "operation": "modify",
-          "description": "Ensure login flow uses Internet Identity as primary auth and post-login navigation returns to /admin when authorized; keep user-facing text in English. Use the selected authorization component guidance for login/logout behaviors (including cache clearing expectations); verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/App.tsx",
-          "operation": "modify",
-          "description": "Wire additional admin-route protection at the routing/layout level (so navigation to /admin while logged out reliably lands on /admin/login), without adding new top-level routes beyond what is required. Use core-infrastructure routing setup as the integration point; verify the component's usage instructions before implementing."
-        }
-      ]
-    },
-    {
-      "id": "REQ-2",
-      "summary": "Restore Admin Panel stability so all existing tabs/managers/dialogs load without runtime errors and React Query data flows work correctly across modules.",
-      "acceptanceCriteria": [
-        "Admin Dashboard loads successfully for an authorized admin without blank screen or uncaught exceptions.",
-        "All existing admin tabs render their manager components (Products, Packages, How to Order, Instagram, Sections, Content Blocks).",
-        "Each manager can fetch its data and perform its save/update/delete operations (subject to authorization) and refreshes UI state after mutations.",
-        "User-facing admin messages remain in English (e.g., errors/toasts, labels, buttons)."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/hooks/useQueries.ts",
-          "operation": "modify",
-          "description": "Audit and stabilize React Query hooks used by the Admin Panel: ensure queries/mutations are gated on authenticated actor readiness where appropriate, keep query keys consistent, and make authorization failures from the backend surface as readable English errors to the UI. Align with selected authorization component guidance on authenticated access and cache invalidation; verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/pages/AdminDashboard.tsx",
-          "operation": "modify",
-          "description": "Ensure all required admin tabs render correctly and never crash on missing data/actor; keep manager mounting consistent with auth/admin checks so dialogs/managers do not run prematurely. Use shadcn-ui Tabs/Dialog/Card patterns already present; verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/components/admin/PackagesManager.tsx",
-          "operation": "modify",
-          "description": "Fix any runtime errors and ensure package fetch/mutations refresh state via React Query invalidations; keep all user-facing strings in English. Use shadcn-ui for dialogs/forms already used; verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/components/admin/HowToOrderManager.tsx",
-          "operation": "modify",
-          "description": "Fix any runtime errors and ensure how-to-order fetch/mutations refresh state via React Query invalidations; keep all user-facing strings in English. Use shadcn-ui for dialogs/forms already used; verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/components/admin/InstagramFeedManager.tsx",
-          "operation": "modify",
-          "description": "Fix any runtime errors and ensure instagram config fetch/mutations refresh state via React Query invalidations; keep all user-facing strings in English. Use shadcn-ui for dialogs/forms already used; verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/components/admin/SectionsManager.tsx",
-          "operation": "modify",
-          "description": "Fix any runtime errors and ensure sections fetch/mutations refresh state via React Query invalidations; keep all user-facing strings in English. Use shadcn-ui for dialogs/forms already used; verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/components/admin/ContentBlocksManager.tsx",
-          "operation": "modify",
-          "description": "Fix any runtime errors and ensure content-block operations refresh relevant section data; keep all user-facing strings in English. Use shadcn-ui for dialogs/forms already used; verify the component's usage instructions before implementing."
+          "description": "Ensure /admin/login provides a clear, stable UX: after successful II login and admin recognition, navigate to `/admin`; for authenticated non-admins, render an explicit AccessDeniedScreen message instead of silent/no-op states. Keep navigation stable to avoid loops. Use AccessDeniedScreen (shadcn-ui composition). Verify the component's usage instructions before implementing."
         }
       ]
     },
     {
       "id": "REQ-3",
-      "summary": "Add an in-app, safe admin-permissions bootstrap UI to bind the logged-in II Principal (known by the user to be hernan@zerma-la.com) as admin, without allowing self-escalation by non-admins.",
+      "summary": "Ensure any admin bootstrap action from Admin Login fails gracefully with clear messaging when unauthorized and is not required for the configured admin principal to access /admin.",
       "acceptanceCriteria": [
-        "There is a clear, in-app way to bind the logged-in Principal (from the II session that the user knows is hernan@zerma-la.com) as an admin Principal (e.g., “Make this Principal Admin” gated by an explicit bootstrap rule).",
-        "After admin bootstrap, isCallerAdmin returns true for that Principal across page reloads and future logins.",
-        "Non-admin Principals cannot grant themselves admin privileges.",
-        "Admin authorization state persists across canister upgrades according to the project’s existing authorization/mixin storage approach."
+        "When the bootstrap action is unauthorized, the UI shows an actionable error message (no silent failure) and remains on the same page.",
+        "For principal `ix7jl-xlknv-uwyet-3fsxh-x7nqh-zkhvg-keqsk-zs4hv-ihh5p-uytti-6ae`, the bootstrap option is not needed to access `/admin` (admin is recognized via backend role configuration)."
       ],
       "file_operations": [
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Add a dedicated React Query mutation hook for the backend bootstrap admin capability (calling the existing backend method exposed in the typed interface). Ensure errors are surfaced as meaningful Error messages for UI display, and invalidate the cached admin-check query on success so the UI updates immediately."
+        },
         {
           "path": "frontend/src/pages/AdminLogin.tsx",
           "operation": "modify",
-          "description": "Add a Bootstrap Admin panel shown only when the user is authenticated but not an admin, providing a clearly labeled, English-only workflow to register the currently logged-in Principal as admin under an explicit bootstrap rule (e.g., requiring a one-time bootstrap secret/token or other existing project-approved gate). Use the selected authorization component guidance for safe role assignment UX; verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/hooks/useQueries.ts",
-          "operation": "modify",
-          "description": "Add a dedicated React Query mutation/hook for the admin bootstrap action that calls the backend capability used to register/assign the logged-in Principal as admin (under the bootstrap rule), with clear error propagation to the UI. Use the selected authorization component patterns for role assignment and error handling; verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/backend.d.ts",
-          "operation": "modify",
-          "description": "Update the frontend backend type definitions to include any already-existing bootstrap/initialization backend capability used by the app (so admin bootstrap calls are type-safe and do not cause runtime mismatches). Use the selected authorization component expectations around initialization if applicable; verify the component's usage instructions before implementing."
-        }
-      ]
-    },
-    {
-      "id": "REQ-4",
-      "summary": "Ensure admin product list/create/update/delete (including image upload/retain) is reliable in the UI and surfaces backend authorization errors cleanly.",
-      "acceptanceCriteria": [
-        "Admin can create a product with bilingual title/description, price, and image upload; the new product appears in the admin list and public product display where applicable.",
-        "Admin can edit an existing product (including optionally keeping existing image) and see updates reflected after save.",
-        "Admin can delete a product and it is removed from subsequent fetches.",
-        "Non-admin users attempting add/edit/delete receive an authorization error from the backend and no mutation occurs."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/components/admin/ProductsManager.tsx",
-          "operation": "modify",
-          "description": "Harden the Products manager end-to-end: ensure create/edit/delete always uses the authenticated actor, keep 'retain existing image' behavior when no new file is selected, show upload progress, and display backend authorization failures as clear English toasts without mutating UI state. Use the selected blob-storage component (ExternalBlob) for image upload and direct URL display; verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/hooks/useQueries.ts",
-          "operation": "modify",
-          "description": "Ensure product queries/mutations are correctly gated (actor readiness), invalidate/refetch the right keys after mutations, and propagate backend authorization errors to the UI layer. Use the selected authorization component patterns for handling trap/deny errors gracefully; verify the component's usage instructions before implementing."
-        }
-      ]
-    },
-    {
-      "id": "REQ-5",
-      "summary": "Add an Admin Panel Diagnostics section that runs auth/admin/product checks and a safe CRUD validation cycle with a clear pass/fail report.",
-      "acceptanceCriteria": [
-        "Admin UI includes a “Diagnostics” section that runs checks and displays clear results in English.",
-        "Diagnostics verifies: current authentication state (logged-in Principal present), isCallerAdmin result, and successful product list fetch.",
-        "Diagnostics can perform a safe CRUD validation cycle (e.g., create a temporary test product, verify it exists, update it, verify update, delete it, verify removal) without leaving orphaned test data.",
-        "If any step fails, the UI reports which step failed and includes the error message returned by the backend."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/components/admin/DiagnosticsPanel.tsx",
-          "operation": "create",
-          "description": "Create a Diagnostics panel for the Admin Dashboard that runs (1) auth state check (principal present), (2) isCallerAdmin check, (3) product list fetch, and (4) a safe product CRUD cycle using a clearly marked temporary product and guaranteed cleanup, presenting a step-by-step English pass/fail report with backend error messages. Use shadcn-ui components (Card/Button/Alert/etc.) for the report UI; verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/pages/AdminDashboard.tsx",
-          "operation": "modify",
-          "description": "Wire the new Diagnostics section into the existing Admin Dashboard Tabs (no new top-level route): add a Diagnostics tab/trigger and render DiagnosticsPanel. Use shadcn-ui Tabs integration already present; verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/hooks/useQueries.ts",
-          "operation": "modify",
-          "description": "Add any helper hooks/mutations needed by Diagnostics (e.g., create/update/delete test product and refetch checks), ensuring they run only for authenticated admins and expose detailed errors for the diagnostics report. Use the selected authorization component patterns for authenticated access and error handling; verify the component's usage instructions before implementing."
+          "description": "Update the bootstrap-admin UI flow to use the dedicated bootstrap mutation hook. When unauthorized or failing, show a clear, actionable English error message inline (in-page) and do not navigate away. Also ensure the bootstrap option is not presented/needed once the backend recognizes the user as admin (i.e., when isAdmin becomes true, the page should route to `/admin`). Use shadcn-ui Alert components for inline error display. Verify the component's usage instructions before implementing."
         }
       ]
     }
