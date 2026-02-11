@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { useInternetIdentity } from '../../hooks/useInternetIdentity';
-import { useIsCallerAdmin, useGetAllProducts, useAddProduct, useEditProduct, useDeleteProduct } from '../../hooks/useQueries';
+import { useAdminSession } from '../../hooks/useAdminSession';
+import { useGetAllProducts, useAddProduct, useEditProduct, useDeleteProduct } from '../../hooks/useQueries';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -16,8 +16,7 @@ interface DiagnosticResult {
 }
 
 export default function DiagnosticsPanel() {
-  const { identity } = useInternetIdentity();
-  const { data: isAdmin, refetch: refetchAdmin } = useIsCallerAdmin();
+  const { isAuthenticated, sessionId } = useAdminSession();
   const { data: products, refetch: refetchProducts } = useGetAllProducts();
   const addProduct = useAddProduct();
   const editProduct = useEditProduct();
@@ -45,29 +44,15 @@ export default function DiagnosticsPanel() {
       updateResult('auth', 'running', 'Checking authentication state...', '');
       await new Promise((resolve) => setTimeout(resolve, 500));
 
-      if (!identity) {
-        updateResult('auth', 'error', 'Not authenticated', 'No Internet Identity session found');
+      if (!isAuthenticated || !sessionId) {
+        updateResult('auth', 'error', 'Not authenticated', 'No active admin session found');
         setIsRunning(false);
         return;
       }
 
-      const principalId = identity.getPrincipal().toString();
-      updateResult('auth', 'success', 'Authenticated', `Principal: ${principalId.substring(0, 20)}...`);
+      updateResult('auth', 'success', 'Authenticated', `Session ID: ${sessionId.substring(0, 20)}...`);
 
-      // Step 2: Check Admin Status
-      updateResult('admin', 'running', 'Checking admin privileges...', '');
-      await new Promise((resolve) => setTimeout(resolve, 500));
-
-      const adminResult = await refetchAdmin();
-      if (adminResult.data === true) {
-        updateResult('admin', 'success', 'Admin privileges confirmed', 'User has admin role');
-      } else {
-        updateResult('admin', 'error', 'No admin privileges', 'User does not have admin role');
-        setIsRunning(false);
-        return;
-      }
-
-      // Step 3: Fetch Products
+      // Step 2: Fetch Products
       updateResult('fetch', 'running', 'Fetching products list...', '');
       await new Promise((resolve) => setTimeout(resolve, 500));
 
@@ -85,7 +70,7 @@ export default function DiagnosticsPanel() {
         return;
       }
 
-      // Step 4: CRUD Validation - Create
+      // Step 3: CRUD Validation - Create
       updateResult('create', 'running', 'Creating test product...', '');
       await new Promise((resolve) => setTimeout(resolve, 500));
 
@@ -117,7 +102,7 @@ export default function DiagnosticsPanel() {
         return;
       }
 
-      // Step 5: CRUD Validation - Read (verify creation)
+      // Step 4: CRUD Validation - Read (verify creation)
       updateResult('read', 'running', 'Verifying test product exists...', '');
       await new Promise((resolve) => setTimeout(resolve, 500));
 
@@ -129,7 +114,7 @@ export default function DiagnosticsPanel() {
         updateResult('read', 'error', 'Test product not found', 'Product was not in the fetched list');
       }
 
-      // Step 6: CRUD Validation - Update
+      // Step 5: CRUD Validation - Update
       if (testProductId && createdProduct) {
         updateResult('update', 'running', 'Updating test product...', '');
         await new Promise((resolve) => setTimeout(resolve, 500));
@@ -158,7 +143,7 @@ export default function DiagnosticsPanel() {
         }
       }
 
-      // Step 7: CRUD Validation - Delete
+      // Step 6: CRUD Validation - Delete
       if (testProductId) {
         updateResult('delete', 'running', 'Deleting test product...', '');
         await new Promise((resolve) => setTimeout(resolve, 500));

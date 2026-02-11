@@ -11,15 +11,21 @@ import VarArray "mo:core/VarArray";
 import MixinAuthorization "authorization/MixinAuthorization";
 import MixinStorage "blob-storage/Mixin";
 
-// NO Migration here, as principal cannot be serialized in migration files unfortunately
 actor {
   include MixinStorage();
 
-  // Admins in development and creator for deployment
-  // TODO: During Deployment, let creators append their IP address
   let hardcodedAdmins = List.fromArray([Principal.fromText("ix7jl-xlknv-uwyet-3fsxh-x7nqh-zkhvg-keqsk-zs4hv-ihh5p-uytti-6ae")]);
   let accessControlState = AccessControl.initState();
   include MixinAuthorization(accessControlState);
+
+  let hardcodedAdminUsername = "Administrator";
+  let hardcodedAdminPassword = "AdminAAboxes26";
+
+  let adminUsers = Map.empty<Text, AdminUser>();
+  let activeAdminSessions = Map.empty<Text, AdminUserSession>();
+
+  // Session timeout: 24 hours in nanoseconds
+  let sessionTimeout : Time.Time = 24 * 60 * 60 * 1_000_000_000;
 
   type Language = {
     #english;
@@ -35,6 +41,23 @@ actor {
   public type TextContent = {
     english : Text;
     spanish : Text;
+  };
+
+  public type AdminUser = {
+    username : Text;
+    fullName : Text;
+    password : Text;
+    isActive : Bool;
+    createdAt : Time.Time;
+    createdBy : Text;
+  };
+
+  public type AdminUserSession = {
+    username : Text;
+    fullName : Text;
+    loginTime : Time.Time;
+    lastActive : Time.Time;
+    sessionId : Text;
   };
 
   public type ContentBlock = {
@@ -257,10 +280,34 @@ actor {
     userProfiles.add(caller, profile);
   };
 
-  public shared ({ caller }) func createAdditionalSection(title : TextContent, description : TextContent, image : ?Storage.ExternalBlob, background : ?Storage.ExternalBlob, order : Nat, isVisible : Bool) : async Text {
-    if (not AccessControl.isAdmin(accessControlState, caller)) {
-      Runtime.trap("Unauthorized: Only admins can create sections");
+  // Session validation helper
+  func validateAdminSession(sessionId : Text) : AdminUserSession {
+    switch (activeAdminSessions.get(sessionId)) {
+      case (?session) {
+        let now = Time.now();
+        let timeSinceLastActive = now - session.lastActive;
+        
+        if (timeSinceLastActive > sessionTimeout) {
+          activeAdminSessions.remove(sessionId);
+          Runtime.trap("Session expired. Please login again.");
+        };
+        
+        // Update last active time
+        let updatedSession = {
+          session with lastActive = now;
+        };
+        activeAdminSessions.add(sessionId, updatedSession);
+        
+        updatedSession;
+      };
+      case (null) {
+        Runtime.trap("Invalid session. Please login.");
+      };
     };
+  };
+
+  public shared ({ caller }) func createAdditionalSection(sessionId : Text, title : TextContent, description : TextContent, image : ?Storage.ExternalBlob, background : ?Storage.ExternalBlob, order : Nat, isVisible : Bool) : async Text {
+    let _ = validateAdminSession(sessionId);
 
     let emptyContentBlocks : [ContentBlock] = [];
     let newId = nextSectionId.toText();
@@ -281,10 +328,8 @@ actor {
     newId;
   };
 
-  public shared ({ caller }) func updateAdditionalSection(id : Text, title : TextContent, description : TextContent, image : ?Storage.ExternalBlob, background : ?Storage.ExternalBlob, order : Nat, isVisible : Bool) : async () {
-    if (not AccessControl.isAdmin(accessControlState, caller)) {
-      Runtime.trap("Unauthorized: Only admins can update sections");
-    };
+  public shared ({ caller }) func updateAdditionalSection(sessionId : Text, id : Text, title : TextContent, description : TextContent, image : ?Storage.ExternalBlob, background : ?Storage.ExternalBlob, order : Nat, isVisible : Bool) : async () {
+    let _ = validateAdminSession(sessionId);
 
     switch (additionalSections.get(id)) {
       case (?existingSection) {
@@ -304,10 +349,8 @@ actor {
     };
   };
 
-  public shared ({ caller }) func deleteAdditionalSection(id : Text) : async () {
-    if (not AccessControl.isAdmin(accessControlState, caller)) {
-      Runtime.trap("Unauthorized: Only admins can delete sections");
-    };
+  public shared ({ caller }) func deleteAdditionalSection(sessionId : Text, id : Text) : async () {
+    let _ = validateAdminSession(sessionId);
 
     switch (additionalSections.get(id)) {
       case (?_) {
@@ -317,10 +360,8 @@ actor {
     };
   };
 
-  public query ({ caller }) func adminDeleteContentBlock(sectionId : Text, blockId : Nat) : async () {
-    if (not AccessControl.isAdmin(accessControlState, caller)) {
-      Runtime.trap("Unauthorized: Only admins can delete content blocks");
-    };
+  public shared ({ caller }) func adminDeleteContentBlock(sessionId : Text, sectionId : Text, blockId : Nat) : async () {
+    let _ = validateAdminSession(sessionId);
 
     switch (additionalSections.get(sectionId)) {
       case (?section) {
@@ -344,10 +385,8 @@ actor {
     ).toArray();
   };
 
-  public query ({ caller }) func getAllSectionsAdmin() : async [SectionContentView] {
-    if (not AccessControl.isAdmin(accessControlState, caller)) {
-      Runtime.trap("Unauthorized: Only admins can view all sections");
-    };
+  public query ({ caller }) func getAllSectionsAdmin(sessionId : Text) : async [SectionContentView] {
+    let _ = validateAdminSession(sessionId);
     additionalSections.values().map<SectionContent, SectionContentView>(
       func(section) {
         {
@@ -358,10 +397,8 @@ actor {
     ).toArray();
   };
 
-  public shared ({ caller }) func addContentBlock(sectionId : Text, title : TextContent, content : TextContent, image : ?Storage.ExternalBlob, blockType : BlockType, order : Nat, isVisible : Bool) : async ContentBlock {
-    if (not AccessControl.isAdmin(accessControlState, caller)) {
-      Runtime.trap("Unauthorized: Only admins can add content blocks");
-    };
+  public shared ({ caller }) func addContentBlock(sessionId : Text, sectionId : Text, title : TextContent, content : TextContent, image : ?Storage.ExternalBlob, blockType : BlockType, order : Nat, isVisible : Bool) : async ContentBlock {
+    let _ = validateAdminSession(sessionId);
 
     switch (additionalSections.get(sectionId)) {
       case (?section) {
@@ -396,10 +433,8 @@ actor {
     block;
   };
 
-  public query ({ caller }) func getVisibleContentBlockAdmin(sectionId : Text) : async [ContentBlockView] {
-    if (not AccessControl.isAdmin(accessControlState, caller)) {
-      Runtime.trap("Unauthorized: Only admins can view content blocks");
-    };
+  public query ({ caller }) func getVisibleContentBlockAdmin(sessionId : Text, sectionId : Text) : async [ContentBlockView] {
+    let _ = validateAdminSession(sessionId);
 
     switch (additionalSections.get(sectionId)) {
       case (?section) {
@@ -411,10 +446,8 @@ actor {
     };
   };
 
-  public query ({ caller }) func getAllContentBlocksAdmin(sectionId : Text) : async [ContentBlockView] {
-    if (not AccessControl.isAdmin(accessControlState, caller)) {
-      Runtime.trap("Unauthorized: Only admins can view all content blocks");
-    };
+  public query ({ caller }) func getAllContentBlocksAdmin(sessionId : Text, sectionId : Text) : async [ContentBlockView] {
+    let _ = validateAdminSession(sessionId);
 
     switch (additionalSections.get(sectionId)) {
       case (?section) {
@@ -439,10 +472,8 @@ actor {
     products.values().toArray();
   };
 
-  public shared ({ caller }) func addProduct(title : TextContent, description : TextContent, image : Storage.ExternalBlob, price : TextContent) : async Product {
-    if (not AccessControl.isAdmin(accessControlState, caller)) {
-      Runtime.trap("Unauthorized: Only admins can add products");
-    };
+  public shared ({ caller }) func addProduct(sessionId : Text, title : TextContent, description : TextContent, image : Storage.ExternalBlob, price : TextContent) : async Product {
+    let _ = validateAdminSession(sessionId);
 
     let newId = nextProductId.toText();
     let newProduct : Product = {
@@ -457,10 +488,8 @@ actor {
     newProduct;
   };
 
-  public shared ({ caller }) func editProduct(id : Text, title : TextContent, description : TextContent, image : Storage.ExternalBlob, price : TextContent) : async Product {
-    if (not AccessControl.isAdmin(accessControlState, caller)) {
-      Runtime.trap("Unauthorized: Only admins can edit products");
-    };
+  public shared ({ caller }) func editProduct(sessionId : Text, id : Text, title : TextContent, description : TextContent, image : Storage.ExternalBlob, price : TextContent) : async Product {
+    let _ = validateAdminSession(sessionId);
 
     switch (products.get(id)) {
       case (?existingProduct) {
@@ -478,10 +507,8 @@ actor {
     };
   };
 
-  public shared ({ caller }) func deleteProduct(id : Text) : async () {
-    if (not AccessControl.isAdmin(accessControlState, caller)) {
-      Runtime.trap("Unauthorized: Only admins can delete products");
-    };
+  public shared ({ caller }) func deleteProduct(sessionId : Text, id : Text) : async () {
+    let _ = validateAdminSession(sessionId);
 
     switch (products.get(id)) {
       case (?_) {
@@ -495,10 +522,8 @@ actor {
     packages.values().toArray();
   };
 
-  public shared ({ caller }) func addPackage(name : TextContent, description : TextContent, image : Storage.ExternalBlob, price : TextContent) : async Package {
-    if (not AccessControl.isAdmin(accessControlState, caller)) {
-      Runtime.trap("Unauthorized: Only admins can add packages");
-    };
+  public shared ({ caller }) func addPackage(sessionId : Text, name : TextContent, description : TextContent, image : Storage.ExternalBlob, price : TextContent) : async Package {
+    let _ = validateAdminSession(sessionId);
 
     let newId = nextPackageId.toText();
     let newPackage : Package = {
@@ -513,10 +538,8 @@ actor {
     newPackage;
   };
 
-  public shared ({ caller }) func editPackage(id : Text, name : TextContent, description : TextContent, image : Storage.ExternalBlob, price : TextContent) : async Package {
-    if (not AccessControl.isAdmin(accessControlState, caller)) {
-      Runtime.trap("Unauthorized: Only admins can edit packages");
-    };
+  public shared ({ caller }) func editPackage(sessionId : Text, id : Text, name : TextContent, description : TextContent, image : Storage.ExternalBlob, price : TextContent) : async Package {
+    let _ = validateAdminSession(sessionId);
 
     switch (packages.get(id)) {
       case (?existingPackage) {
@@ -534,10 +557,8 @@ actor {
     };
   };
 
-  public shared ({ caller }) func deletePackage(id : Text) : async () {
-    if (not AccessControl.isAdmin(accessControlState, caller)) {
-      Runtime.trap("Unauthorized: Only admins can delete packages");
-    };
+  public shared ({ caller }) func deletePackage(sessionId : Text, id : Text) : async () {
+    let _ = validateAdminSession(sessionId);
 
     switch (packages.get(id)) {
       case (?_) {
@@ -551,10 +572,8 @@ actor {
     packages.keys().toArray();
   };
 
-  public shared ({ caller }) func addHowToOrderStep(stepNumber : Nat, title : TextContent, description : TextContent, image : ?Storage.ExternalBlob) : async HowToOrderStep {
-    if (not AccessControl.isAdmin(accessControlState, caller)) {
-      Runtime.trap("Unauthorized: Only admins can add how-to-order steps");
-    };
+  public shared ({ caller }) func addHowToOrderStep(sessionId : Text, stepNumber : Nat, title : TextContent, description : TextContent, image : ?Storage.ExternalBlob) : async HowToOrderStep {
+    let _ = validateAdminSession(sessionId);
 
     let newStep : HowToOrderStep = {
       stepNumber;
@@ -570,10 +589,8 @@ actor {
     howToOrderSteps.values().toArray();
   };
 
-  public shared ({ caller }) func editHowToOrderStep(stepNumber : Nat, title : TextContent, description : TextContent, image : ?Storage.ExternalBlob) : async HowToOrderStep {
-    if (not AccessControl.isAdmin(accessControlState, caller)) {
-      Runtime.trap("Unauthorized: Only admins can edit how-to-order steps");
-    };
+  public shared ({ caller }) func editHowToOrderStep(sessionId : Text, stepNumber : Nat, title : TextContent, description : TextContent, image : ?Storage.ExternalBlob) : async HowToOrderStep {
+    let _ = validateAdminSession(sessionId);
 
     switch (howToOrderSteps.get(stepNumber)) {
       case (?existingStep) {
@@ -594,10 +611,8 @@ actor {
     socialMediaLinks.values().toArray();
   };
 
-  public shared ({ caller }) func addSocialMediaLink(platform : Text, url : Text, icon : ?Storage.ExternalBlob) : async SocialMediaLink {
-    if (not AccessControl.isAdmin(accessControlState, caller)) {
-      Runtime.trap("Unauthorized: Only admins can add social media links");
-    };
+  public shared ({ caller }) func addSocialMediaLink(sessionId : Text, platform : Text, url : Text, icon : ?Storage.ExternalBlob) : async SocialMediaLink {
+    let _ = validateAdminSession(sessionId);
 
     let newLink : SocialMediaLink = {
       platform;
@@ -608,10 +623,8 @@ actor {
     newLink;
   };
 
-  public shared ({ caller }) func editSocialMediaLink(platform : Text, url : Text, icon : ?Storage.ExternalBlob) : async SocialMediaLink {
-    if (not AccessControl.isAdmin(accessControlState, caller)) {
-      Runtime.trap("Unauthorized: Only admins can edit social media links");
-    };
+  public shared ({ caller }) func editSocialMediaLink(sessionId : Text, platform : Text, url : Text, icon : ?Storage.ExternalBlob) : async SocialMediaLink {
+    let _ = validateAdminSession(sessionId);
 
     switch (socialMediaLinks.get(platform)) {
       case (?existingLink) {
@@ -627,10 +640,8 @@ actor {
     };
   };
 
-  public shared ({ caller }) func deleteSocialMediaLink(platform : Text) : async () {
-    if (not AccessControl.isAdmin(accessControlState, caller)) {
-      Runtime.trap("Unauthorized: Only admins can delete social media links");
-    };
+  public shared ({ caller }) func deleteSocialMediaLink(sessionId : Text, platform : Text) : async () {
+    let _ = validateAdminSession(sessionId);
 
     switch (socialMediaLinks.get(platform)) {
       case (?_) {
@@ -640,10 +651,8 @@ actor {
     };
   };
 
-  public shared ({ caller }) func updateInstagramFeedConfig(instagramHandle : Text, instagramEmbedCode : Text, title : TextContent, description : TextContent, displayOrder : Nat, isVisible : Bool) : async () {
-    if (not AccessControl.isAdmin(accessControlState, caller)) {
-      Runtime.trap("Unauthorized: Only admins can update Instagram feed settings");
-    };
+  public shared ({ caller }) func updateInstagramFeedConfig(sessionId : Text, instagramHandle : Text, instagramEmbedCode : Text, title : TextContent, description : TextContent, displayOrder : Nat, isVisible : Bool) : async () {
+    let session = validateAdminSession(sessionId);
 
     let config : InstagramFeedConfig = {
       instagramHandle;
@@ -653,7 +662,7 @@ actor {
       displayOrder;
       lastUpdated = Time.now();
       isVisible;
-      createdBy = caller.toText();
+      createdBy = session.username;
     };
 
     instagramFeed := ?config;
@@ -663,26 +672,84 @@ actor {
     instagramFeed;
   };
 
-  // Internal helpers to check hardcoded admins
-  func isHardcodedAdmin(principal : Principal) : Bool {
-    hardcodedAdmins.find(func(admin) { admin == principal }) != null;
+  public shared ({ caller }) func adminLogin(username : Text, password : Text) : async Text {
+    if (username == hardcodedAdminUsername and password == hardcodedAdminPassword) {
+      let sessionId = Time.now().toText() # "-" # username;
+      let session = {
+        username;
+        fullName = "Primary Admin";
+        loginTime = Time.now();
+        lastActive = Time.now();
+        sessionId;
+      };
+      activeAdminSessions.add(sessionId, session);
+      return sessionId;
+    };
+
+    switch (adminUsers.get(username)) {
+      case (?user) {
+        if (user.password == password and user.isActive) {
+          let sessionId = Time.now().toText() # "-" # username;
+          let session = {
+            username = user.username;
+            fullName = user.fullName;
+            loginTime = Time.now();
+            lastActive = Time.now();
+            sessionId;
+          };
+          activeAdminSessions.add(sessionId, session);
+          return sessionId;
+        } else {
+          Runtime.trap("Invalid credentials or inactive user");
+        };
+      };
+      case (null) { Runtime.trap("Invalid credentials") };
+    };
+  };
+
+  public shared ({ caller }) func adminLogout(sessionId : Text) : async () {
+    let _ = validateAdminSession(sessionId);
+    activeAdminSessions.remove(sessionId);
+  };
+
+  public shared ({ caller }) func createAdminUser(sessionId : Text, username : Text, fullName : Text, password : Text) : async () {
+    let session = validateAdminSession(sessionId);
+    
+    // Check if username already exists
+    switch (adminUsers.get(username)) {
+      case (?_) { Runtime.trap("Username already exists") };
+      case (null) {};
+    };
+
+    let newUser = {
+      username;
+      fullName;
+      password;
+      isActive = true;
+      createdAt = Time.now();
+      createdBy = session.username;
+    };
+    adminUsers.add(username, newUser);
+  };
+
+  public query ({ caller }) func getAdminUsers(sessionId : Text) : async [AdminUser] {
+    let _ = validateAdminSession(sessionId);
+    adminUsers.values().toArray();
+  };
+
+  public query ({ caller }) func validateSession(sessionId : Text) : async Bool {
+    switch (activeAdminSessions.get(sessionId)) {
+      case (?session) {
+        let now = Time.now();
+        let timeSinceLastActive = now - session.lastActive;
+        timeSinceLastActive <= sessionTimeout;
+      };
+      case (null) { false };
+    };
   };
 
   public query ({ caller }) func isAdmin() : async Bool {
-    if (isHardcodedAdmin(caller)) { return true };
     if (caller == Principal.fromText("2vxsx-fae")) { return false };
     AccessControl.isAdmin(accessControlState, caller);
   };
-
-  public shared ({ caller }) func bootstrapAdmin() : async () {
-    switch (isHardcodedAdmin(caller)) {
-      case (true) {
-        Runtime.trap("Bootstrap already exists - admin extension is not needed");
-      };
-      case (false) {
-        Runtime.trap("Unauthorized - you are not authorized to bootstrap as admin");
-      };
-    };
-  };
 };
-

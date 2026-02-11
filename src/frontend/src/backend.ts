@@ -109,6 +109,14 @@ export interface ContentBlock {
     image?: ExternalBlob;
 }
 export type Time = bigint;
+export interface AdminUser {
+    username: string;
+    password: string;
+    createdAt: Time;
+    createdBy: string;
+    fullName: string;
+    isActive: boolean;
+}
 export interface _CaffeineStorageRefillInformation {
     proposed_top_up_amount?: bigint;
 }
@@ -201,41 +209,45 @@ export interface backendInterface {
     _caffeineStorageRefillCashier(refillInformation: _CaffeineStorageRefillInformation | null): Promise<_CaffeineStorageRefillResult>;
     _caffeineStorageUpdateGatewayPrincipals(): Promise<void>;
     _initializeAccessControlWithSecret(userSecret: string): Promise<void>;
-    addContentBlock(sectionId: string, title: TextContent, content: TextContent, image: ExternalBlob | null, blockType: BlockType, order: bigint, isVisible: boolean): Promise<ContentBlock>;
-    addHowToOrderStep(stepNumber: bigint, title: TextContent, description: TextContent, image: ExternalBlob | null): Promise<HowToOrderStep>;
-    addPackage(name: TextContent, description: TextContent, image: ExternalBlob, price: TextContent): Promise<Package>;
-    addProduct(title: TextContent, description: TextContent, image: ExternalBlob, price: TextContent): Promise<Product>;
-    addSocialMediaLink(platform: string, url: string, icon: ExternalBlob | null): Promise<SocialMediaLink>;
-    adminDeleteContentBlock(sectionId: string, blockId: bigint): Promise<void>;
+    addContentBlock(sessionId: string, sectionId: string, title: TextContent, content: TextContent, image: ExternalBlob | null, blockType: BlockType, order: bigint, isVisible: boolean): Promise<ContentBlock>;
+    addHowToOrderStep(sessionId: string, stepNumber: bigint, title: TextContent, description: TextContent, image: ExternalBlob | null): Promise<HowToOrderStep>;
+    addPackage(sessionId: string, name: TextContent, description: TextContent, image: ExternalBlob, price: TextContent): Promise<Package>;
+    addProduct(sessionId: string, title: TextContent, description: TextContent, image: ExternalBlob, price: TextContent): Promise<Product>;
+    addSocialMediaLink(sessionId: string, platform: string, url: string, icon: ExternalBlob | null): Promise<SocialMediaLink>;
+    adminDeleteContentBlock(sessionId: string, sectionId: string, blockId: bigint): Promise<void>;
+    adminLogin(username: string, password: string): Promise<string>;
+    adminLogout(sessionId: string): Promise<void>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
-    bootstrapAdmin(): Promise<void>;
-    createAdditionalSection(title: TextContent, description: TextContent, image: ExternalBlob | null, background: ExternalBlob | null, order: bigint, isVisible: boolean): Promise<string>;
-    deleteAdditionalSection(id: string): Promise<void>;
-    deletePackage(id: string): Promise<void>;
-    deleteProduct(id: string): Promise<void>;
-    deleteSocialMediaLink(platform: string): Promise<void>;
-    editHowToOrderStep(stepNumber: bigint, title: TextContent, description: TextContent, image: ExternalBlob | null): Promise<HowToOrderStep>;
-    editPackage(id: string, name: TextContent, description: TextContent, image: ExternalBlob, price: TextContent): Promise<Package>;
-    editProduct(id: string, title: TextContent, description: TextContent, image: ExternalBlob, price: TextContent): Promise<Product>;
-    editSocialMediaLink(platform: string, url: string, icon: ExternalBlob | null): Promise<SocialMediaLink>;
+    createAdditionalSection(sessionId: string, title: TextContent, description: TextContent, image: ExternalBlob | null, background: ExternalBlob | null, order: bigint, isVisible: boolean): Promise<string>;
+    createAdminUser(sessionId: string, username: string, fullName: string, password: string): Promise<void>;
+    deleteAdditionalSection(sessionId: string, id: string): Promise<void>;
+    deletePackage(sessionId: string, id: string): Promise<void>;
+    deleteProduct(sessionId: string, id: string): Promise<void>;
+    deleteSocialMediaLink(sessionId: string, platform: string): Promise<void>;
+    editHowToOrderStep(sessionId: string, stepNumber: bigint, title: TextContent, description: TextContent, image: ExternalBlob | null): Promise<HowToOrderStep>;
+    editPackage(sessionId: string, id: string, name: TextContent, description: TextContent, image: ExternalBlob, price: TextContent): Promise<Package>;
+    editProduct(sessionId: string, id: string, title: TextContent, description: TextContent, image: ExternalBlob, price: TextContent): Promise<Product>;
+    editSocialMediaLink(sessionId: string, platform: string, url: string, icon: ExternalBlob | null): Promise<SocialMediaLink>;
+    getAdminUsers(sessionId: string): Promise<Array<AdminUser>>;
     getAllAdditionalSections(): Promise<Array<SectionContentView>>;
-    getAllContentBlocksAdmin(sectionId: string): Promise<Array<ContentBlockView>>;
+    getAllContentBlocksAdmin(sessionId: string, sectionId: string): Promise<Array<ContentBlockView>>;
     getAllHowToOrderSteps(): Promise<Array<HowToOrderStep>>;
     getAllPackageIds(): Promise<Array<string>>;
     getAllPackages(): Promise<Array<Package>>;
     getAllProducts(): Promise<Array<Product>>;
-    getAllSectionsAdmin(): Promise<Array<SectionContentView>>;
+    getAllSectionsAdmin(sessionId: string): Promise<Array<SectionContentView>>;
     getAllSocialMediaLinks(): Promise<Array<SocialMediaLink>>;
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
     getInstagramFeedConfig(): Promise<InstagramFeedConfig | null>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
-    getVisibleContentBlockAdmin(sectionId: string): Promise<Array<ContentBlockView>>;
+    getVisibleContentBlockAdmin(sessionId: string, sectionId: string): Promise<Array<ContentBlockView>>;
     isAdmin(): Promise<boolean>;
     isCallerAdmin(): Promise<boolean>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
-    updateAdditionalSection(id: string, title: TextContent, description: TextContent, image: ExternalBlob | null, background: ExternalBlob | null, order: bigint, isVisible: boolean): Promise<void>;
-    updateInstagramFeedConfig(instagramHandle: string, instagramEmbedCode: string, title: TextContent, description: TextContent, displayOrder: bigint, isVisible: boolean): Promise<void>;
+    updateAdditionalSection(sessionId: string, id: string, title: TextContent, description: TextContent, image: ExternalBlob | null, background: ExternalBlob | null, order: bigint, isVisible: boolean): Promise<void>;
+    updateInstagramFeedConfig(sessionId: string, instagramHandle: string, instagramEmbedCode: string, title: TextContent, description: TextContent, displayOrder: bigint, isVisible: boolean): Promise<void>;
+    validateSession(sessionId: string): Promise<boolean>;
 }
 import type { BlockType as _BlockType, ContentBlock as _ContentBlock, ContentBlockView as _ContentBlockView, ExternalBlob as _ExternalBlob, HowToOrderStep as _HowToOrderStep, InstagramFeedConfig as _InstagramFeedConfig, Language as _Language, Package as _Package, Product as _Product, SectionContentView as _SectionContentView, SocialMediaLink as _SocialMediaLink, TextContent as _TextContent, Time as _Time, UserProfile as _UserProfile, UserRole as _UserRole, _CaffeineStorageRefillInformation as __CaffeineStorageRefillInformation, _CaffeineStorageRefillResult as __CaffeineStorageRefillResult } from "./declarations/backend.did.d.ts";
 export class Backend implements backendInterface {
@@ -338,87 +350,115 @@ export class Backend implements backendInterface {
             return result;
         }
     }
-    async addContentBlock(arg0: string, arg1: TextContent, arg2: TextContent, arg3: ExternalBlob | null, arg4: BlockType, arg5: bigint, arg6: boolean): Promise<ContentBlock> {
+    async addContentBlock(arg0: string, arg1: string, arg2: TextContent, arg3: TextContent, arg4: ExternalBlob | null, arg5: BlockType, arg6: bigint, arg7: boolean): Promise<ContentBlock> {
         if (this.processError) {
             try {
-                const result = await this.actor.addContentBlock(arg0, arg1, arg2, await to_candid_opt_n8(this._uploadFile, this._downloadFile, arg3), to_candid_BlockType_n10(this._uploadFile, this._downloadFile, arg4), arg5, arg6);
+                const result = await this.actor.addContentBlock(arg0, arg1, arg2, arg3, await to_candid_opt_n8(this._uploadFile, this._downloadFile, arg4), to_candid_BlockType_n10(this._uploadFile, this._downloadFile, arg5), arg6, arg7);
                 return from_candid_ContentBlock_n12(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.addContentBlock(arg0, arg1, arg2, await to_candid_opt_n8(this._uploadFile, this._downloadFile, arg3), to_candid_BlockType_n10(this._uploadFile, this._downloadFile, arg4), arg5, arg6);
+            const result = await this.actor.addContentBlock(arg0, arg1, arg2, arg3, await to_candid_opt_n8(this._uploadFile, this._downloadFile, arg4), to_candid_BlockType_n10(this._uploadFile, this._downloadFile, arg5), arg6, arg7);
             return from_candid_ContentBlock_n12(this._uploadFile, this._downloadFile, result);
         }
     }
-    async addHowToOrderStep(arg0: bigint, arg1: TextContent, arg2: TextContent, arg3: ExternalBlob | null): Promise<HowToOrderStep> {
+    async addHowToOrderStep(arg0: string, arg1: bigint, arg2: TextContent, arg3: TextContent, arg4: ExternalBlob | null): Promise<HowToOrderStep> {
         if (this.processError) {
             try {
-                const result = await this.actor.addHowToOrderStep(arg0, arg1, arg2, await to_candid_opt_n8(this._uploadFile, this._downloadFile, arg3));
+                const result = await this.actor.addHowToOrderStep(arg0, arg1, arg2, arg3, await to_candid_opt_n8(this._uploadFile, this._downloadFile, arg4));
                 return from_candid_HowToOrderStep_n18(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.addHowToOrderStep(arg0, arg1, arg2, await to_candid_opt_n8(this._uploadFile, this._downloadFile, arg3));
+            const result = await this.actor.addHowToOrderStep(arg0, arg1, arg2, arg3, await to_candid_opt_n8(this._uploadFile, this._downloadFile, arg4));
             return from_candid_HowToOrderStep_n18(this._uploadFile, this._downloadFile, result);
         }
     }
-    async addPackage(arg0: TextContent, arg1: TextContent, arg2: ExternalBlob, arg3: TextContent): Promise<Package> {
+    async addPackage(arg0: string, arg1: TextContent, arg2: TextContent, arg3: ExternalBlob, arg4: TextContent): Promise<Package> {
         if (this.processError) {
             try {
-                const result = await this.actor.addPackage(arg0, arg1, await to_candid_ExternalBlob_n9(this._uploadFile, this._downloadFile, arg2), arg3);
+                const result = await this.actor.addPackage(arg0, arg1, arg2, await to_candid_ExternalBlob_n9(this._uploadFile, this._downloadFile, arg3), arg4);
                 return from_candid_Package_n20(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.addPackage(arg0, arg1, await to_candid_ExternalBlob_n9(this._uploadFile, this._downloadFile, arg2), arg3);
+            const result = await this.actor.addPackage(arg0, arg1, arg2, await to_candid_ExternalBlob_n9(this._uploadFile, this._downloadFile, arg3), arg4);
             return from_candid_Package_n20(this._uploadFile, this._downloadFile, result);
         }
     }
-    async addProduct(arg0: TextContent, arg1: TextContent, arg2: ExternalBlob, arg3: TextContent): Promise<Product> {
+    async addProduct(arg0: string, arg1: TextContent, arg2: TextContent, arg3: ExternalBlob, arg4: TextContent): Promise<Product> {
         if (this.processError) {
             try {
-                const result = await this.actor.addProduct(arg0, arg1, await to_candid_ExternalBlob_n9(this._uploadFile, this._downloadFile, arg2), arg3);
+                const result = await this.actor.addProduct(arg0, arg1, arg2, await to_candid_ExternalBlob_n9(this._uploadFile, this._downloadFile, arg3), arg4);
                 return from_candid_Product_n22(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.addProduct(arg0, arg1, await to_candid_ExternalBlob_n9(this._uploadFile, this._downloadFile, arg2), arg3);
+            const result = await this.actor.addProduct(arg0, arg1, arg2, await to_candid_ExternalBlob_n9(this._uploadFile, this._downloadFile, arg3), arg4);
             return from_candid_Product_n22(this._uploadFile, this._downloadFile, result);
         }
     }
-    async addSocialMediaLink(arg0: string, arg1: string, arg2: ExternalBlob | null): Promise<SocialMediaLink> {
+    async addSocialMediaLink(arg0: string, arg1: string, arg2: string, arg3: ExternalBlob | null): Promise<SocialMediaLink> {
         if (this.processError) {
             try {
-                const result = await this.actor.addSocialMediaLink(arg0, arg1, await to_candid_opt_n8(this._uploadFile, this._downloadFile, arg2));
+                const result = await this.actor.addSocialMediaLink(arg0, arg1, arg2, await to_candid_opt_n8(this._uploadFile, this._downloadFile, arg3));
                 return from_candid_SocialMediaLink_n24(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.addSocialMediaLink(arg0, arg1, await to_candid_opt_n8(this._uploadFile, this._downloadFile, arg2));
+            const result = await this.actor.addSocialMediaLink(arg0, arg1, arg2, await to_candid_opt_n8(this._uploadFile, this._downloadFile, arg3));
             return from_candid_SocialMediaLink_n24(this._uploadFile, this._downloadFile, result);
         }
     }
-    async adminDeleteContentBlock(arg0: string, arg1: bigint): Promise<void> {
+    async adminDeleteContentBlock(arg0: string, arg1: string, arg2: bigint): Promise<void> {
         if (this.processError) {
             try {
-                const result = await this.actor.adminDeleteContentBlock(arg0, arg1);
+                const result = await this.actor.adminDeleteContentBlock(arg0, arg1, arg2);
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.adminDeleteContentBlock(arg0, arg1);
+            const result = await this.actor.adminDeleteContentBlock(arg0, arg1, arg2);
+            return result;
+        }
+    }
+    async adminLogin(arg0: string, arg1: string): Promise<string> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.adminLogin(arg0, arg1);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.adminLogin(arg0, arg1);
+            return result;
+        }
+    }
+    async adminLogout(arg0: string): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.adminLogout(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.adminLogout(arg0);
             return result;
         }
     }
@@ -436,144 +476,158 @@ export class Backend implements backendInterface {
             return result;
         }
     }
-    async bootstrapAdmin(): Promise<void> {
+    async createAdditionalSection(arg0: string, arg1: TextContent, arg2: TextContent, arg3: ExternalBlob | null, arg4: ExternalBlob | null, arg5: bigint, arg6: boolean): Promise<string> {
         if (this.processError) {
             try {
-                const result = await this.actor.bootstrapAdmin();
+                const result = await this.actor.createAdditionalSection(arg0, arg1, arg2, await to_candid_opt_n8(this._uploadFile, this._downloadFile, arg3), await to_candid_opt_n8(this._uploadFile, this._downloadFile, arg4), arg5, arg6);
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.bootstrapAdmin();
+            const result = await this.actor.createAdditionalSection(arg0, arg1, arg2, await to_candid_opt_n8(this._uploadFile, this._downloadFile, arg3), await to_candid_opt_n8(this._uploadFile, this._downloadFile, arg4), arg5, arg6);
             return result;
         }
     }
-    async createAdditionalSection(arg0: TextContent, arg1: TextContent, arg2: ExternalBlob | null, arg3: ExternalBlob | null, arg4: bigint, arg5: boolean): Promise<string> {
+    async createAdminUser(arg0: string, arg1: string, arg2: string, arg3: string): Promise<void> {
         if (this.processError) {
             try {
-                const result = await this.actor.createAdditionalSection(arg0, arg1, await to_candid_opt_n8(this._uploadFile, this._downloadFile, arg2), await to_candid_opt_n8(this._uploadFile, this._downloadFile, arg3), arg4, arg5);
+                const result = await this.actor.createAdminUser(arg0, arg1, arg2, arg3);
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.createAdditionalSection(arg0, arg1, await to_candid_opt_n8(this._uploadFile, this._downloadFile, arg2), await to_candid_opt_n8(this._uploadFile, this._downloadFile, arg3), arg4, arg5);
+            const result = await this.actor.createAdminUser(arg0, arg1, arg2, arg3);
             return result;
         }
     }
-    async deleteAdditionalSection(arg0: string): Promise<void> {
+    async deleteAdditionalSection(arg0: string, arg1: string): Promise<void> {
         if (this.processError) {
             try {
-                const result = await this.actor.deleteAdditionalSection(arg0);
+                const result = await this.actor.deleteAdditionalSection(arg0, arg1);
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.deleteAdditionalSection(arg0);
+            const result = await this.actor.deleteAdditionalSection(arg0, arg1);
             return result;
         }
     }
-    async deletePackage(arg0: string): Promise<void> {
+    async deletePackage(arg0: string, arg1: string): Promise<void> {
         if (this.processError) {
             try {
-                const result = await this.actor.deletePackage(arg0);
+                const result = await this.actor.deletePackage(arg0, arg1);
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.deletePackage(arg0);
+            const result = await this.actor.deletePackage(arg0, arg1);
             return result;
         }
     }
-    async deleteProduct(arg0: string): Promise<void> {
+    async deleteProduct(arg0: string, arg1: string): Promise<void> {
         if (this.processError) {
             try {
-                const result = await this.actor.deleteProduct(arg0);
+                const result = await this.actor.deleteProduct(arg0, arg1);
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.deleteProduct(arg0);
+            const result = await this.actor.deleteProduct(arg0, arg1);
             return result;
         }
     }
-    async deleteSocialMediaLink(arg0: string): Promise<void> {
+    async deleteSocialMediaLink(arg0: string, arg1: string): Promise<void> {
         if (this.processError) {
             try {
-                const result = await this.actor.deleteSocialMediaLink(arg0);
+                const result = await this.actor.deleteSocialMediaLink(arg0, arg1);
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.deleteSocialMediaLink(arg0);
+            const result = await this.actor.deleteSocialMediaLink(arg0, arg1);
             return result;
         }
     }
-    async editHowToOrderStep(arg0: bigint, arg1: TextContent, arg2: TextContent, arg3: ExternalBlob | null): Promise<HowToOrderStep> {
+    async editHowToOrderStep(arg0: string, arg1: bigint, arg2: TextContent, arg3: TextContent, arg4: ExternalBlob | null): Promise<HowToOrderStep> {
         if (this.processError) {
             try {
-                const result = await this.actor.editHowToOrderStep(arg0, arg1, arg2, await to_candid_opt_n8(this._uploadFile, this._downloadFile, arg3));
+                const result = await this.actor.editHowToOrderStep(arg0, arg1, arg2, arg3, await to_candid_opt_n8(this._uploadFile, this._downloadFile, arg4));
                 return from_candid_HowToOrderStep_n18(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.editHowToOrderStep(arg0, arg1, arg2, await to_candid_opt_n8(this._uploadFile, this._downloadFile, arg3));
+            const result = await this.actor.editHowToOrderStep(arg0, arg1, arg2, arg3, await to_candid_opt_n8(this._uploadFile, this._downloadFile, arg4));
             return from_candid_HowToOrderStep_n18(this._uploadFile, this._downloadFile, result);
         }
     }
-    async editPackage(arg0: string, arg1: TextContent, arg2: TextContent, arg3: ExternalBlob, arg4: TextContent): Promise<Package> {
+    async editPackage(arg0: string, arg1: string, arg2: TextContent, arg3: TextContent, arg4: ExternalBlob, arg5: TextContent): Promise<Package> {
         if (this.processError) {
             try {
-                const result = await this.actor.editPackage(arg0, arg1, arg2, await to_candid_ExternalBlob_n9(this._uploadFile, this._downloadFile, arg3), arg4);
+                const result = await this.actor.editPackage(arg0, arg1, arg2, arg3, await to_candid_ExternalBlob_n9(this._uploadFile, this._downloadFile, arg4), arg5);
                 return from_candid_Package_n20(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.editPackage(arg0, arg1, arg2, await to_candid_ExternalBlob_n9(this._uploadFile, this._downloadFile, arg3), arg4);
+            const result = await this.actor.editPackage(arg0, arg1, arg2, arg3, await to_candid_ExternalBlob_n9(this._uploadFile, this._downloadFile, arg4), arg5);
             return from_candid_Package_n20(this._uploadFile, this._downloadFile, result);
         }
     }
-    async editProduct(arg0: string, arg1: TextContent, arg2: TextContent, arg3: ExternalBlob, arg4: TextContent): Promise<Product> {
+    async editProduct(arg0: string, arg1: string, arg2: TextContent, arg3: TextContent, arg4: ExternalBlob, arg5: TextContent): Promise<Product> {
         if (this.processError) {
             try {
-                const result = await this.actor.editProduct(arg0, arg1, arg2, await to_candid_ExternalBlob_n9(this._uploadFile, this._downloadFile, arg3), arg4);
+                const result = await this.actor.editProduct(arg0, arg1, arg2, arg3, await to_candid_ExternalBlob_n9(this._uploadFile, this._downloadFile, arg4), arg5);
                 return from_candid_Product_n22(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.editProduct(arg0, arg1, arg2, await to_candid_ExternalBlob_n9(this._uploadFile, this._downloadFile, arg3), arg4);
+            const result = await this.actor.editProduct(arg0, arg1, arg2, arg3, await to_candid_ExternalBlob_n9(this._uploadFile, this._downloadFile, arg4), arg5);
             return from_candid_Product_n22(this._uploadFile, this._downloadFile, result);
         }
     }
-    async editSocialMediaLink(arg0: string, arg1: string, arg2: ExternalBlob | null): Promise<SocialMediaLink> {
+    async editSocialMediaLink(arg0: string, arg1: string, arg2: string, arg3: ExternalBlob | null): Promise<SocialMediaLink> {
         if (this.processError) {
             try {
-                const result = await this.actor.editSocialMediaLink(arg0, arg1, await to_candid_opt_n8(this._uploadFile, this._downloadFile, arg2));
+                const result = await this.actor.editSocialMediaLink(arg0, arg1, arg2, await to_candid_opt_n8(this._uploadFile, this._downloadFile, arg3));
                 return from_candid_SocialMediaLink_n24(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.editSocialMediaLink(arg0, arg1, await to_candid_opt_n8(this._uploadFile, this._downloadFile, arg2));
+            const result = await this.actor.editSocialMediaLink(arg0, arg1, arg2, await to_candid_opt_n8(this._uploadFile, this._downloadFile, arg3));
             return from_candid_SocialMediaLink_n24(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async getAdminUsers(arg0: string): Promise<Array<AdminUser>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getAdminUsers(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getAdminUsers(arg0);
+            return result;
         }
     }
     async getAllAdditionalSections(): Promise<Array<SectionContentView>> {
@@ -590,17 +644,17 @@ export class Backend implements backendInterface {
             return from_candid_vec_n28(this._uploadFile, this._downloadFile, result);
         }
     }
-    async getAllContentBlocksAdmin(arg0: string): Promise<Array<ContentBlockView>> {
+    async getAllContentBlocksAdmin(arg0: string, arg1: string): Promise<Array<ContentBlockView>> {
         if (this.processError) {
             try {
-                const result = await this.actor.getAllContentBlocksAdmin(arg0);
+                const result = await this.actor.getAllContentBlocksAdmin(arg0, arg1);
                 return from_candid_vec_n32(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.getAllContentBlocksAdmin(arg0);
+            const result = await this.actor.getAllContentBlocksAdmin(arg0, arg1);
             return from_candid_vec_n32(this._uploadFile, this._downloadFile, result);
         }
     }
@@ -660,17 +714,17 @@ export class Backend implements backendInterface {
             return from_candid_vec_n36(this._uploadFile, this._downloadFile, result);
         }
     }
-    async getAllSectionsAdmin(): Promise<Array<SectionContentView>> {
+    async getAllSectionsAdmin(arg0: string): Promise<Array<SectionContentView>> {
         if (this.processError) {
             try {
-                const result = await this.actor.getAllSectionsAdmin();
+                const result = await this.actor.getAllSectionsAdmin(arg0);
                 return from_candid_vec_n28(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.getAllSectionsAdmin();
+            const result = await this.actor.getAllSectionsAdmin(arg0);
             return from_candid_vec_n28(this._uploadFile, this._downloadFile, result);
         }
     }
@@ -744,17 +798,17 @@ export class Backend implements backendInterface {
             return from_candid_opt_n38(this._uploadFile, this._downloadFile, result);
         }
     }
-    async getVisibleContentBlockAdmin(arg0: string): Promise<Array<ContentBlockView>> {
+    async getVisibleContentBlockAdmin(arg0: string, arg1: string): Promise<Array<ContentBlockView>> {
         if (this.processError) {
             try {
-                const result = await this.actor.getVisibleContentBlockAdmin(arg0);
+                const result = await this.actor.getVisibleContentBlockAdmin(arg0, arg1);
                 return from_candid_vec_n32(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.getVisibleContentBlockAdmin(arg0);
+            const result = await this.actor.getVisibleContentBlockAdmin(arg0, arg1);
             return from_candid_vec_n32(this._uploadFile, this._downloadFile, result);
         }
     }
@@ -800,31 +854,45 @@ export class Backend implements backendInterface {
             return result;
         }
     }
-    async updateAdditionalSection(arg0: string, arg1: TextContent, arg2: TextContent, arg3: ExternalBlob | null, arg4: ExternalBlob | null, arg5: bigint, arg6: boolean): Promise<void> {
+    async updateAdditionalSection(arg0: string, arg1: string, arg2: TextContent, arg3: TextContent, arg4: ExternalBlob | null, arg5: ExternalBlob | null, arg6: bigint, arg7: boolean): Promise<void> {
         if (this.processError) {
             try {
-                const result = await this.actor.updateAdditionalSection(arg0, arg1, arg2, await to_candid_opt_n8(this._uploadFile, this._downloadFile, arg3), await to_candid_opt_n8(this._uploadFile, this._downloadFile, arg4), arg5, arg6);
+                const result = await this.actor.updateAdditionalSection(arg0, arg1, arg2, arg3, await to_candid_opt_n8(this._uploadFile, this._downloadFile, arg4), await to_candid_opt_n8(this._uploadFile, this._downloadFile, arg5), arg6, arg7);
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.updateAdditionalSection(arg0, arg1, arg2, await to_candid_opt_n8(this._uploadFile, this._downloadFile, arg3), await to_candid_opt_n8(this._uploadFile, this._downloadFile, arg4), arg5, arg6);
+            const result = await this.actor.updateAdditionalSection(arg0, arg1, arg2, arg3, await to_candid_opt_n8(this._uploadFile, this._downloadFile, arg4), await to_candid_opt_n8(this._uploadFile, this._downloadFile, arg5), arg6, arg7);
             return result;
         }
     }
-    async updateInstagramFeedConfig(arg0: string, arg1: string, arg2: TextContent, arg3: TextContent, arg4: bigint, arg5: boolean): Promise<void> {
+    async updateInstagramFeedConfig(arg0: string, arg1: string, arg2: string, arg3: TextContent, arg4: TextContent, arg5: bigint, arg6: boolean): Promise<void> {
         if (this.processError) {
             try {
-                const result = await this.actor.updateInstagramFeedConfig(arg0, arg1, arg2, arg3, arg4, arg5);
+                const result = await this.actor.updateInstagramFeedConfig(arg0, arg1, arg2, arg3, arg4, arg5, arg6);
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.updateInstagramFeedConfig(arg0, arg1, arg2, arg3, arg4, arg5);
+            const result = await this.actor.updateInstagramFeedConfig(arg0, arg1, arg2, arg3, arg4, arg5, arg6);
+            return result;
+        }
+    }
+    async validateSession(arg0: string): Promise<boolean> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.validateSession(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.validateSession(arg0);
             return result;
         }
     }

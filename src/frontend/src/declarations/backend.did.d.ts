@@ -10,6 +10,14 @@ import type { ActorMethod } from '@icp-sdk/core/agent';
 import type { IDL } from '@icp-sdk/core/candid';
 import type { Principal } from '@icp-sdk/core/principal';
 
+export interface AdminUser {
+  'username' : string,
+  'password' : string,
+  'createdAt' : Time,
+  'createdBy' : string,
+  'fullName' : string,
+  'isActive' : boolean,
+}
 export type BlockType = { 'textBlock' : null } |
   { 'imageBlock' : null } |
   { 'mixedBlock' : null };
@@ -126,6 +134,7 @@ export interface _SERVICE {
   'addContentBlock' : ActorMethod<
     [
       string,
+      string,
       TextContent,
       TextContent,
       [] | [ExternalBlob],
@@ -136,26 +145,28 @@ export interface _SERVICE {
     ContentBlock
   >,
   'addHowToOrderStep' : ActorMethod<
-    [bigint, TextContent, TextContent, [] | [ExternalBlob]],
+    [string, bigint, TextContent, TextContent, [] | [ExternalBlob]],
     HowToOrderStep
   >,
   'addPackage' : ActorMethod<
-    [TextContent, TextContent, ExternalBlob, TextContent],
+    [string, TextContent, TextContent, ExternalBlob, TextContent],
     Package
   >,
   'addProduct' : ActorMethod<
-    [TextContent, TextContent, ExternalBlob, TextContent],
+    [string, TextContent, TextContent, ExternalBlob, TextContent],
     Product
   >,
   'addSocialMediaLink' : ActorMethod<
-    [string, string, [] | [ExternalBlob]],
+    [string, string, string, [] | [ExternalBlob]],
     SocialMediaLink
   >,
-  'adminDeleteContentBlock' : ActorMethod<[string, bigint], undefined>,
+  'adminDeleteContentBlock' : ActorMethod<[string, string, bigint], undefined>,
+  'adminLogin' : ActorMethod<[string, string], string>,
+  'adminLogout' : ActorMethod<[string], undefined>,
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
-  'bootstrapAdmin' : ActorMethod<[], undefined>,
   'createAdditionalSection' : ActorMethod<
     [
+      string,
       TextContent,
       TextContent,
       [] | [ExternalBlob],
@@ -165,40 +176,45 @@ export interface _SERVICE {
     ],
     string
   >,
-  'deleteAdditionalSection' : ActorMethod<[string], undefined>,
-  'deletePackage' : ActorMethod<[string], undefined>,
-  'deleteProduct' : ActorMethod<[string], undefined>,
-  'deleteSocialMediaLink' : ActorMethod<[string], undefined>,
+  'createAdminUser' : ActorMethod<[string, string, string, string], undefined>,
+  'deleteAdditionalSection' : ActorMethod<[string, string], undefined>,
+  'deletePackage' : ActorMethod<[string, string], undefined>,
+  'deleteProduct' : ActorMethod<[string, string], undefined>,
+  'deleteSocialMediaLink' : ActorMethod<[string, string], undefined>,
   'editHowToOrderStep' : ActorMethod<
-    [bigint, TextContent, TextContent, [] | [ExternalBlob]],
+    [string, bigint, TextContent, TextContent, [] | [ExternalBlob]],
     HowToOrderStep
   >,
   'editPackage' : ActorMethod<
-    [string, TextContent, TextContent, ExternalBlob, TextContent],
+    [string, string, TextContent, TextContent, ExternalBlob, TextContent],
     Package
   >,
   'editProduct' : ActorMethod<
-    [string, TextContent, TextContent, ExternalBlob, TextContent],
+    [string, string, TextContent, TextContent, ExternalBlob, TextContent],
     Product
   >,
   'editSocialMediaLink' : ActorMethod<
-    [string, string, [] | [ExternalBlob]],
+    [string, string, string, [] | [ExternalBlob]],
     SocialMediaLink
   >,
+  'getAdminUsers' : ActorMethod<[string], Array<AdminUser>>,
   'getAllAdditionalSections' : ActorMethod<[], Array<SectionContentView>>,
-  'getAllContentBlocksAdmin' : ActorMethod<[string], Array<ContentBlockView>>,
+  'getAllContentBlocksAdmin' : ActorMethod<
+    [string, string],
+    Array<ContentBlockView>
+  >,
   'getAllHowToOrderSteps' : ActorMethod<[], Array<HowToOrderStep>>,
   'getAllPackageIds' : ActorMethod<[], Array<string>>,
   'getAllPackages' : ActorMethod<[], Array<Package>>,
   'getAllProducts' : ActorMethod<[], Array<Product>>,
-  'getAllSectionsAdmin' : ActorMethod<[], Array<SectionContentView>>,
+  'getAllSectionsAdmin' : ActorMethod<[string], Array<SectionContentView>>,
   'getAllSocialMediaLinks' : ActorMethod<[], Array<SocialMediaLink>>,
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
   'getInstagramFeedConfig' : ActorMethod<[], [] | [InstagramFeedConfig]>,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
   'getVisibleContentBlockAdmin' : ActorMethod<
-    [string],
+    [string, string],
     Array<ContentBlockView>
   >,
   'isAdmin' : ActorMethod<[], boolean>,
@@ -206,6 +222,7 @@ export interface _SERVICE {
   'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
   'updateAdditionalSection' : ActorMethod<
     [
+      string,
       string,
       TextContent,
       TextContent,
@@ -217,9 +234,10 @@ export interface _SERVICE {
     undefined
   >,
   'updateInstagramFeedConfig' : ActorMethod<
-    [string, string, TextContent, TextContent, bigint, boolean],
+    [string, string, string, TextContent, TextContent, bigint, boolean],
     undefined
   >,
+  'validateSession' : ActorMethod<[string], boolean>,
 }
 export declare const idlService: IDL.ServiceClass;
 export declare const idlInitArgs: IDL.Type[];

@@ -1,72 +1,105 @@
 {
   "kind": "build_request",
-  "title": "Fix admin panel access and grant admin role to hernan@zerma-la.com (principal ix7jl-…-6ae)",
-  "priority": "normal",
+  "title": "Disable Internet Identity for Admin Access and Implement Simple Username/Password Admin Login",
+  "priority": "high",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Guarantee that the Internet Identity principal `ix7jl-xlknv-uwyet-3fsxh-x7nqh-zkhvg-keqsk-zs4hv-ihh5p-uytti-6ae` (user email reference: `hernan@zerma-la.com`) is granted admin privileges in the backend so that this user can access the admin dashboard.",
-      "target": "backend",
+      "text": "Disable the Internet Identity authentication flow for the admin system UI so users can no longer log in to the admin area using Internet Identity.",
+      "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1"
+          "msg-last"
         ],
         "quotes": [
-          "revisa que el panel admin funcione correctamente y agrega a hernan@zerma-la.com como admin"
+          "El acceso al admin system sigue sin funcionar. Desahibilita que el acceso sea con internet authenticator"
         ]
       },
       "acceptanceCriteria": [
-        "Calling the backend admin-check method (used by the frontend `useIsCallerAdmin` hook) returns `true` for principal `ix7jl-xlknv-uwyet-3fsxh-x7nqh-zkhvg-keqsk-zs4hv-ihh5p-uytti-6ae`.",
-        "Admin-only backend methods (e.g., product CRUD) succeed for this principal and continue to reject non-admin principals.",
-        "If the canister is upgraded and existing state is present, the change is applied without wiping existing content/state (profiles/products/packages/sections/etc.)."
+        "The /admin/login page no longer shows any Internet Identity login button or text referencing Internet Identity.",
+        "Header admin navigation no longer relies on Internet Identity state (e.g., no checks against `useInternetIdentity()` for admin routing).",
+        "No admin access flow requires or triggers Internet Identity authentication."
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Review and fix the admin panel end-to-end flow so it works reliably: Internet Identity login, admin role check, navigation to `/admin`, and a clear non-admin experience without silent loops or no-op behavior.",
-      "target": "frontend",
+      "text": "Add a custom admin authentication flow using a username and password, with an initial hardcoded primary admin credential set: Username \"Administrator\" and Password \"AdminAAboxes26\".",
+      "target": "both",
       "source": {
         "messageIds": [
-          "msg-1"
+          "msg-last"
         ],
         "quotes": [
-          "revisa que el panel admin funcione correctamente"
+          "El acceso al admin system sigue sin funcionar. Desahibilita que el acceso sea con internet authenticator"
         ]
       },
       "acceptanceCriteria": [
-        "After logging in with Internet Identity as an admin, the app navigates to `/admin` and renders the Admin Dashboard (no blank screen).",
-        "If a logged-in user is not an admin, `/admin` and `/admin/login` show a clear message indicating access is denied (and do not get stuck in a redirect loop).",
-        "The Admin Diagnostics panel can be executed by an admin without errors and completes product CRUD validation successfully (create/read/update/delete of the temporary test product)."
+        "The /admin/login page provides Username and Password fields and a submit button.",
+        "Logging in with username \"Administrator\" and password \"AdminAAboxes26\" successfully grants access to /admin.",
+        "Logging in with incorrect credentials shows a clear error message in English and does not grant access.",
+        "Refreshing the page preserves the logged-in admin session until explicit logout (or until cleared by user)."
       ]
     },
     {
       "id": "REQ-3",
-      "text": "If the project currently supports a 'bootstrap admin' action from the Admin Login page, ensure it fails gracefully with a clear error message when unauthorized, and ensure it is not required for the configured admin principal in REQ-1 to access the admin dashboard.",
-      "target": "both",
+      "text": "Implement backend support for username/password-based admin sessions and authorization, replacing the current admin authorization reliance on Internet Identity principals for admin-dashboard operations.",
+      "target": "backend",
       "source": {
         "messageIds": [
-          "msg-1"
+          "msg-last"
         ],
         "quotes": [
-          "revisa que el panel admin funcione correctamente y agrega a hernan@zerma-la.com como admin"
+          "Desahibilita que el acceso sea con internet authenticator"
         ]
       },
       "acceptanceCriteria": [
-        "When the bootstrap action is unauthorized, the UI shows an actionable error message (no silent failure) and remains on the same page.",
-        "For principal `ix7jl-xlknv-uwyet-3fsxh-x7nqh-zkhvg-keqsk-zs4hv-ihh5p-uytti-6ae`, the bootstrap option is not needed to access `/admin` (admin is recognized via backend role configuration)."
+        "Backend exposes a login method that validates username/password and returns an admin session token (or equivalent session identifier).",
+        "Backend exposes a logout/invalidate method for the current session token.",
+        "All admin-only backend methods used by the admin dashboard enforce authorization based on the session token (not Internet Identity principal).",
+        "Unauthorized calls to admin-only backend methods fail with a consistent error (trap or error result) indicating authorization is required."
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "text": "Update the admin dashboard to use the new custom auth session (and provide logout) while keeping the existing admin content management panels functional.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-last"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Visiting /admin while not logged in redirects (or navigates) to /admin/login.",
+        "Visiting /admin while logged in loads the admin dashboard and existing tabs (Products, Packages, How to Order, Instagram, Sections, Content Blocks, Diagnostics) continue to work.",
+        "Logout clears the custom auth session and returns the user to the public website or admin login page."
+      ]
+    },
+    {
+      "id": "REQ-5",
+      "text": "Add admin user management capability so the admin can create additional users with username/password and role, and view the list of existing users.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-last"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Admin dashboard includes a User Management panel accessible only when logged in as an admin.",
+        "User Management panel shows a list of existing users including username and role.",
+        "Admin can create a new user by entering Username, Password, and Role (at minimum: 'admin' and 'user').",
+        "Newly created users can log in via the same /admin/login page, and only users with role 'admin' can access /admin."
       ]
     }
   ],
   "constraints": [
-    "Backend must remain a single Motoko actor in `backend/main.mo` (no new backend services).",
-    "Only add `backend/migration.mo` changes if needed to preserve/upgrade existing stable state; follow the conditional migration policy.",
-    "Do not modify any files under `frontend/src/components/ui` or any paths listed as immutable in SYSTEM_CONTEXT (compose instead).",
-    "Use English for any user-facing text added/changed in the UI."
+    "Do not edit immutable frontend paths: frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, frontend/src/components/ui/*.",
+    "Backend must remain single-actor Motoko (all logic in backend/main.mo).",
+    "All user-facing text added/changed by this work must be in English."
   ],
   "nonGoals": [
-    "Adding third-party authentication providers (only Internet Identity).",
-    "Adding external databases or non-IC storage systems.",
-    "Building real-time features (WebSockets/push notifications/chat)."
+    "Do not implement Supabase integration, Supabase tables, or Supabase RLS policies (not supported in this stack).",
+    "Do not add third-party authentication providers (only custom username/password per this request).",
+    "Do not implement real-time features (e.g., websockets) as part of this change."
   ],
   "imageRequirements": {
     "required": [],

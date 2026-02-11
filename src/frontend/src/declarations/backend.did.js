@@ -71,6 +71,14 @@ export const UserRole = IDL.Variant({
   'user' : IDL.Null,
   'guest' : IDL.Null,
 });
+export const AdminUser = IDL.Record({
+  'username' : IDL.Text,
+  'password' : IDL.Text,
+  'createdAt' : Time,
+  'createdBy' : IDL.Text,
+  'fullName' : IDL.Text,
+  'isActive' : IDL.Bool,
+});
 export const SectionContentView = IDL.Record({
   'id' : IDL.Text,
   'title' : TextContent,
@@ -145,6 +153,7 @@ export const idlService = IDL.Service({
   'addContentBlock' : IDL.Func(
       [
         IDL.Text,
+        IDL.Text,
         TextContent,
         TextContent,
         IDL.Opt(ExternalBlob),
@@ -156,30 +165,32 @@ export const idlService = IDL.Service({
       [],
     ),
   'addHowToOrderStep' : IDL.Func(
-      [IDL.Nat, TextContent, TextContent, IDL.Opt(ExternalBlob)],
+      [IDL.Text, IDL.Nat, TextContent, TextContent, IDL.Opt(ExternalBlob)],
       [HowToOrderStep],
       [],
     ),
   'addPackage' : IDL.Func(
-      [TextContent, TextContent, ExternalBlob, TextContent],
+      [IDL.Text, TextContent, TextContent, ExternalBlob, TextContent],
       [Package],
       [],
     ),
   'addProduct' : IDL.Func(
-      [TextContent, TextContent, ExternalBlob, TextContent],
+      [IDL.Text, TextContent, TextContent, ExternalBlob, TextContent],
       [Product],
       [],
     ),
   'addSocialMediaLink' : IDL.Func(
-      [IDL.Text, IDL.Text, IDL.Opt(ExternalBlob)],
+      [IDL.Text, IDL.Text, IDL.Text, IDL.Opt(ExternalBlob)],
       [SocialMediaLink],
       [],
     ),
-  'adminDeleteContentBlock' : IDL.Func([IDL.Text, IDL.Nat], [], ['query']),
+  'adminDeleteContentBlock' : IDL.Func([IDL.Text, IDL.Text, IDL.Nat], [], []),
+  'adminLogin' : IDL.Func([IDL.Text, IDL.Text], [IDL.Text], []),
+  'adminLogout' : IDL.Func([IDL.Text], [], []),
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
-  'bootstrapAdmin' : IDL.Func([], [], []),
   'createAdditionalSection' : IDL.Func(
       [
+        IDL.Text,
         TextContent,
         TextContent,
         IDL.Opt(ExternalBlob),
@@ -190,37 +201,43 @@ export const idlService = IDL.Service({
       [IDL.Text],
       [],
     ),
-  'deleteAdditionalSection' : IDL.Func([IDL.Text], [], []),
-  'deletePackage' : IDL.Func([IDL.Text], [], []),
-  'deleteProduct' : IDL.Func([IDL.Text], [], []),
-  'deleteSocialMediaLink' : IDL.Func([IDL.Text], [], []),
+  'createAdminUser' : IDL.Func(
+      [IDL.Text, IDL.Text, IDL.Text, IDL.Text],
+      [],
+      [],
+    ),
+  'deleteAdditionalSection' : IDL.Func([IDL.Text, IDL.Text], [], []),
+  'deletePackage' : IDL.Func([IDL.Text, IDL.Text], [], []),
+  'deleteProduct' : IDL.Func([IDL.Text, IDL.Text], [], []),
+  'deleteSocialMediaLink' : IDL.Func([IDL.Text, IDL.Text], [], []),
   'editHowToOrderStep' : IDL.Func(
-      [IDL.Nat, TextContent, TextContent, IDL.Opt(ExternalBlob)],
+      [IDL.Text, IDL.Nat, TextContent, TextContent, IDL.Opt(ExternalBlob)],
       [HowToOrderStep],
       [],
     ),
   'editPackage' : IDL.Func(
-      [IDL.Text, TextContent, TextContent, ExternalBlob, TextContent],
+      [IDL.Text, IDL.Text, TextContent, TextContent, ExternalBlob, TextContent],
       [Package],
       [],
     ),
   'editProduct' : IDL.Func(
-      [IDL.Text, TextContent, TextContent, ExternalBlob, TextContent],
+      [IDL.Text, IDL.Text, TextContent, TextContent, ExternalBlob, TextContent],
       [Product],
       [],
     ),
   'editSocialMediaLink' : IDL.Func(
-      [IDL.Text, IDL.Text, IDL.Opt(ExternalBlob)],
+      [IDL.Text, IDL.Text, IDL.Text, IDL.Opt(ExternalBlob)],
       [SocialMediaLink],
       [],
     ),
+  'getAdminUsers' : IDL.Func([IDL.Text], [IDL.Vec(AdminUser)], ['query']),
   'getAllAdditionalSections' : IDL.Func(
       [],
       [IDL.Vec(SectionContentView)],
       ['query'],
     ),
   'getAllContentBlocksAdmin' : IDL.Func(
-      [IDL.Text],
+      [IDL.Text, IDL.Text],
       [IDL.Vec(ContentBlockView)],
       ['query'],
     ),
@@ -229,7 +246,7 @@ export const idlService = IDL.Service({
   'getAllPackages' : IDL.Func([], [IDL.Vec(Package)], ['query']),
   'getAllProducts' : IDL.Func([], [IDL.Vec(Product)], ['query']),
   'getAllSectionsAdmin' : IDL.Func(
-      [],
+      [IDL.Text],
       [IDL.Vec(SectionContentView)],
       ['query'],
     ),
@@ -251,7 +268,7 @@ export const idlService = IDL.Service({
       ['query'],
     ),
   'getVisibleContentBlockAdmin' : IDL.Func(
-      [IDL.Text],
+      [IDL.Text, IDL.Text],
       [IDL.Vec(ContentBlockView)],
       ['query'],
     ),
@@ -260,6 +277,7 @@ export const idlService = IDL.Service({
   'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
   'updateAdditionalSection' : IDL.Func(
       [
+        IDL.Text,
         IDL.Text,
         TextContent,
         TextContent,
@@ -272,10 +290,19 @@ export const idlService = IDL.Service({
       [],
     ),
   'updateInstagramFeedConfig' : IDL.Func(
-      [IDL.Text, IDL.Text, TextContent, TextContent, IDL.Nat, IDL.Bool],
+      [
+        IDL.Text,
+        IDL.Text,
+        IDL.Text,
+        TextContent,
+        TextContent,
+        IDL.Nat,
+        IDL.Bool,
+      ],
       [],
       [],
     ),
+  'validateSession' : IDL.Func([IDL.Text], [IDL.Bool], ['query']),
 });
 
 export const idlInitArgs = [];
@@ -343,6 +370,14 @@ export const idlFactory = ({ IDL }) => {
     'admin' : IDL.Null,
     'user' : IDL.Null,
     'guest' : IDL.Null,
+  });
+  const AdminUser = IDL.Record({
+    'username' : IDL.Text,
+    'password' : IDL.Text,
+    'createdAt' : Time,
+    'createdBy' : IDL.Text,
+    'fullName' : IDL.Text,
+    'isActive' : IDL.Bool,
   });
   const SectionContentView = IDL.Record({
     'id' : IDL.Text,
@@ -415,6 +450,7 @@ export const idlFactory = ({ IDL }) => {
     'addContentBlock' : IDL.Func(
         [
           IDL.Text,
+          IDL.Text,
           TextContent,
           TextContent,
           IDL.Opt(ExternalBlob),
@@ -426,30 +462,32 @@ export const idlFactory = ({ IDL }) => {
         [],
       ),
     'addHowToOrderStep' : IDL.Func(
-        [IDL.Nat, TextContent, TextContent, IDL.Opt(ExternalBlob)],
+        [IDL.Text, IDL.Nat, TextContent, TextContent, IDL.Opt(ExternalBlob)],
         [HowToOrderStep],
         [],
       ),
     'addPackage' : IDL.Func(
-        [TextContent, TextContent, ExternalBlob, TextContent],
+        [IDL.Text, TextContent, TextContent, ExternalBlob, TextContent],
         [Package],
         [],
       ),
     'addProduct' : IDL.Func(
-        [TextContent, TextContent, ExternalBlob, TextContent],
+        [IDL.Text, TextContent, TextContent, ExternalBlob, TextContent],
         [Product],
         [],
       ),
     'addSocialMediaLink' : IDL.Func(
-        [IDL.Text, IDL.Text, IDL.Opt(ExternalBlob)],
+        [IDL.Text, IDL.Text, IDL.Text, IDL.Opt(ExternalBlob)],
         [SocialMediaLink],
         [],
       ),
-    'adminDeleteContentBlock' : IDL.Func([IDL.Text, IDL.Nat], [], ['query']),
+    'adminDeleteContentBlock' : IDL.Func([IDL.Text, IDL.Text, IDL.Nat], [], []),
+    'adminLogin' : IDL.Func([IDL.Text, IDL.Text], [IDL.Text], []),
+    'adminLogout' : IDL.Func([IDL.Text], [], []),
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
-    'bootstrapAdmin' : IDL.Func([], [], []),
     'createAdditionalSection' : IDL.Func(
         [
+          IDL.Text,
           TextContent,
           TextContent,
           IDL.Opt(ExternalBlob),
@@ -460,37 +498,57 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Text],
         [],
       ),
-    'deleteAdditionalSection' : IDL.Func([IDL.Text], [], []),
-    'deletePackage' : IDL.Func([IDL.Text], [], []),
-    'deleteProduct' : IDL.Func([IDL.Text], [], []),
-    'deleteSocialMediaLink' : IDL.Func([IDL.Text], [], []),
+    'createAdminUser' : IDL.Func(
+        [IDL.Text, IDL.Text, IDL.Text, IDL.Text],
+        [],
+        [],
+      ),
+    'deleteAdditionalSection' : IDL.Func([IDL.Text, IDL.Text], [], []),
+    'deletePackage' : IDL.Func([IDL.Text, IDL.Text], [], []),
+    'deleteProduct' : IDL.Func([IDL.Text, IDL.Text], [], []),
+    'deleteSocialMediaLink' : IDL.Func([IDL.Text, IDL.Text], [], []),
     'editHowToOrderStep' : IDL.Func(
-        [IDL.Nat, TextContent, TextContent, IDL.Opt(ExternalBlob)],
+        [IDL.Text, IDL.Nat, TextContent, TextContent, IDL.Opt(ExternalBlob)],
         [HowToOrderStep],
         [],
       ),
     'editPackage' : IDL.Func(
-        [IDL.Text, TextContent, TextContent, ExternalBlob, TextContent],
+        [
+          IDL.Text,
+          IDL.Text,
+          TextContent,
+          TextContent,
+          ExternalBlob,
+          TextContent,
+        ],
         [Package],
         [],
       ),
     'editProduct' : IDL.Func(
-        [IDL.Text, TextContent, TextContent, ExternalBlob, TextContent],
+        [
+          IDL.Text,
+          IDL.Text,
+          TextContent,
+          TextContent,
+          ExternalBlob,
+          TextContent,
+        ],
         [Product],
         [],
       ),
     'editSocialMediaLink' : IDL.Func(
-        [IDL.Text, IDL.Text, IDL.Opt(ExternalBlob)],
+        [IDL.Text, IDL.Text, IDL.Text, IDL.Opt(ExternalBlob)],
         [SocialMediaLink],
         [],
       ),
+    'getAdminUsers' : IDL.Func([IDL.Text], [IDL.Vec(AdminUser)], ['query']),
     'getAllAdditionalSections' : IDL.Func(
         [],
         [IDL.Vec(SectionContentView)],
         ['query'],
       ),
     'getAllContentBlocksAdmin' : IDL.Func(
-        [IDL.Text],
+        [IDL.Text, IDL.Text],
         [IDL.Vec(ContentBlockView)],
         ['query'],
       ),
@@ -503,7 +561,7 @@ export const idlFactory = ({ IDL }) => {
     'getAllPackages' : IDL.Func([], [IDL.Vec(Package)], ['query']),
     'getAllProducts' : IDL.Func([], [IDL.Vec(Product)], ['query']),
     'getAllSectionsAdmin' : IDL.Func(
-        [],
+        [IDL.Text],
         [IDL.Vec(SectionContentView)],
         ['query'],
       ),
@@ -525,7 +583,7 @@ export const idlFactory = ({ IDL }) => {
         ['query'],
       ),
     'getVisibleContentBlockAdmin' : IDL.Func(
-        [IDL.Text],
+        [IDL.Text, IDL.Text],
         [IDL.Vec(ContentBlockView)],
         ['query'],
       ),
@@ -534,6 +592,7 @@ export const idlFactory = ({ IDL }) => {
     'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
     'updateAdditionalSection' : IDL.Func(
         [
+          IDL.Text,
           IDL.Text,
           TextContent,
           TextContent,
@@ -546,10 +605,19 @@ export const idlFactory = ({ IDL }) => {
         [],
       ),
     'updateInstagramFeedConfig' : IDL.Func(
-        [IDL.Text, IDL.Text, TextContent, TextContent, IDL.Nat, IDL.Bool],
+        [
+          IDL.Text,
+          IDL.Text,
+          IDL.Text,
+          TextContent,
+          TextContent,
+          IDL.Nat,
+          IDL.Bool,
+        ],
         [],
         [],
       ),
+    'validateSession' : IDL.Func([IDL.Text], [IDL.Bool], ['query']),
   });
 };
 

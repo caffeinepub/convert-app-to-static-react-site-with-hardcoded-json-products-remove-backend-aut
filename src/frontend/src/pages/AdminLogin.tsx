@@ -1,56 +1,55 @@
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from '@tanstack/react-router';
-import { useInternetIdentity } from '../hooks/useInternetIdentity';
-import { useIsCallerAdmin } from '../hooks/useQueries';
+import { useAdminSession } from '../hooks/useAdminSession';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Shield, Loader2 } from 'lucide-react';
-import { useLanguage } from '@/contexts/LanguageContext';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Shield, Loader2, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
-import AccessDeniedScreen from '../components/admin/AccessDeniedScreen';
 
 export default function AdminLogin() {
   const navigate = useNavigate();
-  const { login, loginStatus, identity } = useInternetIdentity();
-  const { data: isAdmin, isLoading: isCheckingAdmin, isFetched } = useIsCallerAdmin();
-  const { t } = useLanguage();
+  const { login, isAuthenticated, isLoading, error } = useAdminSession();
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const isAuthenticated = !!identity;
-  const isLoggingIn = loginStatus === 'logging-in';
-
-  // Redirect to admin dashboard if authenticated and admin
+  // Redirect to admin dashboard if already authenticated
   useEffect(() => {
-    if (isAuthenticated && !isCheckingAdmin && isAdmin === true) {
+    if (isAuthenticated && !isLoading) {
       navigate({ to: '/admin' });
     }
-  }, [isAuthenticated, isAdmin, isCheckingAdmin, navigate]);
+  }, [isAuthenticated, isLoading, navigate]);
 
-  const handleLogin = async () => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!username.trim() || !password.trim()) {
+      toast.error('Please enter both username and password');
+      return;
+    }
+
+    setIsSubmitting(true);
     try {
-      await login();
-    } catch (error: any) {
-      console.error('Login error:', error);
-      toast.error('Login failed. Please try again.');
+      await login(username, password);
+      toast.success('Login successful!');
+      navigate({ to: '/admin' });
+    } catch (err: any) {
+      const errorMessage = err?.message || 'Invalid credentials';
+      toast.error(errorMessage);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  // Show access denied if authenticated but not admin
-  if (isAuthenticated && isFetched && isAdmin === false) {
-    return (
-      <AccessDeniedScreen 
-        message="You are authenticated but do not have admin privileges. Please contact the system administrator if you need access."
-        showHomeButton={true}
-      />
-    );
-  }
-
-  // Show loading while checking admin status
-  if (isAuthenticated && isCheckingAdmin) {
+  // Show loading while validating existing session
+  if (isLoading && !isSubmitting) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-rose-50 via-pink-50 to-purple-50 dark:from-rose-950/20 dark:via-pink-950/20 dark:to-purple-950/20 flex items-center justify-center">
         <div className="text-center space-y-4">
           <Loader2 className="w-12 h-12 animate-spin mx-auto text-rose-500" />
-          <p className="text-muted-foreground">Verifying admin privileges...</p>
+          <p className="text-muted-foreground">Checking session...</p>
         </div>
       </div>
     );
@@ -67,33 +66,63 @@ export default function AdminLogin() {
             Admin Login
           </CardTitle>
           <CardDescription className="text-base">
-            {t('nav.home')} - A&A Boxes Admin Panel
+            A&A Boxes Admin Panel
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          <div className="text-center space-y-4">
-            <p className="text-muted-foreground">
-              Secure authentication using Internet Identity
-            </p>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="username">Username</Label>
+              <Input
+                id="username"
+                type="text"
+                placeholder="Enter your username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                disabled={isSubmitting}
+                autoComplete="username"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                disabled={isSubmitting}
+                autoComplete="current-password"
+              />
+            </div>
+
+            {error && (
+              <div className="flex items-center gap-2 text-sm text-destructive bg-destructive/10 p-3 rounded-md">
+                <AlertCircle className="h-4 w-4" />
+                <span>{error}</span>
+              </div>
+            )}
+
             <Button
-              onClick={handleLogin}
-              disabled={isLoggingIn}
+              type="submit"
+              disabled={isSubmitting}
               className="w-full bg-gradient-to-r from-rose-400 to-pink-600 hover:from-rose-500 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transition-all duration-300"
               size="lg"
             >
-              {isLoggingIn ? (
+              {isSubmitting ? (
                 <>
                   <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                  Authenticating...
+                  Logging in...
                 </>
               ) : (
                 <>
                   <Shield className="mr-2 h-5 w-5" />
-                  Login with Internet Identity
+                  Login
                 </>
               )}
             </Button>
-          </div>
+          </form>
 
           <div className="pt-4 border-t">
             <Button

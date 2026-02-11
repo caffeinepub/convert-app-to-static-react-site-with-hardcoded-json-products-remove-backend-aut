@@ -1,17 +1,15 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { ShieldAlert, Home } from 'lucide-react';
+import { ShieldAlert, Home, LogIn } from 'lucide-react';
 import { useNavigate } from '@tanstack/react-router';
 
 interface AccessDeniedScreenProps {
   message?: string;
-  showHomeButton?: boolean;
 }
 
 export default function AccessDeniedScreen({ 
-  message = "You do not have permission to access this area. Admin privileges are required.",
-  showHomeButton = true 
+  message = "You are authenticated but do not have admin privileges. Please contact the system administrator if you need access."
 }: AccessDeniedScreenProps) {
   const navigate = useNavigate();
 
@@ -32,33 +30,33 @@ export default function AccessDeniedScreen({
         <CardContent className="space-y-6">
           <Alert variant="destructive">
             <ShieldAlert className="h-4 w-4" />
-            <AlertDescription>
+            <AlertDescription className="text-sm">
               {message}
             </AlertDescription>
           </Alert>
 
           <div className="space-y-3">
-            {showHomeButton && (
-              <Button
-                onClick={() => navigate({ to: '/' })}
-                className="w-full bg-gradient-to-r from-rose-400 to-pink-600 hover:from-rose-500 hover:to-pink-700 text-white"
-                size="lg"
-              >
-                <Home className="mr-2 h-5 w-5" />
-                Return to Home
-              </Button>
-            )}
+            <Button
+              onClick={() => navigate({ to: '/' })}
+              className="w-full bg-gradient-to-r from-rose-400 to-pink-600 hover:from-rose-500 hover:to-pink-700 text-white"
+              size="lg"
+            >
+              <Home className="mr-2 h-5 w-5" />
+              Return to Home
+            </Button>
             
             <Button
               variant="outline"
               onClick={() => navigate({ to: '/admin/login' })}
               className="w-full"
+              size="lg"
             >
+              <LogIn className="mr-2 h-5 w-5" />
               Back to Login
             </Button>
           </div>
 
-          <p className="text-xs text-center text-muted-foreground">
+          <p className="text-xs text-center text-muted-foreground pt-2">
             If you believe this is an error, please contact the system administrator.
           </p>
         </CardContent>

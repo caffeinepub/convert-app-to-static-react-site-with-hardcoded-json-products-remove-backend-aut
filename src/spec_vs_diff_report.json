@@ -1,76 +1,55 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-10T21:19:10.673Z",
-  "summary": "Diff adds a hardcoded admin principal in the Motoko backend and introduces an explicit AccessDenied UI plus updated admin login/dashboard flow. However, the diff evidence is insufficient to confirm that all admin-only backend methods enforce authorization correctly, that the change is upgrade-safe without wiping state, that Admin Diagnostics CRUD validation works, or that any existing 'bootstrap admin' action fails gracefully when unauthorized. The diff also includes many unrelated frontend content/styling changes not requested in the BuildRequest.",
+  "generatedAt": "2026-02-11T20:26:03.427Z",
+  "summary": "Diff implements a custom admin session system (username/password login, session persistence via localStorage, session-based gating of /admin, logout) and adds an Admin Dashboard “User Management” tab. However, REQ-5 role-based user creation/access control appears incomplete (no role field in backend AdminUser type and create-user UI). Diff also includes substantial unrelated marketing/landing-page content changes not requested by the BuildRequest.",
   "missing_requirements": [
     {
-      "id": "REQ-1",
-      "requirement": "Admin-only backend methods (e.g., product CRUD) succeed for the configured admin principal and continue to reject non-admin principals.",
-      "reason": "The diff shows the admin principal added to a `hardcodedAdmins` list, but does not show (in the provided truncated snippet) how `isAdmin` or admin guards are implemented/enforced across admin-only methods, so enforcement cannot be verified from the diff summary.",
+      "id": "REQ-5",
+      "requirement": "Admin can create a new user by entering Username, Password, and Role (at minimum: 'admin' and 'user'), and only users with role 'admin' can access /admin.",
+      "reason": "The added User Management UI shows fields for username, full name, and password, but no role input. Backend AdminUser type shown in diff has no role field, making role-based access control and role display unlikely to be implemented as required.",
       "evidence": [
-        "backend/main.mo (truncated)"
-      ]
-    },
-    {
-      "id": "REQ-1",
-      "requirement": "If the canister is upgraded and existing state is present, the change is applied without wiping existing content/state.",
-      "reason": "The backend change includes a comment explicitly stating no migration is used, and the diff summary provides no evidence of stable-state upgrade handling or a conditional migration that preserves existing state while applying the admin allowlist change.",
-      "evidence": [
-        "backend/main.mo (truncated)"
-      ]
-    },
-    {
-      "id": "REQ-2",
-      "requirement": "The Admin Diagnostics panel can be executed by an admin without errors and completes product CRUD validation successfully (create/read/update/delete of the temporary test product).",
-      "reason": "Admin pages import `DiagnosticsPanel`, but the diff summary does not show any implementation or changes to the diagnostics flow itself, nor any evidence it runs end-to-end without errors.",
-      "evidence": [
-        "frontend/src/pages/AdminDashboard.tsx (truncated)",
-        "frontend-file-summaries.txt (mentions DiagnosticsPanel but no diff evidence of its behavior)"
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "requirement": "If a 'bootstrap admin' action exists, it fails gracefully with a clear actionable error message when unauthorized and is not required for the configured admin principal to access /admin.",
-      "reason": "The diff summary indicates the Admin Login page has access denied handling and states it is 'without bootstrap functionality', but provides no evidence of how an existing bootstrap action (if present in the project) behaves when unauthorized (e.g., UI error messaging and staying on the same page).",
-      "evidence": [
-        "frontend/src/pages/AdminLogin.tsx (truncated)",
-        "frontend-file-summaries.txt (\"Admin login... clear access denied ... without bootstrap functionality\")"
+        "frontend/src/components/admin/UserManagementPanel.tsx",
+        "backend/main.mo"
       ]
     }
   ],
   "hallucinated_features": [
     {
-      "description": "Unrequested landing-page/marketing content updates across multiple sections (Hero/Header/Footer/About/Products/Contact), including updated product catalog content and updated contact details.",
-      "reason": "BuildRequest is focused on fixing admin access/flow and granting admin role; these content changes are not requested.",
+      "description": "Large set of non-admin/marketing site content and UI updates (Hero/About/Products/Packages/How to Order/Contact/Footer, Instagram section placement, global styles palette).",
+      "reason": "BuildRequest scope is admin authentication replacement and admin user management; these landing-page content changes are not requested.",
       "evidence": [
-        "frontend-file-summaries.txt (entries for Header.tsx, Hero.tsx, Products.tsx, About.tsx, Contact.tsx, Footer.tsx)"
+        "frontend-file-summaries.txt"
       ]
     },
     {
-      "description": "Unrequested UI theming/styling changes (soft-glam OKLCH palette, animations, Instagram embed container styling).",
-      "reason": "Not part of admin access/flow or backend admin role requirements.",
+      "description": "Diagnostics panel creates a bilingual '[TEST] Diagnostic Product' with Spanish text content as part of diagnostics flow.",
+      "reason": "BuildRequest does not ask for creating test products or adding Spanish content in this change; it also conflicts with the constraint that user-facing text added/changed by this work must be in English.",
       "evidence": [
-        "frontend-file-summaries.txt (frontend/src/index.css summary)"
+        "frontend/src/components/admin/DiagnosticsPanel.tsx"
       ]
     },
     {
-      "description": "Unrequested addition/expansion of non-admin features such as Instagram Feed section positioning and new Packages/HowToOrder sections content.",
-      "reason": "Not requested by the BuildRequest, which is limited to admin access and admin panel flow fixes.",
+      "description": "Admin user model/UI includes a 'full name' field for created users.",
+      "reason": "REQ-5 only requires username/password/role; full name is an extra feature not requested.",
       "evidence": [
-        "frontend-file-summaries.txt (App.tsx summary: Instagram Feed section positioning)",
-        "frontend-file-summaries.txt (components/Packages.tsx, components/HowToOrder.tsx summaries)"
+        "frontend/src/components/admin/UserManagementPanel.tsx",
+        "backend/main.mo"
       ]
     }
   ],
-  "confidence": 0.62,
+  "confidence": 0.74,
   "changed_files": [
     "backend/main.mo",
     "frontend-file-summaries.txt",
-    "frontend/src/components/admin/AccessDeniedScreen.tsx",
+    "frontend/src/components/Header.tsx",
+    "frontend/src/components/admin/DiagnosticsPanel.tsx",
+    "frontend/src/components/admin/UserManagementPanel.tsx",
+    "frontend/src/hooks/useAdminSession.ts",
     "frontend/src/hooks/useQueries.ts",
     "frontend/src/pages/AdminDashboard.tsx",
     "frontend/src/pages/AdminLogin.tsx",
+    "frontend/src/utils/adminSessionStorage.ts",
     "project_state.json"
   ]
 }

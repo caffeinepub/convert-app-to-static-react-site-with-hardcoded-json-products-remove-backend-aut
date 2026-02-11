@@ -1,6 +1,18 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useActor } from './useActor';
-import type { Product, Package, HowToOrderStep, UserProfile, SectionContentView, ContentBlockView, BlockType, InstagramFeedConfig } from '../backend';
+import { useAdminSession } from './useAdminSession';
+import type {
+  UserProfile,
+  Product,
+  Package,
+  HowToOrderStep,
+  SectionContentView,
+  ContentBlockView,
+  InstagramFeedConfig,
+  TextContent,
+  BlockType,
+  AdminUser,
+} from '../backend';
 import { ExternalBlob } from '../backend';
 
 // User Profile Queries
@@ -11,12 +23,7 @@ export function useGetCallerUserProfile() {
     queryKey: ['currentUserProfile'],
     queryFn: async () => {
       if (!actor) throw new Error('Actor not available');
-      try {
-        return await actor.getCallerUserProfile();
-      } catch (error: any) {
-        console.error('Error fetching user profile:', error);
-        throw error;
-      }
+      return actor.getCallerUserProfile();
     },
     enabled: !!actor && !actorFetching,
     retry: false,
@@ -36,12 +43,7 @@ export function useSaveCallerUserProfile() {
   return useMutation({
     mutationFn: async (profile: UserProfile) => {
       if (!actor) throw new Error('Actor not available');
-      try {
-        return await actor.saveCallerUserProfile(profile);
-      } catch (error: any) {
-        console.error('Error saving profile:', error);
-        throw new Error(error?.message || 'Failed to save profile');
-      }
+      return actor.saveCallerUserProfile(profile);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['currentUserProfile'] });
@@ -49,34 +51,22 @@ export function useSaveCallerUserProfile() {
   });
 }
 
-// Admin Check Query
+// Admin Check (kept for backwards compatibility but not used for auth)
 export function useIsCallerAdmin() {
   const { actor, isFetching: actorFetching } = useActor();
 
-  const query = useQuery<boolean>({
+  return useQuery<boolean>({
     queryKey: ['isCallerAdmin'],
     queryFn: async () => {
       if (!actor) return false;
-      try {
-        return await actor.isAdmin();
-      } catch (error: any) {
-        console.error('Error checking admin status:', error);
-        return false;
-      }
+      return actor.isCallerAdmin();
     },
     enabled: !!actor && !actorFetching,
     retry: false,
-    staleTime: 30000, // Cache for 30 seconds
   });
-
-  return {
-    ...query,
-    isLoading: actorFetching || query.isLoading,
-    isFetched: !!actor && query.isFetched,
-  };
 }
 
-// Products Queries
+// Products
 export function useGetAllProducts() {
   const { actor, isFetching } = useActor();
 
@@ -84,12 +74,7 @@ export function useGetAllProducts() {
     queryKey: ['products'],
     queryFn: async () => {
       if (!actor) return [];
-      try {
-        return await actor.getAllProducts();
-      } catch (error: any) {
-        console.error('Error fetching products:', error);
-        throw error;
-      }
+      return actor.getAllProducts();
     },
     enabled: !!actor && !isFetching,
   });
@@ -97,17 +82,18 @@ export function useGetAllProducts() {
 
 export function useAddProduct() {
   const { actor } = useActor();
+  const { sessionId } = useAdminSession();
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (product: { title: { english: string; spanish: string }; description: { english: string; spanish: string }; image: ExternalBlob; price: { english: string; spanish: string } }) => {
-      if (!actor) throw new Error('Actor not available');
-      try {
-        return await actor.addProduct(product.title, product.description, product.image, product.price);
-      } catch (error: any) {
-        console.error('Error adding product:', error);
-        throw new Error(error?.message || 'Failed to add product');
-      }
+    mutationFn: async (data: {
+      title: TextContent;
+      description: TextContent;
+      image: ExternalBlob;
+      price: TextContent;
+    }) => {
+      if (!actor || !sessionId) throw new Error('Not authenticated');
+      return actor.addProduct(sessionId, data.title, data.description, data.image, data.price);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
@@ -117,17 +103,19 @@ export function useAddProduct() {
 
 export function useEditProduct() {
   const { actor } = useActor();
+  const { sessionId } = useAdminSession();
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (product: { id: string; title: { english: string; spanish: string }; description: { english: string; spanish: string }; image: ExternalBlob; price: { english: string; spanish: string } }) => {
-      if (!actor) throw new Error('Actor not available');
-      try {
-        return await actor.editProduct(product.id, product.title, product.description, product.image, product.price);
-      } catch (error: any) {
-        console.error('Error editing product:', error);
-        throw new Error(error?.message || 'Failed to edit product');
-      }
+    mutationFn: async (data: {
+      id: string;
+      title: TextContent;
+      description: TextContent;
+      image: ExternalBlob;
+      price: TextContent;
+    }) => {
+      if (!actor || !sessionId) throw new Error('Not authenticated');
+      return actor.editProduct(sessionId, data.id, data.title, data.description, data.image, data.price);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
@@ -137,17 +125,13 @@ export function useEditProduct() {
 
 export function useDeleteProduct() {
   const { actor } = useActor();
+  const { sessionId } = useAdminSession();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (id: string) => {
-      if (!actor) throw new Error('Actor not available');
-      try {
-        return await actor.deleteProduct(id);
-      } catch (error: any) {
-        console.error('Error deleting product:', error);
-        throw new Error(error?.message || 'Failed to delete product');
-      }
+      if (!actor || !sessionId) throw new Error('Not authenticated');
+      return actor.deleteProduct(sessionId, id);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
@@ -155,7 +139,7 @@ export function useDeleteProduct() {
   });
 }
 
-// Packages Queries
+// Packages
 export function useGetAllPackages() {
   const { actor, isFetching } = useActor();
 
@@ -163,12 +147,7 @@ export function useGetAllPackages() {
     queryKey: ['packages'],
     queryFn: async () => {
       if (!actor) return [];
-      try {
-        return await actor.getAllPackages();
-      } catch (error: any) {
-        console.error('Error fetching packages:', error);
-        throw error;
-      }
+      return actor.getAllPackages();
     },
     enabled: !!actor && !isFetching,
   });
@@ -176,17 +155,18 @@ export function useGetAllPackages() {
 
 export function useAddPackage() {
   const { actor } = useActor();
+  const { sessionId } = useAdminSession();
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (pkg: { name: { english: string; spanish: string }; description: { english: string; spanish: string }; image: ExternalBlob; price: { english: string; spanish: string } }) => {
-      if (!actor) throw new Error('Actor not available');
-      try {
-        return await actor.addPackage(pkg.name, pkg.description, pkg.image, pkg.price);
-      } catch (error: any) {
-        console.error('Error adding package:', error);
-        throw new Error(error?.message || 'Failed to add package');
-      }
+    mutationFn: async (data: {
+      name: TextContent;
+      description: TextContent;
+      image: ExternalBlob;
+      price: TextContent;
+    }) => {
+      if (!actor || !sessionId) throw new Error('Not authenticated');
+      return actor.addPackage(sessionId, data.name, data.description, data.image, data.price);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['packages'] });
@@ -196,17 +176,19 @@ export function useAddPackage() {
 
 export function useEditPackage() {
   const { actor } = useActor();
+  const { sessionId } = useAdminSession();
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (pkg: { id: string; name: { english: string; spanish: string }; description: { english: string; spanish: string }; image: ExternalBlob; price: { english: string; spanish: string } }) => {
-      if (!actor) throw new Error('Actor not available');
-      try {
-        return await actor.editPackage(pkg.id, pkg.name, pkg.description, pkg.image, pkg.price);
-      } catch (error: any) {
-        console.error('Error editing package:', error);
-        throw new Error(error?.message || 'Failed to edit package');
-      }
+    mutationFn: async (data: {
+      id: string;
+      name: TextContent;
+      description: TextContent;
+      image: ExternalBlob;
+      price: TextContent;
+    }) => {
+      if (!actor || !sessionId) throw new Error('Not authenticated');
+      return actor.editPackage(sessionId, data.id, data.name, data.description, data.image, data.price);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['packages'] });
@@ -216,17 +198,13 @@ export function useEditPackage() {
 
 export function useDeletePackage() {
   const { actor } = useActor();
+  const { sessionId } = useAdminSession();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (id: string) => {
-      if (!actor) throw new Error('Actor not available');
-      try {
-        return await actor.deletePackage(id);
-      } catch (error: any) {
-        console.error('Error deleting package:', error);
-        throw new Error(error?.message || 'Failed to delete package');
-      }
+      if (!actor || !sessionId) throw new Error('Not authenticated');
+      return actor.deletePackage(sessionId, id);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['packages'] });
@@ -234,7 +212,7 @@ export function useDeletePackage() {
   });
 }
 
-// How To Order Queries
+// How to Order Steps
 export function useGetAllHowToOrderSteps() {
   const { actor, isFetching } = useActor();
 
@@ -242,12 +220,7 @@ export function useGetAllHowToOrderSteps() {
     queryKey: ['howToOrderSteps'],
     queryFn: async () => {
       if (!actor) return [];
-      try {
-        return await actor.getAllHowToOrderSteps();
-      } catch (error: any) {
-        console.error('Error fetching how-to-order steps:', error);
-        throw error;
-      }
+      return actor.getAllHowToOrderSteps();
     },
     enabled: !!actor && !isFetching,
   });
@@ -255,17 +228,18 @@ export function useGetAllHowToOrderSteps() {
 
 export function useAddHowToOrderStep() {
   const { actor } = useActor();
+  const { sessionId } = useAdminSession();
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (step: { stepNumber: bigint; title: { english: string; spanish: string }; description: { english: string; spanish: string }; image: ExternalBlob | null }) => {
-      if (!actor) throw new Error('Actor not available');
-      try {
-        return await actor.addHowToOrderStep(step.stepNumber, step.title, step.description, step.image);
-      } catch (error: any) {
-        console.error('Error adding how-to-order step:', error);
-        throw new Error(error?.message || 'Failed to add step');
-      }
+    mutationFn: async (data: {
+      stepNumber: bigint;
+      title: TextContent;
+      description: TextContent;
+      image: ExternalBlob | null;
+    }) => {
+      if (!actor || !sessionId) throw new Error('Not authenticated');
+      return actor.addHowToOrderStep(sessionId, data.stepNumber, data.title, data.description, data.image);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['howToOrderSteps'] });
@@ -275,17 +249,18 @@ export function useAddHowToOrderStep() {
 
 export function useEditHowToOrderStep() {
   const { actor } = useActor();
+  const { sessionId } = useAdminSession();
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (step: { stepNumber: bigint; title: { english: string; spanish: string }; description: { english: string; spanish: string }; image: ExternalBlob | null }) => {
-      if (!actor) throw new Error('Actor not available');
-      try {
-        return await actor.editHowToOrderStep(step.stepNumber, step.title, step.description, step.image);
-      } catch (error: any) {
-        console.error('Error editing how-to-order step:', error);
-        throw new Error(error?.message || 'Failed to edit step');
-      }
+    mutationFn: async (data: {
+      stepNumber: bigint;
+      title: TextContent;
+      description: TextContent;
+      image: ExternalBlob | null;
+    }) => {
+      if (!actor || !sessionId) throw new Error('Not authenticated');
+      return actor.editHowToOrderStep(sessionId, data.stepNumber, data.title, data.description, data.image);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['howToOrderSteps'] });
@@ -293,59 +268,62 @@ export function useEditHowToOrderStep() {
   });
 }
 
-// Sections Queries
+// Sections - Public
 export function useGetAllAdditionalSections() {
   const { actor, isFetching } = useActor();
 
   return useQuery<SectionContentView[]>({
-    queryKey: ['additionalSections'],
+    queryKey: ['sections'],
     queryFn: async () => {
       if (!actor) return [];
-      try {
-        return await actor.getAllAdditionalSections();
-      } catch (error: any) {
-        console.error('Error fetching sections:', error);
-        throw error;
-      }
+      return actor.getAllAdditionalSections();
     },
     enabled: !!actor && !isFetching,
   });
 }
 
+// Sections - Admin
 export function useGetAllSectionsAdmin() {
-  const { actor, isFetching } = useActor();
+  const { actor } = useActor();
+  const { sessionId } = useAdminSession();
 
   return useQuery<SectionContentView[]>({
     queryKey: ['sectionsAdmin'],
     queryFn: async () => {
-      if (!actor) return [];
-      try {
-        return await actor.getAllSectionsAdmin();
-      } catch (error: any) {
-        console.error('Error fetching admin sections:', error);
-        throw error;
-      }
+      if (!actor || !sessionId) return [];
+      return actor.getAllSectionsAdmin(sessionId);
     },
-    enabled: !!actor && !isFetching,
+    enabled: !!actor && !!sessionId,
   });
 }
 
 export function useCreateAdditionalSection() {
   const { actor } = useActor();
+  const { sessionId } = useAdminSession();
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (section: { title: { english: string; spanish: string }; description: { english: string; spanish: string }; image: ExternalBlob | null; background: ExternalBlob | null; order: bigint; isVisible: boolean }) => {
-      if (!actor) throw new Error('Actor not available');
-      try {
-        return await actor.createAdditionalSection(section.title, section.description, section.image, section.background, section.order, section.isVisible);
-      } catch (error: any) {
-        console.error('Error creating section:', error);
-        throw new Error(error?.message || 'Failed to create section');
-      }
+    mutationFn: async (data: {
+      title: TextContent;
+      description: TextContent;
+      image: ExternalBlob | null;
+      background: ExternalBlob | null;
+      order: bigint;
+      isVisible: boolean;
+    }) => {
+      if (!actor || !sessionId) throw new Error('Not authenticated');
+      return actor.createAdditionalSection(
+        sessionId,
+        data.title,
+        data.description,
+        data.image,
+        data.background,
+        data.order,
+        data.isVisible
+      );
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['additionalSections'] });
+      queryClient.invalidateQueries({ queryKey: ['sections'] });
       queryClient.invalidateQueries({ queryKey: ['sectionsAdmin'] });
     },
   });
@@ -353,20 +331,33 @@ export function useCreateAdditionalSection() {
 
 export function useUpdateAdditionalSection() {
   const { actor } = useActor();
+  const { sessionId } = useAdminSession();
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (section: { id: string; title: { english: string; spanish: string }; description: { english: string; spanish: string }; image: ExternalBlob | null; background: ExternalBlob | null; order: bigint; isVisible: boolean }) => {
-      if (!actor) throw new Error('Actor not available');
-      try {
-        return await actor.updateAdditionalSection(section.id, section.title, section.description, section.image, section.background, section.order, section.isVisible);
-      } catch (error: any) {
-        console.error('Error updating section:', error);
-        throw new Error(error?.message || 'Failed to update section');
-      }
+    mutationFn: async (data: {
+      id: string;
+      title: TextContent;
+      description: TextContent;
+      image: ExternalBlob | null;
+      background: ExternalBlob | null;
+      order: bigint;
+      isVisible: boolean;
+    }) => {
+      if (!actor || !sessionId) throw new Error('Not authenticated');
+      return actor.updateAdditionalSection(
+        sessionId,
+        data.id,
+        data.title,
+        data.description,
+        data.image,
+        data.background,
+        data.order,
+        data.isVisible
+      );
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['additionalSections'] });
+      queryClient.invalidateQueries({ queryKey: ['sections'] });
       queryClient.invalidateQueries({ queryKey: ['sectionsAdmin'] });
     },
   });
@@ -374,77 +365,94 @@ export function useUpdateAdditionalSection() {
 
 export function useDeleteAdditionalSection() {
   const { actor } = useActor();
+  const { sessionId } = useAdminSession();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (id: string) => {
-      if (!actor) throw new Error('Actor not available');
-      try {
-        return await actor.deleteAdditionalSection(id);
-      } catch (error: any) {
-        console.error('Error deleting section:', error);
-        throw new Error(error?.message || 'Failed to delete section');
-      }
+      if (!actor || !sessionId) throw new Error('Not authenticated');
+      return actor.deleteAdditionalSection(sessionId, id);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['additionalSections'] });
+      queryClient.invalidateQueries({ queryKey: ['sections'] });
       queryClient.invalidateQueries({ queryKey: ['sectionsAdmin'] });
     },
   });
 }
 
-// Content Blocks Queries
+// Content Blocks
 export function useGetAllContentBlocksAdmin() {
-  const { actor, isFetching } = useActor();
+  const { actor } = useActor();
+  const { sessionId } = useAdminSession();
 
   return useMutation({
     mutationFn: async (sectionId: string) => {
-      if (!actor) throw new Error('Actor not available');
-      try {
-        return await actor.getAllContentBlocksAdmin(sectionId);
-      } catch (error: any) {
-        console.error('Error fetching content blocks:', error);
-        throw new Error(error?.message || 'Failed to fetch content blocks');
-      }
+      if (!actor || !sessionId) throw new Error('Not authenticated');
+      return actor.getAllContentBlocksAdmin(sessionId, sectionId);
     },
   });
 }
 
 export function useAddContentBlock() {
   const { actor } = useActor();
+  const { sessionId } = useAdminSession();
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (block: { sectionId: string; title: { english: string; spanish: string }; content: { english: string; spanish: string }; image: ExternalBlob | null; blockType: BlockType; order: bigint; isVisible: boolean }) => {
-      if (!actor) throw new Error('Actor not available');
-      try {
-        return await actor.addContentBlock(block.sectionId, block.title, block.content, block.image, block.blockType, block.order, block.isVisible);
-      } catch (error: any) {
-        console.error('Error adding content block:', error);
-        throw new Error(error?.message || 'Failed to add content block');
-      }
+    mutationFn: async (data: {
+      sectionId: string;
+      title: TextContent;
+      content: TextContent;
+      image: ExternalBlob | null;
+      blockType: BlockType;
+      order: bigint;
+      isVisible: boolean;
+    }) => {
+      if (!actor || !sessionId) throw new Error('Not authenticated');
+      return actor.addContentBlock(
+        sessionId,
+        data.sectionId,
+        data.title,
+        data.content,
+        data.image,
+        data.blockType,
+        data.order,
+        data.isVisible
+      );
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['additionalSections'] });
+      queryClient.invalidateQueries({ queryKey: ['sections'] });
       queryClient.invalidateQueries({ queryKey: ['sectionsAdmin'] });
     },
   });
 }
 
-// Instagram Feed Queries
+export function useDeleteContentBlock() {
+  const { actor } = useActor();
+  const { sessionId } = useAdminSession();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (data: { sectionId: string; blockId: bigint }) => {
+      if (!actor || !sessionId) throw new Error('Not authenticated');
+      return actor.adminDeleteContentBlock(sessionId, data.sectionId, data.blockId);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['sections'] });
+      queryClient.invalidateQueries({ queryKey: ['sectionsAdmin'] });
+    },
+  });
+}
+
+// Instagram Feed
 export function useGetInstagramFeedConfig() {
   const { actor, isFetching } = useActor();
 
   return useQuery<InstagramFeedConfig | null>({
-    queryKey: ['instagramFeedConfig'],
+    queryKey: ['instagramFeed'],
     queryFn: async () => {
       if (!actor) return null;
-      try {
-        return await actor.getInstagramFeedConfig();
-      } catch (error: any) {
-        console.error('Error fetching Instagram feed config:', error);
-        throw error;
-      }
+      return actor.getInstagramFeedConfig();
     },
     enabled: !!actor && !isFetching,
   });
@@ -452,20 +460,62 @@ export function useGetInstagramFeedConfig() {
 
 export function useUpdateInstagramFeedConfig() {
   const { actor } = useActor();
+  const { sessionId } = useAdminSession();
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (config: { instagramHandle: string; instagramEmbedCode: string; title: { english: string; spanish: string }; description: { english: string; spanish: string }; displayOrder: bigint; isVisible: boolean }) => {
-      if (!actor) throw new Error('Actor not available');
-      try {
-        return await actor.updateInstagramFeedConfig(config.instagramHandle, config.instagramEmbedCode, config.title, config.description, config.displayOrder, config.isVisible);
-      } catch (error: any) {
-        console.error('Error updating Instagram feed config:', error);
-        throw new Error(error?.message || 'Failed to update Instagram feed config');
-      }
+    mutationFn: async (data: {
+      instagramHandle: string;
+      instagramEmbedCode: string;
+      title: TextContent;
+      description: TextContent;
+      displayOrder: bigint;
+      isVisible: boolean;
+    }) => {
+      if (!actor || !sessionId) throw new Error('Not authenticated');
+      return actor.updateInstagramFeedConfig(
+        sessionId,
+        data.instagramHandle,
+        data.instagramEmbedCode,
+        data.title,
+        data.description,
+        data.displayOrder,
+        data.isVisible
+      );
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['instagramFeedConfig'] });
+      queryClient.invalidateQueries({ queryKey: ['instagramFeed'] });
+    },
+  });
+}
+
+// User Management
+export function useGetAdminUsers() {
+  const { actor } = useActor();
+  const { sessionId } = useAdminSession();
+
+  return useQuery<AdminUser[]>({
+    queryKey: ['adminUsers'],
+    queryFn: async () => {
+      if (!actor || !sessionId) return [];
+      return actor.getAdminUsers(sessionId);
+    },
+    enabled: !!actor && !!sessionId,
+  });
+}
+
+export function useCreateAdminUser() {
+  const { actor } = useActor();
+  const { sessionId } = useAdminSession();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (data: { username: string; fullName: string; password: string }) => {
+      if (!actor || !sessionId) throw new Error('Not authenticated');
+      return actor.createAdminUser(sessionId, data.username, data.fullName, data.password);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['adminUsers'] });
     },
   });
 }

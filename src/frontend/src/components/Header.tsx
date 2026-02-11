@@ -3,18 +3,14 @@ import { useNavigate } from '@tanstack/react-router';
 import { Menu, X, Languages, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useInternetIdentity } from '../hooks/useInternetIdentity';
-import { useIsCallerAdmin } from '../hooks/useQueries';
+import { useAdminSession } from '../hooks/useAdminSession';
 
 const Header = () => {
   const navigate = useNavigate();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { language, setLanguage, t } = useLanguage();
-  const { identity } = useInternetIdentity();
-  const { data: isAdmin } = useIsCallerAdmin();
-
-  const isAuthenticated = !!identity;
+  const { isAuthenticated } = useAdminSession();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -45,7 +41,7 @@ const Header = () => {
   };
 
   const handleAdminClick = () => {
-    if (isAuthenticated && isAdmin) {
+    if (isAuthenticated) {
       navigate({ to: '/admin' });
     } else {
       navigate({ to: '/admin/login' });
@@ -82,132 +78,143 @@ const Header = () => {
           <nav className="hidden md:flex items-center space-x-6">
             <button
               onClick={() => scrollToSection('hero')}
-              className="text-foreground/80 hover:text-rose-500 transition-colors duration-300 font-medium"
+              className="text-foreground/80 hover:text-foreground transition-colors font-medium"
             >
               {t('nav.home')}
             </button>
             <button
-              onClick={() => scrollToSection('packages')}
-              className="text-foreground/80 hover:text-rose-500 transition-colors duration-300 font-medium"
-            >
-              {t('nav.packages')}
-            </button>
-            <button
               onClick={() => scrollToSection('products')}
-              className="text-foreground/80 hover:text-rose-500 transition-colors duration-300 font-medium"
+              className="text-foreground/80 hover:text-foreground transition-colors font-medium"
             >
               {t('nav.products')}
             </button>
             <button
+              onClick={() => scrollToSection('packages')}
+              className="text-foreground/80 hover:text-foreground transition-colors font-medium"
+            >
+              {t('nav.packages')}
+            </button>
+            <button
               onClick={() => scrollToSection('how-to-order')}
-              className="text-foreground/80 hover:text-rose-500 transition-colors duration-300 font-medium"
+              className="text-foreground/80 hover:text-foreground transition-colors font-medium"
             >
               {t('nav.howToOrder')}
             </button>
             <button
               onClick={() => scrollToSection('about')}
-              className="text-foreground/80 hover:text-rose-500 transition-colors duration-300 font-medium"
+              className="text-foreground/80 hover:text-foreground transition-colors font-medium"
             >
               {t('nav.about')}
             </button>
             <button
+              onClick={() => scrollToSection('instagram-feed')}
+              className="text-foreground/80 hover:text-foreground transition-colors font-medium"
+            >
+              {t('nav.instagram')}
+            </button>
+            <button
               onClick={() => scrollToSection('contact')}
-              className="text-foreground/80 hover:text-rose-500 transition-colors duration-300 font-medium"
+              className="text-foreground/80 hover:text-foreground transition-colors font-medium"
             >
               {t('nav.contact')}
             </button>
-            <button
-              onClick={toggleLanguage}
-              className="flex items-center space-x-1 text-foreground/80 hover:text-rose-500 transition-colors duration-300 font-medium"
-              aria-label="Toggle language"
-            >
-              <Languages size={18} />
-              <span className="text-sm uppercase">{language}</span>
-            </button>
-            <button
-              onClick={handleAdminClick}
-              className="flex items-center space-x-1 text-foreground/80 hover:text-rose-500 transition-colors duration-300 font-medium"
-              aria-label="Admin"
-            >
-              <Shield size={18} />
-            </button>
             <Button
-              onClick={() => scrollToSection('contact')}
-              className="bg-gradient-to-r from-rose-400 to-pink-600 hover:from-rose-500 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+              variant="ghost"
+              size="icon"
+              onClick={toggleLanguage}
+              className="text-foreground/80 hover:text-foreground"
             >
-              {t('nav.getStarted')}
+              <Languages className="h-5 w-5" />
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleAdminClick}
+              className="border-rose-400 text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/20"
+            >
+              <Shield className="mr-2 h-4 w-4" />
+              Admin
             </Button>
           </nav>
 
           {/* Mobile Menu Button */}
-          <button
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden p-2 text-foreground hover:text-rose-500 transition-colors"
-          >
-            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
+          <div className="md:hidden flex items-center space-x-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleLanguage}
+              className="text-foreground/80 hover:text-foreground"
+            >
+              <Languages className="h-5 w-5" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="text-foreground/80 hover:text-foreground"
+            >
+              {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </Button>
+          </div>
         </div>
 
-        {/* Mobile Navigation */}
+        {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <nav className="md:hidden py-4 space-y-4 animate-in fade-in slide-in-from-top-5 duration-300">
-            <button
-              onClick={() => scrollToSection('hero')}
-              className="block w-full text-left px-4 py-2 text-foreground/80 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/20 transition-all duration-300 rounded-lg"
-            >
-              {t('nav.home')}
-            </button>
-            <button
-              onClick={() => scrollToSection('packages')}
-              className="block w-full text-left px-4 py-2 text-foreground/80 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/20 transition-all duration-300 rounded-lg"
-            >
-              {t('nav.packages')}
-            </button>
-            <button
-              onClick={() => scrollToSection('products')}
-              className="block w-full text-left px-4 py-2 text-foreground/80 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/20 transition-all duration-300 rounded-lg"
-            >
-              {t('nav.products')}
-            </button>
-            <button
-              onClick={() => scrollToSection('how-to-order')}
-              className="block w-full text-left px-4 py-2 text-foreground/80 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/20 transition-all duration-300 rounded-lg"
-            >
-              {t('nav.howToOrder')}
-            </button>
-            <button
-              onClick={() => scrollToSection('about')}
-              className="block w-full text-left px-4 py-2 text-foreground/80 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/20 transition-all duration-300 rounded-lg"
-            >
-              {t('nav.about')}
-            </button>
-            <button
-              onClick={() => scrollToSection('contact')}
-              className="block w-full text-left px-4 py-2 text-foreground/80 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/20 transition-all duration-300 rounded-lg"
-            >
-              {t('nav.contact')}
-            </button>
-            <button
-              onClick={toggleLanguage}
-              className="flex items-center space-x-2 w-full text-left px-4 py-2 text-foreground/80 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/20 transition-all duration-300 rounded-lg"
-            >
-              <Languages size={18} />
-              <span className="text-sm uppercase">{language === 'en' ? 'English' : 'Español'}</span>
-            </button>
-            <button
-              onClick={handleAdminClick}
-              className="flex items-center space-x-2 w-full text-left px-4 py-2 text-foreground/80 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/20 transition-all duration-300 rounded-lg"
-            >
-              <Shield size={18} />
-              <span>Admin</span>
-            </button>
-            <Button
-              onClick={() => scrollToSection('contact')}
-              className="w-full bg-gradient-to-r from-rose-400 to-pink-600 hover:from-rose-500 hover:to-pink-700 text-white"
-            >
-              {t('nav.getStarted')}
-            </Button>
-          </nav>
+          <div className="md:hidden py-4 bg-background/95 backdrop-blur-md border-t">
+            <nav className="flex flex-col space-y-4">
+              <button
+                onClick={() => scrollToSection('hero')}
+                className="text-foreground/80 hover:text-foreground transition-colors font-medium text-left"
+              >
+                {t('nav.home')}
+              </button>
+              <button
+                onClick={() => scrollToSection('products')}
+                className="text-foreground/80 hover:text-foreground transition-colors font-medium text-left"
+              >
+                {t('nav.products')}
+              </button>
+              <button
+                onClick={() => scrollToSection('packages')}
+                className="text-foreground/80 hover:text-foreground transition-colors font-medium text-left"
+              >
+                {t('nav.packages')}
+              </button>
+              <button
+                onClick={() => scrollToSection('how-to-order')}
+                className="text-foreground/80 hover:text-foreground transition-colors font-medium text-left"
+              >
+                {t('nav.howToOrder')}
+              </button>
+              <button
+                onClick={() => scrollToSection('about')}
+                className="text-foreground/80 hover:text-foreground transition-colors font-medium text-left"
+              >
+                {t('nav.about')}
+              </button>
+              <button
+                onClick={() => scrollToSection('instagram-feed')}
+                className="text-foreground/80 hover:text-foreground transition-colors font-medium text-left"
+              >
+                {t('nav.instagram')}
+              </button>
+              <button
+                onClick={() => scrollToSection('contact')}
+                className="text-foreground/80 hover:text-foreground transition-colors font-medium text-left"
+              >
+                {t('nav.contact')}
+              </button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleAdminClick}
+                className="border-rose-400 text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/20 justify-start"
+              >
+                <Shield className="mr-2 h-4 w-4" />
+                Admin
+              </Button>
+            </nav>
+          </div>
         )}
       </div>
     </header>

@@ -1,28 +1,46 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "Project involves an app with an admin panel secured by Internet Identity. Current need is to ensure the admin panel login/authorization works and to grant admin access to the user (hernan@zerma-la.com), using their confirmed Internet Identity principal.",
+  "summary": "Implement a simplified admin authentication system by removing Internet Identity auth and replacing it with custom username/password login, backed by a Supabase profiles table with roles and an admin-only dashboard for user management.",
   "architectural_notes": [
-    "Admin access is determined by Internet Identity Principal (not email); backend must maintain an admin principals allowlist/roles store."
+    "Auth will not use Internet Identity; replace with custom username/password login.",
+    "User roles stored in Supabase profiles table; /admin protected by role==='admin'.",
+    "Supabase RLS required: admin full CRUD; users read own profile; no unauthenticated access."
   ],
   "known_issues": [
-    "If no initial admin is configured, role assignment fails with \"Unauthorized: Only admins can assign user roles\" and the app may return to Admin Login without an explicit error (login loop/no-op button)."
+    "Admin access currently failing ('access denied') under Internet Identity; needs to be disabled/replaced per new auth plan."
   ],
   "isFixRequest": true,
   "existing_features": [
     {
-      "id": "feature-review-and-fix-the-admin-panel-end-to-end-flow-so-it-works-reliably-internet-identity-login-admin-role-check-navigation-to-admin-and-a-clear-non-admin-experience-without-silent-loops-or-no-op-behavior",
-      "title": "Review and fix the admin panel end-to-end flow so it works reliably: Internet Identity login, admin role check, navigation to `/admin`, and a clear non-admin experience without silent loops or no-op behavior.",
+      "id": "feature-disable-the-internet-identity-authentication-flow-for-the-admin-system-ui-so-users-can-no-longer-log-in-to-the-admin-area-using-internet-identity",
+      "title": "Disable the Internet Identity authentication flow for the admin system UI so users can no longer log in to the admin area using Internet Identity.",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-custom-admin-authentication-flow-using-a-username-and-password-with-an-initial-hardcoded-primary-admin-credential-set-username-administrator-and-password-adminaaboxes26",
+      "title": "Add a custom admin authentication flow using a username and password, with an initial hardcoded primary admin credential set: Username \"Administrator\" and Password \"AdminAAboxes26\".",
       "reqIds": [
         "REQ-2"
       ],
       "version": 1
     },
     {
-      "id": "feature-if-the-project-currently-supports-a-bootstrap-admin-action-from-the-admin-login-page-ensure-it-fails-gracefully-with-a-clear-error-message-when-unauthorized-and-ensure-it-is-not-required-for-the-configured-admin-principal-in-req-1-to-access-the-admin-dashboard",
-      "title": "If the project currently supports a 'bootstrap admin' action from the Admin Login page, ensure it fails gracefully with a clear error message when unauthorized, and ensure it is not required for the configured admin principal in REQ-1 to access the admin dashboard.",
+      "id": "feature-update-the-admin-dashboard-to-use-the-new-custom-auth-session-and-provide-logout-while-keeping-the-existing-admin-content-management-panels-functional",
+      "title": "Update the admin dashboard to use the new custom auth session (and provide logout) while keeping the existing admin content management panels functional.",
       "reqIds": [
-        "REQ-3"
+        "REQ-4"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-admin-user-management-capability-so-the-admin-can-create-additional-users-with-username-password-and-role-and-view-the-list-of-existing-users",
+      "title": "Add admin user management capability so the admin can create additional users with username/password and role, and view the list of existing users.",
+      "reqIds": [
+        "REQ-5"
       ],
       "version": 1
     }
@@ -30,26 +48,44 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Verify admin panel works end-to-end (Internet Identity login, role check, access to /admin, editing products/texts) and fix the login loop/no-response behavior.",
+      "summary": "Remove/disable Internet Identity authentication and related UI/providers (no more Internet Identity login)",
       "reqIds": [],
       "status": "pending"
     },
     {
       "id": "AR-2",
-      "summary": "Add admin privileges for Hernan (hernan@zerma-la.com) by registering their Internet Identity principal (ix7jl-xlknv-uwyet-3fsxh-x7nqh-zkhvg-keqsk-zs4hv-ihh5p-uytti-6ae) in backend admin list/roles.",
+      "summary": "Implement custom username/password login page with initial hardcoded admin credentials (Administrator / AdminAAboxes26)",
       "reqIds": [],
       "status": "pending"
     },
     {
       "id": "AR-3",
-      "summary": "Guarantee that the Internet Identity principal `ix7jl-xlknv-uwyet-3fsxh-x7nqh-zkhvg-keqsk-zs4hv-ihh5p-uytti-6ae` (user email reference: `hernan@zerma-la.com`) is granted admin privileges in the backend so that this user can access the admin dashboard.",
+      "summary": "Create Supabase profiles table (id uuid PK, username unique, role default 'user', created_at) and seed Administrator as role='admin'",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-4",
+      "summary": "Add protected /admin route accessible only to users with role==='admin' and build Admin User Management (list users, create users with username/password/role)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-5",
+      "summary": "Enable Supabase RLS on profiles: admins full CRUD; users can read own profile only; unauthenticated users no access",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-8",
+      "summary": "Implement backend support for username/password-based admin sessions and authorization, replacing the current admin authorization reliance on Internet Identity principals for admin-dashboard operations.",
       "reqIds": [
-        "REQ-1"
+        "REQ-3"
       ],
       "status": "pending"
     }
   ],
-  "projectName": "Fix admin panel access and grant admin role to hernan@zerma-la.com (principal ix7jl-…-6ae)",
+  "projectName": "Disable Internet Identity for Admin Access and Implement Simple Username/Password Admin Login",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

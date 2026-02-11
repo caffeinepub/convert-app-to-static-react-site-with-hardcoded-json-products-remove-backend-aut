@@ -30,6 +30,14 @@ export interface ContentBlock {
     image?: ExternalBlob;
 }
 export type Time = bigint;
+export interface AdminUser {
+    username: string;
+    password: string;
+    createdAt: Time;
+    createdBy: string;
+    fullName: string;
+    isActive: boolean;
+}
 export interface SectionContentView {
     id: string;
     title: TextContent;
@@ -108,39 +116,43 @@ export enum UserRole {
     guest = "guest"
 }
 export interface backendInterface {
-    addContentBlock(sectionId: string, title: TextContent, content: TextContent, image: ExternalBlob | null, blockType: BlockType, order: bigint, isVisible: boolean): Promise<ContentBlock>;
-    addHowToOrderStep(stepNumber: bigint, title: TextContent, description: TextContent, image: ExternalBlob | null): Promise<HowToOrderStep>;
-    addPackage(name: TextContent, description: TextContent, image: ExternalBlob, price: TextContent): Promise<Package>;
-    addProduct(title: TextContent, description: TextContent, image: ExternalBlob, price: TextContent): Promise<Product>;
-    addSocialMediaLink(platform: string, url: string, icon: ExternalBlob | null): Promise<SocialMediaLink>;
-    adminDeleteContentBlock(sectionId: string, blockId: bigint): Promise<void>;
+    addContentBlock(sessionId: string, sectionId: string, title: TextContent, content: TextContent, image: ExternalBlob | null, blockType: BlockType, order: bigint, isVisible: boolean): Promise<ContentBlock>;
+    addHowToOrderStep(sessionId: string, stepNumber: bigint, title: TextContent, description: TextContent, image: ExternalBlob | null): Promise<HowToOrderStep>;
+    addPackage(sessionId: string, name: TextContent, description: TextContent, image: ExternalBlob, price: TextContent): Promise<Package>;
+    addProduct(sessionId: string, title: TextContent, description: TextContent, image: ExternalBlob, price: TextContent): Promise<Product>;
+    addSocialMediaLink(sessionId: string, platform: string, url: string, icon: ExternalBlob | null): Promise<SocialMediaLink>;
+    adminDeleteContentBlock(sessionId: string, sectionId: string, blockId: bigint): Promise<void>;
+    adminLogin(username: string, password: string): Promise<string>;
+    adminLogout(sessionId: string): Promise<void>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
-    bootstrapAdmin(): Promise<void>;
-    createAdditionalSection(title: TextContent, description: TextContent, image: ExternalBlob | null, background: ExternalBlob | null, order: bigint, isVisible: boolean): Promise<string>;
-    deleteAdditionalSection(id: string): Promise<void>;
-    deletePackage(id: string): Promise<void>;
-    deleteProduct(id: string): Promise<void>;
-    deleteSocialMediaLink(platform: string): Promise<void>;
-    editHowToOrderStep(stepNumber: bigint, title: TextContent, description: TextContent, image: ExternalBlob | null): Promise<HowToOrderStep>;
-    editPackage(id: string, name: TextContent, description: TextContent, image: ExternalBlob, price: TextContent): Promise<Package>;
-    editProduct(id: string, title: TextContent, description: TextContent, image: ExternalBlob, price: TextContent): Promise<Product>;
-    editSocialMediaLink(platform: string, url: string, icon: ExternalBlob | null): Promise<SocialMediaLink>;
+    createAdditionalSection(sessionId: string, title: TextContent, description: TextContent, image: ExternalBlob | null, background: ExternalBlob | null, order: bigint, isVisible: boolean): Promise<string>;
+    createAdminUser(sessionId: string, username: string, fullName: string, password: string): Promise<void>;
+    deleteAdditionalSection(sessionId: string, id: string): Promise<void>;
+    deletePackage(sessionId: string, id: string): Promise<void>;
+    deleteProduct(sessionId: string, id: string): Promise<void>;
+    deleteSocialMediaLink(sessionId: string, platform: string): Promise<void>;
+    editHowToOrderStep(sessionId: string, stepNumber: bigint, title: TextContent, description: TextContent, image: ExternalBlob | null): Promise<HowToOrderStep>;
+    editPackage(sessionId: string, id: string, name: TextContent, description: TextContent, image: ExternalBlob, price: TextContent): Promise<Package>;
+    editProduct(sessionId: string, id: string, title: TextContent, description: TextContent, image: ExternalBlob, price: TextContent): Promise<Product>;
+    editSocialMediaLink(sessionId: string, platform: string, url: string, icon: ExternalBlob | null): Promise<SocialMediaLink>;
+    getAdminUsers(sessionId: string): Promise<Array<AdminUser>>;
     getAllAdditionalSections(): Promise<Array<SectionContentView>>;
-    getAllContentBlocksAdmin(sectionId: string): Promise<Array<ContentBlockView>>;
+    getAllContentBlocksAdmin(sessionId: string, sectionId: string): Promise<Array<ContentBlockView>>;
     getAllHowToOrderSteps(): Promise<Array<HowToOrderStep>>;
     getAllPackageIds(): Promise<Array<string>>;
     getAllPackages(): Promise<Array<Package>>;
     getAllProducts(): Promise<Array<Product>>;
-    getAllSectionsAdmin(): Promise<Array<SectionContentView>>;
+    getAllSectionsAdmin(sessionId: string): Promise<Array<SectionContentView>>;
     getAllSocialMediaLinks(): Promise<Array<SocialMediaLink>>;
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
     getInstagramFeedConfig(): Promise<InstagramFeedConfig | null>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
-    getVisibleContentBlockAdmin(sectionId: string): Promise<Array<ContentBlockView>>;
+    getVisibleContentBlockAdmin(sessionId: string, sectionId: string): Promise<Array<ContentBlockView>>;
     isAdmin(): Promise<boolean>;
     isCallerAdmin(): Promise<boolean>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
-    updateAdditionalSection(id: string, title: TextContent, description: TextContent, image: ExternalBlob | null, background: ExternalBlob | null, order: bigint, isVisible: boolean): Promise<void>;
-    updateInstagramFeedConfig(instagramHandle: string, instagramEmbedCode: string, title: TextContent, description: TextContent, displayOrder: bigint, isVisible: boolean): Promise<void>;
+    updateAdditionalSection(sessionId: string, id: string, title: TextContent, description: TextContent, image: ExternalBlob | null, background: ExternalBlob | null, order: bigint, isVisible: boolean): Promise<void>;
+    updateInstagramFeedConfig(sessionId: string, instagramHandle: string, instagramEmbedCode: string, title: TextContent, description: TextContent, displayOrder: bigint, isVisible: boolean): Promise<void>;
+    validateSession(sessionId: string): Promise<boolean>;
 }

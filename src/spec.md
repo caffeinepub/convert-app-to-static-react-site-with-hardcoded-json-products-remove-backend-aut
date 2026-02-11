@@ -1,14 +1,14 @@
 # Specification
 
 ## Summary
-**Goal:** Restore reliable admin dashboard access and ensure the specified Internet Identity principal is recognized as an admin.
+**Goal:** Replace the admin area’s Internet Identity login with a simple username/password login backed by server-side sessions, and add basic admin user management.
 
 **Planned changes:**
-- Add/verify backend admin role configuration so principal `ix7jl-xlknv-uwyet-3fsxh-x7nqh-zkhvg-keqsk-zs4hv-ihh5p-uytti-6ae` is granted admin privileges and admin-only methods authorize correctly.
-- Ensure the admin-check method used by the frontend `useIsCallerAdmin` hook returns the correct result for admins vs non-admins.
-- Fix the frontend admin flow end-to-end: Internet Identity login, admin role check, and rendering/navigation for `/admin` without blank screens or redirect loops.
-- Update `/admin` and `/admin/login` to show a clear access-denied message for logged-in non-admin users.
-- Ensure any existing “bootstrap admin” action is not required for the configured admin principal, and shows a clear error message when unauthorized.
-- Preserve existing canister state across upgrade; apply changes without wiping existing data.
+- Remove/disable any Internet Identity UI and logic from the admin login and admin navigation so the admin flow never triggers Internet Identity authentication.
+- Implement a new `/admin/login` screen with Username/Password fields, English error messaging, and login/logout controls.
+- Add backend login/logout endpoints to create/invalidate an admin session token and enforce authorization for all admin-only backend methods using that session (not Internet Identity principals).
+- Update admin routing so `/admin` requires a valid admin session (redirect to `/admin/login` when not logged in) while keeping existing admin panels functional.
+- Add a User Management panel in the admin dashboard to list users and create new users with username, password, and role (`admin`/`user`), where only `admin` role can access `/admin`.
+- Seed/allow login with the initial primary admin credentials: Username `Administrator`, Password `AdminAAboxes26`.
 
-**User-visible outcome:** Admin users (including the specified principal) can log in with Internet Identity and reliably access the Admin Dashboard at `/admin`, while non-admin users see a clear access-denied message instead of loops or silent failures.
+**User-visible outcome:** Users can no longer use Internet Identity to access the admin area; admins can log in at `/admin/login` using username/password (session persists until logout), access the existing admin dashboard tabs, log out, and manage additional users/roles from a User Management panel.
