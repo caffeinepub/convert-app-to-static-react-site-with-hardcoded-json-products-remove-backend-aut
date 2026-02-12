@@ -1,47 +1,55 @@
 {
   "kind": "build_request",
-  "title": "Clarify and document where the admin route is defined",
+  "title": "Provide a downloadable UI text file for editing",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Ensure the admin route location and paths are clearly documented for developers by keeping `frontend/src/ADMIN_ROUTES.md` accurate and adding a short pointer comment in `frontend/src/App.tsx` near the admin route definitions indicating that admin routes live there and referencing `frontend/src/ADMIN_ROUTES.md`.",
+      "text": "Add a user-accessible download option that provides the current plain-text UI translations file as a direct file download in the browser (same format as `frontend/src/texts/ui-texts.txt`: `KEY = English | Spanish`).",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-3"
+          "msg-1"
         ],
         "quotes": [
-          "muestrame en el chat cual es la ruta donde esta el admin"
+          "enviame el archivo para descargar"
         ]
       },
       "acceptanceCriteria": [
-        "`frontend/src/ADMIN_ROUTES.md` explicitly states that admin routes are defined in `frontend/src/App.tsx` and lists the admin paths: `/admin/login` and `/admin`.",
-        "`frontend/src/App.tsx` includes a brief comment near the admin route declarations (the `createRoute` blocks for `/admin/login` and `/admin`) pointing maintainers to `frontend/src/ADMIN_ROUTES.md`.",
-        "No changes are made to any files under `frontend/src/hooks/useInternetIdentity.ts`, `frontend/src/hooks/useInternetIdentity.tsx`, `frontend/src/hooks/useActor.ts`, `frontend/src/main.tsx`, or `frontend/src/components/ui`."
+        "A user can click a control in the UI and their browser downloads a `.txt` file containing the UI translations in the existing plain-text format.",
+        "The downloaded file contents match the app’s current translation source (including comments and section headers) and are not missing any keys.",
+        "The download works in a production build (not only in local dev)."
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "text": "Update the plain-text workflow documentation to include clear instructions on how to download the translations text file from the app UI and where that file maps in the repository.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "enviame el archivo para descargar"
+        ]
+      },
+      "acceptanceCriteria": [
+        "`frontend/src/UI_TEXT_PLAIN_TEXT_WORKFLOW.md` documents the exact UI location/steps to download the `.txt` file.",
+        "Documentation names the repository source file (`frontend/src/texts/ui-texts.txt`) and the downloaded filename users should expect."
       ]
     }
   ],
   "constraints": [
-    "Backend must remain single-actor; do not introduce additional canisters/services.",
-    "Do not modify files listed in `frontend.immutablePaths` from SYSTEM_CONTEXT."
+    "Do not modify any files under `frontend/src/components/ui` (read-only UI library components).",
+    "Do not edit the immutable hook/entry paths listed in SYSTEM_CONTEXT (compose around them instead)."
   ],
   "nonGoals": [
-    "Changing admin authentication logic or session behavior.",
-    "Adding new admin pages or changing existing admin route URLs."
+    "Implementing an in-app editor for translations.",
+    "Adding backend storage or persistence for translations.",
+    "Adding third-party localization platforms or integrations."
   ],
   "imageRequirements": {
     "required": [],
     "edits": []
-  },
-  "userProfileUpdate": {
-    "goalsToAdd": [],
-    "goalsToRemove": [],
-    "preferencesToAdd": [],
-    "preferencesToRemove": [],
-    "miscToAdd": [],
-    "miscToRemove": [],
-    "fieldsToSet": {},
-    "fieldsToDelete": []
   }
 }

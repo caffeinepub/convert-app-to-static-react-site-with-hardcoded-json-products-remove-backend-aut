@@ -1,6 +1,8 @@
-import { Heart } from 'lucide-react';
+import { Heart, Download } from 'lucide-react';
 import { SiFacebook, SiInstagram } from 'react-icons/si';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { downloadUiTexts } from '@/utils/downloadUiTexts';
+import { Button } from '@/components/ui/button';
 
 const Footer = () => {
   const { t } = useLanguage();
@@ -17,6 +19,10 @@ const Footer = () => {
         behavior: 'smooth',
       });
     }
+  };
+
+  const handleDownloadTexts = () => {
+    downloadUiTexts();
   };
 
   return (
@@ -109,6 +115,17 @@ const Footer = () => {
                 >
                   {t('nav.contact')}
                 </button>
+              </li>
+              <li>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleDownloadTexts}
+                  className="text-foreground/70 hover:text-rose-500 transition-colors text-sm p-0 h-auto font-normal justify-start"
+                >
+                  <Download size={14} className="mr-1.5" />
+                  Download UI Texts
+                </Button>
               </li>
             </ul>
           </div>

@@ -1,10 +1,11 @@
 # Specification
 
 ## Summary
-**Goal:** Make it clear for developers where the admin routes are defined and what the admin paths are.
+**Goal:** Let users download the app’s current plain-text UI translations file directly from the UI, and document how to do it.
 
 **Planned changes:**
-- Update `frontend/src/ADMIN_ROUTES.md` to explicitly state that admin routes are defined in `frontend/src/App.tsx` and list the paths `/admin/login` and `/admin`.
-- Add a short comment in `frontend/src/App.tsx` near the `/admin/login` and `/admin` route definitions pointing maintainers to `frontend/src/ADMIN_ROUTES.md`.
+- Add a user-accessible UI control that triggers a browser download of the current UI translations as a `.txt` file in the existing `KEY = English | Spanish` format.
+- Ensure the downloaded file content matches `frontend/src/texts/ui-texts.txt` exactly (including comments and section headers) and works in production builds.
+- Update `frontend/src/UI_TEXT_PLAIN_TEXT_WORKFLOW.md` with step-by-step instructions for downloading the file from the UI, and document the mapping to `frontend/src/texts/ui-texts.txt` plus the expected downloaded filename.
 
-**User-visible outcome:** Developers can quickly find and verify the admin route definitions and paths without changing any app behavior.
+**User-visible outcome:** A user can click an in-app download option to get a `.txt` translations file that matches the app’s current UI text source, and can follow documentation to locate and understand the source file in the repository.

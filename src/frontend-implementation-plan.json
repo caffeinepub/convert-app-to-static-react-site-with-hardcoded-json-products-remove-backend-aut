@@ -1,26 +1,51 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Document and annotate where admin routes are defined",
+  "title": "Downloadable UI translations plain-text file",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Keep admin route documentation accurate and add an in-code pointer comment near the admin route declarations in App.tsx referencing ADMIN_ROUTES.md.",
+      "summary": "Provide an in-app control that downloads the current ui-texts plain-text translations file exactly as used by the app.",
       "acceptanceCriteria": [
-        "`frontend/src/ADMIN_ROUTES.md` explicitly states that admin routes are defined in `frontend/src/App.tsx` and lists the admin paths: `/admin/login` and `/admin`.",
-        "`frontend/src/App.tsx` includes a brief comment near the admin route declarations (the `createRoute` blocks for `/admin/login` and `/admin`) pointing maintainers to `frontend/src/ADMIN_ROUTES.md`.",
-        "No changes are made to any files under `frontend/src/hooks/useInternetIdentity.ts`, `frontend/src/hooks/useInternetIdentity.tsx`, `frontend/src/hooks/useActor.ts`, `frontend/src/main.tsx`, or `frontend/src/components/ui`."
+        "A user can click a control in the UI and their browser downloads a `.txt` file containing the UI translations in the existing plain-text format.",
+        "The downloaded file contents match the app’s current translation source (including comments and section headers) and are not missing any keys.",
+        "The download works in a production build (not only in local dev)."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/ADMIN_ROUTES.md",
-          "operation": "modify",
-          "description": "Verify the documentation explicitly states that admin routes are defined in `frontend/src/App.tsx` and that it clearly lists the admin paths `/admin/login` and `/admin` (adjust wording/formatting for clarity while keeping the same paths)."
+          "path": "frontend/src/texts/uiTextsSource.ts",
+          "operation": "create",
+          "description": "Centralize the UI translations plain-text source by importing `frontend/src/texts/ui-texts.txt?raw` and exporting (a) the raw plain-text content and (b) the expected downloaded filename (e.g., `ui-texts.txt`) so both translation loading and download use the exact same string in production builds."
         },
         {
-          "path": "frontend/src/App.tsx",
+          "path": "frontend/src/contexts/LanguageContext.tsx",
           "operation": "modify",
-          "description": "Add a short pointer comment immediately adjacent to the admin `createRoute` declarations for `/admin/login` and `/admin` indicating that admin routes live here and referencing `frontend/src/ADMIN_ROUTES.md` for maintainers."
+          "description": "Update translation loading to consume the raw plain-text string from `frontend/src/texts/uiTextsSource.ts` (instead of importing the txt directly) so the app’s translation source and the downloaded file always match exactly."
+        },
+        {
+          "path": "frontend/src/utils/downloadUiTexts.ts",
+          "operation": "create",
+          "description": "Implement a small utility that triggers a browser download by creating a `text/plain;charset=utf-8` Blob from the exported raw plain-text content, creating a temporary object URL, and clicking an `<a download>` link; ensure it uses the exported expected filename from `frontend/src/texts/uiTextsSource.ts`."
+        },
+        {
+          "path": "frontend/src/components/Footer.tsx",
+          "operation": "modify",
+          "description": "Add a user-accessible control (e.g., a link-styled button in the footer Quick Links or bottom bar) labeled to indicate downloading the translations file; wire its click handler to the `downloadUiTexts` utility so users can download the `.txt` file from the public UI. Use shadcn-ui (e.g., Button) only via existing imports if desired; verify the component's usage instructions before implementing."
+        }
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "summary": "Document how to download the translations text file from the UI and how it maps to the repository source file.",
+      "acceptanceCriteria": [
+        "`frontend/src/UI_TEXT_PLAIN_TEXT_WORKFLOW.md` documents the exact UI location/steps to download the `.txt` file.",
+        "Documentation names the repository source file (`frontend/src/texts/ui-texts.txt`) and the downloaded filename users should expect."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/UI_TEXT_PLAIN_TEXT_WORKFLOW.md",
+          "operation": "modify",
+          "description": "Expand the workflow doc to (1) name the repository source file `frontend/src/texts/ui-texts.txt`, (2) describe the exact UI location/steps to download it (matching where the Footer control is added), and (3) state the exact downloaded filename users should expect (matching the filename used by the download utility)."
         }
       ]
     }

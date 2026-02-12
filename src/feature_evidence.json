@@ -2,10 +2,13 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-ensure-the-admin-route-location-and-paths-are-clearly-documented-for-developers-by-keeping-frontend-src-admin-routes-md-accurate-and-adding-a-short-pointer-comment-in-frontend-src-app-tsx-near-the-admin-route-definitions-indicating-that-admin-routes-live-there-and-referencing-frontend-src-admin-routes-md",
-      "featureTitle": "Ensure the admin route location and paths are clearly documented for developers by keeping `frontend/src/ADMIN_ROUTES.md` accurate and adding a short pointer comment in `frontend/src/App.tsx` near the admin route definitions indicating that admin routes live there and referencing `frontend/src/ADMIN_ROUTES.md`.",
+      "featureId": "feature-add-a-user-accessible-download-option-that-provides-the-current-plain-text-ui-translations-file-as-a-direct-file-download-in-the-browser-same-format-as-frontend-src-texts-ui-texts-txt-key-english-spanish",
+      "featureTitle": "Add a user-accessible download option that provides the current plain-text UI translations file as a direct file download in the browser (same format as `frontend/src/texts/ui-texts.txt`: `KEY = English | Spanish`).",
       "files": [
-        "frontend/src/App.tsx"
+        "frontend/src/components/Footer.tsx",
+        "frontend/src/contexts/LanguageContext.tsx",
+        "frontend/src/texts/uiTextsSource.ts",
+        "frontend/src/utils/downloadUiTexts.ts"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -18,6 +21,26 @@
       ],
       "testIds": [
         "REQ-1"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-update-the-plain-text-workflow-documentation-to-include-clear-instructions-on-how-to-download-the-translations-text-file-from-the-app-ui-and-where-that-file-maps-in-the-repository",
+      "featureTitle": "Update the plain-text workflow documentation to include clear instructions on how to download the translations text file from the app UI and where that file maps in the repository.",
+      "files": [
+        "frontend/src/UI_TEXT_PLAIN_TEXT_WORKFLOW.md"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "blob-storage@4.0.0",
+        "authorization@4.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-2"
       ],
       "confidence": "high"
     }

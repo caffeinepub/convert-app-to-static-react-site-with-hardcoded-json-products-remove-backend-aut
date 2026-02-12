@@ -1,0 +1,561 @@
+# A&A Boxes UI Text - Plain Text Format
+# Format: KEY = English Text | Spanish Text
+# Lines starting with # are comments
+# Empty lines are ignored
+
+# ===== HEADER / NAVIGATION =====
+nav.home = Home | Inicio
+nav.packages = Packages | Paquetes
+nav.products = Products | Productos
+nav.howToOrder = How to Order | Cómo Ordenar
+nav.about = About | Nosotros
+nav.contact = Contact | Contacto
+nav.getStarted = Get Started | Comenzar
+
+# ===== HERO SECTION =====
+hero.title1 = Luxury Gift Boxes | Cajas de Regalo de Lujo
+hero.title2 = Made with Love | Hechas con Amor
+hero.subtitle = Create unforgettable moments with our premium, customizable gift boxes designed to celebrate life's special occasions | Crea momentos inolvidables con nuestras cajas de regalo premium y personalizables diseñadas para celebrar las ocasiones especiales de la vida
+hero.exploreCollection = Explore Our Collection | Explora Nuestra Colección
+hero.customOrders = Custom Orders | Pedidos Personalizados
+hero.feature1.title = Premium Quality | Calidad Premium
+hero.feature1.desc = Handcrafted with the finest materials | Hechas a mano con los mejores materiales
+hero.feature2.title = Fully Customizable | Totalmente Personalizable
+hero.feature2.desc = Personalize every detail to perfection | Personaliza cada detalle a la perfección
+hero.feature3.title = Made with Love | Hechas con Amor
+hero.feature3.desc = Each box tells a unique story | Cada caja cuenta una historia única
+
+# ===== PACKAGES SECTION =====
+packages.title = Our Packages | Nuestros Paquetes
+packages.subtitle = Choose from our curated package options designed for every occasion | Elige entre nuestras opciones de paquetes diseñados para cada ocasión
+
+package.basic.name = Basic Package | Paquete Básico
+package.basic.desc = Perfect starter package with essential customization options. Includes personalized labels, themed decorations, and quality gift items. | Paquete inicial perfecto con opciones esenciales de personalización. Incluye etiquetas personalizadas, decoraciones temáticas y artículos de regalo de calidad.
+package.basic.tag = Starter | Inicial
+
+package.deluxe.name = Deluxe Package | Paquete Deluxe
+package.deluxe.desc = Enhanced package with premium items and advanced customization. Features luxury materials, exclusive designs, and premium gift selections. | Paquete mejorado con artículos premium y personalización avanzada. Presenta materiales de lujo, diseños exclusivos y selecciones de regalos premium.
+package.deluxe.tag = Popular | Popular
+
+package.premium.name = Premium Package | Paquete Premium
+package.premium.desc = Our most luxurious package with full customization and premium contents. Includes designer elements, high-end gifts, and white-glove service. | Nuestro paquete más lujoso con personalización completa y contenidos premium. Incluye elementos de diseñador, regalos de alta gama y servicio de guante blanco.
+package.premium.tag = Luxury | Lujo
+
+package.corporate.name = Corporate Package | Paquete Corporativo
+package.corporate.desc = Professional packages for business events and client appreciation. Branded with your company logo and tailored to corporate standards. | Paquetes profesionales para eventos empresariales y apreciación de clientes. Con marca de tu empresa y adaptados a estándares corporativos.
+package.corporate.tag = Business | Negocios
+
+package.event.name = Event Package | Paquete de Eventos
+package.event.desc = Comprehensive packages for large celebrations and special events. Bulk ordering available with consistent quality and theming. | Paquetes completos para grandes celebraciones y eventos especiales. Pedidos al por mayor disponibles con calidad y temática consistentes.
+package.event.tag = Events | Eventos
+
+package.seasonal.name = Seasonal Package | Paquete de Temporada
+package.seasonal.desc = Limited edition packages celebrating holidays and special seasons. Features seasonal themes, colors, and festive elements. | Paquetes de edición limitada celebrando días festivos y temporadas especiales. Presenta temas de temporada, colores y elementos festivos.
+package.seasonal.tag = Limited | Limitado
+
+# ===== PRODUCTS SECTION =====
+products.title = Our Products | Nuestros Productos
+products.subtitle = Discover our curated selection of premium gift items, each designed to create unforgettable moments | Descubre nuestra selección curada de artículos de regalo premium, cada uno diseñado para crear momentos inolvidables
+
+product.customNutella.name = Custom Nutella Jar | Frasco Nutella Personalizado
+product.customNutella.desc = Personalized Nutella jars with custom labels featuring names, photos, or special messages. Perfect for sweet celebrations and unique gift giving. | Frascos de Nutella personalizados con etiquetas personalizadas con nombres, fotos o mensajes especiales. Perfecto para celebraciones dulces y regalos únicos.
+product.customNutella.tag = Custom | Personalizado
+
+product.customPlaydoh.name = Custom Play-Doh | Play-Doh Personalizado
+product.customPlaydoh.desc = Branded Play-Doh containers with personalized packaging and labels. Ideal for children's parties, creative activities, and memorable party favors. | Contenedores de Play-Doh con marca y empaque y etiquetas personalizadas. Ideal para fiestas infantiles, actividades creativas y recuerdos memorables.
+product.customPlaydoh.tag = Kids | Niños
+
+product.customPringles.name = Custom Pringles | Pringles Personalizados
+product.customPringles.desc = Personalized Pringles cans with custom labels and designs. A fun and unique way to celebrate any occasion with a savory twist. | Latas de Pringles personalizadas con etiquetas y diseños personalizados. Una forma divertida y única de celebrar cualquier ocasión con un toque salado.
+product.customPringles.tag = Snacks | Snacks
+
+product.chocolateBox.name = Deluxe Chocolate Box | Caja Chocolate Deluxe
+product.chocolateBox.desc = Premium chocolate gift box featuring an assortment of gourmet chocolates. Elegantly packaged for the ultimate indulgence experience. | Caja de regalo de chocolate premium con una variedad de chocolates gourmet. Elegantemente empaquetada para la máxima experiencia de indulgencia.
+product.chocolateBox.tag = Deluxe | Deluxe
+
+product.pyramidBox.name = Pyramid Surprise Box | Caja Sorpresa Pirámide
+product.pyramidBox.desc = Interactive surprise box with unique pyramid design. Shake to reveal hidden treats and gifts inside. Perfect for creating memorable unboxing moments. | Caja sorpresa interactiva con diseño piramidal único. Agita para revelar golosinas y regalos ocultos en el interior. Perfecta para crear momentos memorables de apertura.
+product.pyramidBox.tag = Special | Especial
+
+product.castleBox.name = Castle Party Box | Caja Fiesta Castillo
+product.castleBox.desc = Magical celebration box perfect for princess-themed parties. Includes decorative castle design, party favors, and customizable elements for an enchanting experience. | Caja de celebración mágica perfecta para fiestas temáticas de princesas. Incluye diseño de castillo decorativo, favores de fiesta y elementos personalizables para una experiencia encantadora.
+product.castleBox.tag = Party | Fiesta
+
+product.giftBags.name = Custom Gift Bags | Bolsas de Regalo Personalizadas
+product.giftBags.desc = Personalized gift bags in various sizes and designs. Perfect for party favors, corporate gifts, and special occasion giveaways. | Bolsas de regalo personalizadas en varios tamaños y diseños. Perfectas para favores de fiesta, regalos corporativos y obsequios de ocasiones especiales.
+product.giftBags.tag = Versatile | Versátil
+
+product.candyJars.name = Candy Jars | Frascos de Dulces
+product.candyJars.desc = Decorative candy jars filled with premium sweets. Customizable labels and ribbon colors to match any theme or celebration. | Frascos decorativos de dulces llenos de dulces premium. Etiquetas personalizables y colores de cinta para combinar con cualquier tema o celebración.
+product.candyJars.tag = Sweet | Dulce
+
+product.partyFavors.name = Party Favor Sets | Sets de Favores de Fiesta
+product.partyFavors.desc = Complete party favor sets with coordinated items. Includes small gifts, treats, and decorative elements for guest appreciation. | Sets completos de favores de fiesta con artículos coordinados. Incluye pequeños regalos, golosinas y elementos decorativos para apreciación de invitados.
+product.partyFavors.tag = Party | Fiesta
+
+product.customCookies.name = Custom Cookies | Galletas Personalizadas
+product.customCookies.desc = Decorated cookies with custom designs and messages. Individually wrapped and perfect for any celebration or corporate event. | Galletas decoradas con diseños y mensajes personalizados. Envueltas individualmente y perfectas para cualquier celebración o evento corporativo.
+product.customCookies.tag = Treats | Golosinas
+
+product.giftBaskets.name = Gift Baskets | Canastas de Regalo
+product.giftBaskets.desc = Curated gift baskets with premium items. Customizable contents and presentation to suit any occasion or recipient preference. | Canastas de regalo curadas con artículos premium. Contenidos y presentación personalizables para adaptarse a cualquier ocasión o preferencia del destinatario.
+product.giftBaskets.tag = Premium | Premium
+
+product.themeSets.name = Themed Gift Sets | Sets de Regalo Temáticos
+product.themeSets.desc = Coordinated gift sets designed around specific themes. From baby showers to weddings, each set tells a cohesive story. | Sets de regalo coordinados diseñados alrededor de temas específicos. Desde baby showers hasta bodas, cada set cuenta una historia cohesiva.
+product.themeSets.tag = Themed | Temático
+
+# ===== HOW TO ORDER SECTION =====
+howToOrder.title = How to Order | Cómo Ordenar
+howToOrder.subtitle = Follow these simple steps to create your perfect gift box | Sigue estos simples pasos para crear tu caja de regalo perfecta
+
+howToOrder.step1.title = Choose Your Package | Elige Tu Paquete
+howToOrder.step1.desc = Select from our range of packages that best fits your occasion and budget. Browse our Basic, Deluxe, Premium, Corporate, Event, or Seasonal options. | Selecciona de nuestra gama de paquetes que mejor se adapte a tu ocasión y presupuesto. Explora nuestras opciones Básico, Deluxe, Premium, Corporativo, Eventos o de Temporada.
+
+howToOrder.step2.title = Select Your Products | Selecciona Tus Productos
+howToOrder.step2.desc = Pick the items you want to include in your gift box. Mix and match from our extensive product catalog to create the perfect combination. | Elige los artículos que deseas incluir en tu caja de regalo. Mezcla y combina de nuestro extenso catálogo de productos para crear la combinación perfecta.
+
+howToOrder.step3.title = Customize Your Design | Personaliza Tu Diseño
+howToOrder.step3.desc = Personalize your gift box with custom labels, colors, messages, and themes. Share your vision with us and we'll bring it to life. | Personaliza tu caja de regalo con etiquetas, colores, mensajes y temas personalizados. Comparte tu visión con nosotros y la haremos realidad.
+
+howToOrder.step4.title = Review & Confirm | Revisa y Confirma
+howToOrder.step4.desc = Review your selections and customization details. We'll provide a preview and quote for your approval before production begins. | Revisa tus selecciones y detalles de personalización. Te proporcionaremos una vista previa y cotización para tu aprobación antes de comenzar la producción.
+
+howToOrder.step5.title = Place Your Order | Realiza Tu Pedido
+howToOrder.step5.desc = Confirm your order and complete payment. We accept multiple payment methods for your convenience. | Confirma tu pedido y completa el pago. Aceptamos múltiples métodos de pago para tu conveniencia.
+
+howToOrder.step6.title = We Create & Deliver | Creamos y Entregamos
+howToOrder.step6.desc = Our team handcrafts your gift box with care. We'll keep you updated throughout the process and deliver to your specified location. | Nuestro equipo elabora tu caja de regalo con cuidado. Te mantendremos actualizado durante todo el proceso y entregaremos en tu ubicación especificada.
+
+howToOrder.cta = Start Your Order | Comienza Tu Pedido
+howToOrder.contact = Have questions? Contact us for personalized assistance. | ¿Tienes preguntas? Contáctanos para asistencia personalizada.
+
+# ===== INSTAGRAM SECTION =====
+instagram.title = Follow Us on Instagram | Síguenos en Instagram
+instagram.visitProfile = Visit Our Instagram | Visita Nuestro Instagram
+instagram.notConfigured = Instagram feed not configured yet | Feed de Instagram no configurado aún
+
+# ===== ABOUT SECTION =====
+about.title = About A&A Boxes | Sobre A&A Boxes
+about.subtitle = Crafting memorable experiences through thoughtfully designed gift boxes | Creando experiencias memorables a través de cajas de regalo cuidadosamente diseñadas
+about.text1 = At A&A Boxes, we believe that every gift tells a story. Our passion is creating premium, customizable gift boxes that transform ordinary moments into extraordinary memories. | En A&A Boxes, creemos que cada regalo cuenta una historia. Nuestra pasión es crear cajas de regalo premium y personalizables que transforman momentos ordinarios en recuerdos extraordinarios.
+about.text2 = Each box is carefully curated and handcrafted with attention to detail, ensuring that your gift reflects the love and thoughtfulness behind it. From birthdays to celebrations, we're here to make every occasion special. | Cada caja está cuidadosamente curada y hecha a mano con atención al detalle, asegurando que tu regalo refleje el amor y la consideración detrás de él. Desde cumpleaños hasta celebraciones, estamos aquí para hacer que cada ocasión sea especial.
+about.tagline = Made with love, delivered with care | Hechas con amor, entregadas con cuidado
+about.stat1.number = 500+ | 500+
+about.stat1.label = Happy Customers | Clientes Felices
+about.stat2.number = 1000+ | 1000+
+about.stat2.label = Boxes Created | Cajas Creadas
+about.stat3.number = 100% | 100%
+about.stat3.label = Love & Care | Amor y Cuidado
+about.stat4.number = 24/7 | 24/7
+about.stat4.label = Support | Soporte
+
+# ===== CONTACT SECTION =====
+contact.title = Get in Touch | Contáctanos
+contact.subtitle = Ready to create something special? Let's bring your vision to life | ¿Listo para crear algo especial? Hagamos realidad tu visión
+contact.form.name = Name | Nombre
+contact.form.namePlaceholder = Your name | Tu nombre
+contact.form.email = Email | Correo
+contact.form.emailPlaceholder = your@email.com | tu@correo.com
+contact.form.message = Message | Mensaje
+contact.form.messagePlaceholder = Tell us about your dream gift box... | Cuéntanos sobre tu caja de regalo soñada...
+contact.form.send = Send Message | Enviar Mensaje
+contact.form.successTitle = Thank you! We'll get back to you soon. | ¡Gracias! Te responderemos pronto.
+contact.form.successDesc = Your message has been received. | Tu mensaje ha sido recibido.
+contact.info.title = Contact Information | Información de Contacto
+contact.info.email = Email | Correo
+contact.info.phone = Phone | Teléfono
+contact.info.whatsapp = WhatsApp | WhatsApp
+contact.info.location = Location | Ubicación
+contact.info.emailValue = aaboxespr@gmail.com | aaboxespr@gmail.com
+contact.info.phoneValue = +1 (787) 605-5590 | +1 (787) 605-5590
+contact.info.whatsappValue = +1 (787) 605-5590 | +1 (787) 605-5590
+contact.info.address = San Juan, Puerto Rico\nServing all areas | San Juan, Puerto Rico\nServimos todas las áreas
+contact.hours.title = Business Hours | Horario de Atención
+contact.hours.weekdays = Monday - Friday: 9:00 AM - 6:00 PM | Lunes - Viernes: 9:00 AM - 6:00 PM
+contact.hours.saturday = Saturday: 10:00 AM - 4:00 PM | Sábado: 10:00 AM - 4:00 PM
+contact.hours.sunday = Sunday: By Appointment | Domingo: Con Cita Previa
+contact.social.title = Follow Us | Síguenos
+contact.social.desc = Stay connected for the latest designs and special offers | Mantente conectado para los últimos diseños y ofertas especiales
+contact.social.facebook = https://facebook.com/aaboxespr | https://facebook.com/aaboxespr
+contact.social.instagram = https://instagram.com/aaboxespr | https://instagram.com/aaboxespr
+
+# ===== FOOTER =====
+footer.tagline = Creating unforgettable moments through premium, customizable gift boxes | Creando momentos inolvidables a través de cajas de regalo premium y personalizables
+footer.quickLinks = Quick Links | Enlaces Rápidos
+footer.services = Services | Servicios
+footer.service1 = Custom Gift Boxes | Cajas de Regalo Personalizadas
+footer.service2 = Party Packages | Paquetes de Fiesta
+footer.service3 = Corporate Gifts | Regalos Corporativos
+footer.service4 = Special Occasions | Ocasiones Especiales
+footer.followUs = Follow Us | Síguenos
+footer.copyright = © 2025. Built with | © 2025. Construido con
+footer.using = using | usando
+
+# ===== ADMIN LOGIN =====
+admin.login.title = Admin Login | Inicio de Sesión Admin
+admin.login.subtitle = Sign in to access the admin dashboard | Inicia sesión para acceder al panel de administración
+admin.login.username = Username | Usuario
+admin.login.usernamePlaceholder = Enter your username | Ingresa tu usuario
+admin.login.password = Password | Contraseña
+admin.login.passwordPlaceholder = Enter your password | Ingresa tu contraseña
+admin.login.button = Sign In | Iniciar Sesión
+admin.login.loggingIn = Logging in... | Iniciando sesión...
+admin.login.error = Login failed. Please check your credentials. | Error al iniciar sesión. Verifica tus credenciales.
+admin.login.connectionError = Connection Error | Error de Conexión
+admin.login.connectionErrorDesc = Unable to connect to the backend. Please check your connection and try again. | No se puede conectar al backend. Verifica tu conexión e intenta nuevamente.
+admin.login.retry = Retry Connection | Reintentar Conexión
+admin.login.loading = Connecting... | Conectando...
+
+# ===== ADMIN DASHBOARD =====
+admin.dashboard.title = Admin Dashboard | Panel de Administración
+admin.dashboard.welcome = Welcome back | Bienvenido de nuevo
+admin.dashboard.logout = Logout | Cerrar Sesión
+admin.dashboard.loading = Loading dashboard... | Cargando panel...
+admin.dashboard.connectionError = Connection Error | Error de Conexión
+admin.dashboard.connectionErrorDesc = Unable to connect to the backend. Please check your connection and try again. | No se puede conectar al backend. Verifica tu conexión e intenta nuevamente.
+admin.dashboard.retry = Retry Connection | Reintentar Conexión
+
+admin.dashboard.tab.products = Products | Productos
+admin.dashboard.tab.packages = Packages | Paquetes
+admin.dashboard.tab.howToOrder = How to Order | Cómo Ordenar
+admin.dashboard.tab.sections = Sections | Secciones
+admin.dashboard.tab.contentBlocks = Content Blocks | Bloques de Contenido
+admin.dashboard.tab.instagram = Instagram | Instagram
+admin.dashboard.tab.users = Users | Usuarios
+admin.dashboard.tab.diagnostics = Diagnostics | Diagnósticos
+
+# ===== ACCESS DENIED =====
+admin.accessDenied.title = Access Denied | Acceso Denegado
+admin.accessDenied.description = You don't have permission to access the admin panel. | No tienes permiso para acceder al panel de administración.
+admin.accessDenied.defaultMessage = This area is restricted to administrators only. If you believe you should have access, please contact the system administrator. | Esta área está restringida solo para administradores. Si crees que deberías tener acceso, contacta al administrador del sistema.
+admin.accessDenied.returnHome = Return to Home | Volver al Inicio
+admin.accessDenied.backToLogin = Back to Login | Volver al Login
+admin.accessDenied.note = Note: You are currently logged in, but your account does not have admin privileges. | Nota: Actualmente has iniciado sesión, pero tu cuenta no tiene privilegios de administrador.
+
+# ===== DIAGNOSTICS PANEL =====
+admin.diagnostics.title = System Diagnostics | Diagnósticos del Sistema
+admin.diagnostics.description = Run comprehensive tests on authentication, authorization, and product CRUD operations | Ejecuta pruebas completas de autenticación, autorización y operaciones CRUD de productos
+admin.diagnostics.runButton = Run Diagnostics | Ejecutar Diagnósticos
+admin.diagnostics.running = Running... | Ejecutando...
+admin.diagnostics.ready = Ready to run diagnostics | Listo para ejecutar diagnósticos
+admin.diagnostics.readyDesc = Click "Run Diagnostics" to test authentication, admin privileges, and product CRUD operations. This will create and delete a temporary test product. | Haz clic en "Ejecutar Diagnósticos" para probar autenticación, privilegios de administrador y operaciones CRUD de productos. Esto creará y eliminará un producto de prueba temporal.
+admin.diagnostics.allPassed = All tests passed! | ¡Todas las pruebas pasaron!
+admin.diagnostics.allPassedDesc = Your system is functioning correctly. Authentication, authorization, and CRUD operations are working as expected. | Tu sistema está funcionando correctamente. La autenticación, autorización y operaciones CRUD están funcionando como se espera.
+admin.diagnostics.someFailed = Some tests failed | Algunas pruebas fallaron
+admin.diagnostics.someFailedDesc = Please review the errors below and contact support if issues persist. | Revisa los errores a continuación y contacta soporte si los problemas persisten.
+
+admin.diagnostics.step.auth = Checking authentication state... | Verificando estado de autenticación...
+admin.diagnostics.step.authSuccess = Authenticated | Autenticado
+admin.diagnostics.step.authError = Not authenticated | No autenticado
+admin.diagnostics.step.authErrorDesc = No active admin session found | No se encontró sesión de administrador activa
+
+admin.diagnostics.step.fetch = Fetching products list... | Obteniendo lista de productos...
+admin.diagnostics.step.fetchSuccess = Products fetched successfully | Productos obtenidos exitosamente
+admin.diagnostics.step.fetchError = Failed to fetch products | Error al obtener productos
+admin.diagnostics.step.fetchErrorDesc = No data returned | No se devolvieron datos
+
+admin.diagnostics.step.create = Creating test product... | Creando producto de prueba...
+admin.diagnostics.step.createSuccess = Test product created | Producto de prueba creado
+admin.diagnostics.step.createError = Failed to create test product | Error al crear producto de prueba
+
+admin.diagnostics.step.read = Verifying test product exists... | Verificando que el producto de prueba existe...
+admin.diagnostics.step.readSuccess = Test product verified | Producto de prueba verificado
+admin.diagnostics.step.readSuccessDesc = Product found in list | Producto encontrado en la lista
+admin.diagnostics.step.readError = Test product not found | Producto de prueba no encontrado
+admin.diagnostics.step.readErrorDesc = Product was not in the fetched list | El producto no estaba en la lista obtenida
+
+admin.diagnostics.step.update = Updating test product... | Actualizando producto de prueba...
+admin.diagnostics.step.updateSuccess = Test product updated | Producto de prueba actualizado
+admin.diagnostics.step.updateSuccessDesc = Update verified successfully | Actualización verificada exitosamente
+admin.diagnostics.step.updateError = Failed to update test product | Error al actualizar producto de prueba
+admin.diagnostics.step.updateVerifyError = Update verification failed | Verificación de actualización falló
+admin.diagnostics.step.updateVerifyErrorDesc = Product was not updated correctly | El producto no se actualizó correctamente
+
+admin.diagnostics.step.delete = Deleting test product... | Eliminando producto de prueba...
+admin.diagnostics.step.deleteSuccess = Test product deleted | Producto de prueba eliminado
+admin.diagnostics.step.deleteSuccessDesc = Product removed successfully | Producto eliminado exitosamente
+admin.diagnostics.step.deleteError = Failed to delete test product | Error al eliminar producto de prueba
+admin.diagnostics.step.deleteVerifyError = Delete verification failed | Verificación de eliminación falló
+admin.diagnostics.step.deleteVerifyErrorDesc = Product still exists after deletion | El producto aún existe después de la eliminación
+
+admin.diagnostics.completed = Diagnostics completed! | ¡Diagnósticos completados!
+admin.diagnostics.failed = Diagnostics failed | Diagnósticos fallaron
+
+# ===== PRODUCTS MANAGER =====
+admin.products.title = Products Management | Gestión de Productos
+admin.products.description = Add, edit, or remove products from your catalog | Agrega, edita o elimina productos de tu catálogo
+admin.products.addButton = Add Product | Agregar Producto
+admin.products.editButton = Edit | Editar
+admin.products.deleteButton = Delete | Eliminar
+admin.products.loading = Loading... | Cargando...
+
+admin.products.dialog.titleAdd = Add New Product | Agregar Nuevo Producto
+admin.products.dialog.titleEdit = Edit Product | Editar Producto
+admin.products.dialog.description = Fill in the product details in both English and Spanish | Completa los detalles del producto en inglés y español
+
+admin.products.form.titleEn = Title (English) * | Título (Inglés) *
+admin.products.form.titleEnPlaceholder = Product title in English | Título del producto en inglés
+admin.products.form.titleEs = Title (Spanish) * | Título (Español) *
+admin.products.form.titleEsPlaceholder = Título del producto en español | Título del producto en español
+admin.products.form.descriptionEn = Description (English) * | Descripción (Inglés) *
+admin.products.form.descriptionEnPlaceholder = Product description in English | Descripción del producto en inglés
+admin.products.form.descriptionEs = Description (Spanish) * | Descripción (Español) *
+admin.products.form.descriptionEsPlaceholder = Descripción del producto en español | Descripción del producto en español
+admin.products.form.priceEn = Price (English) | Precio (Inglés)
+admin.products.form.priceEnPlaceholder = e.g., $25.00 | ej., $25.00
+admin.products.form.priceEs = Price (Spanish) | Precio (Español)
+admin.products.form.priceEsPlaceholder = ej., $25.00 | ej., $25.00
+admin.products.form.image = Product Image * | Imagen del Producto *
+admin.products.form.imageChange = Change Image | Cambiar Imagen
+admin.products.form.uploading = Uploading | Subiendo
+
+admin.products.form.cancel = Cancel | Cancelar
+admin.products.form.save = Save Product | Guardar Producto
+admin.products.form.saving = Saving... | Guardando...
+
+admin.products.delete.title = Are you sure? | ¿Estás seguro?
+admin.products.delete.description = This action cannot be undone. This will permanently delete the product. | Esta acción no se puede deshacer. Esto eliminará permanentemente el producto.
+admin.products.delete.cancel = Cancel | Cancelar
+admin.products.delete.confirm = Delete | Eliminar
+admin.products.delete.deleting = Deleting... | Eliminando...
+
+admin.products.toast.fillFields = Please fill in all required fields | Por favor completa todos los campos requeridos
+admin.products.toast.selectImage = Please select an image | Por favor selecciona una imagen
+admin.products.toast.added = Product added successfully! | ¡Producto agregado exitosamente!
+admin.products.toast.updated = Product updated successfully! | ¡Producto actualizado exitosamente!
+admin.products.toast.deleted = Product deleted successfully! | ¡Producto eliminado exitosamente!
+admin.products.toast.error = Failed to save product | Error al guardar producto
+admin.products.toast.deleteError = Failed to delete product | Error al eliminar producto
+
+# ===== PACKAGES MANAGER =====
+admin.packages.title = Packages Management | Gestión de Paquetes
+admin.packages.description = Add, edit, or remove packages from your catalog | Agrega, edita o elimina paquetes de tu catálogo
+admin.packages.addButton = Add Package | Agregar Paquete
+admin.packages.editButton = Edit | Editar
+admin.packages.deleteButton = Delete | Eliminar
+admin.packages.loading = Loading... | Cargando...
+
+admin.packages.dialog.titleAdd = Add New Package | Agregar Nuevo Paquete
+admin.packages.dialog.titleEdit = Edit Package | Editar Paquete
+admin.packages.dialog.description = Fill in the package details in both English and Spanish | Completa los detalles del paquete en inglés y español
+
+admin.packages.form.nameEn = Name (English) * | Nombre (Inglés) *
+admin.packages.form.nameEnPlaceholder = Package name in English | Nombre del paquete en inglés
+admin.packages.form.nameEs = Name (Spanish) * | Nombre (Español) *
+admin.packages.form.nameEsPlaceholder = Nombre del paquete en español | Nombre del paquete en español
+admin.packages.form.descriptionEn = Description (English) * | Descripción (Inglés) *
+admin.packages.form.descriptionEnPlaceholder = Package description in English | Descripción del paquete en inglés
+admin.packages.form.descriptionEs = Description (Spanish) * | Descripción (Español) *
+admin.packages.form.descriptionEsPlaceholder = Descripción del paquete en español | Descripción del paquete en español
+admin.packages.form.priceEn = Price (English) | Precio (Inglés)
+admin.packages.form.priceEnPlaceholder = e.g., Starting at $50 | ej., Desde $50
+admin.packages.form.priceEs = Price (Spanish) | Precio (Español)
+admin.packages.form.priceEsPlaceholder = ej., Desde $50 | ej., Desde $50
+admin.packages.form.image = Package Image * | Imagen del Paquete *
+admin.packages.form.imageChange = Change Image | Cambiar Imagen
+admin.packages.form.uploading = Uploading | Subiendo
+
+admin.packages.form.cancel = Cancel | Cancelar
+admin.packages.form.save = Save Package | Guardar Paquete
+admin.packages.form.saving = Saving... | Guardando...
+
+admin.packages.delete.title = Are you sure? | ¿Estás seguro?
+admin.packages.delete.description = This action cannot be undone. This will permanently delete the package. | Esta acción no se puede deshacer. Esto eliminará permanentemente el paquete.
+admin.packages.delete.cancel = Cancel | Cancelar
+admin.packages.delete.confirm = Delete | Eliminar
+admin.packages.delete.deleting = Deleting... | Eliminando...
+
+admin.packages.toast.fillFields = Please fill in all required fields | Por favor completa todos los campos requeridos
+admin.packages.toast.selectImage = Please select an image | Por favor selecciona una imagen
+admin.packages.toast.added = Package added successfully! | ¡Paquete agregado exitosamente!
+admin.packages.toast.updated = Package updated successfully! | ¡Paquete actualizado exitosamente!
+admin.packages.toast.deleted = Package deleted successfully! | ¡Paquete eliminado exitosamente!
+admin.packages.toast.error = Failed to save package | Error al guardar paquete
+admin.packages.toast.deleteError = Failed to delete package | Error al eliminar paquete
+
+# ===== HOW TO ORDER MANAGER =====
+admin.howToOrder.title = How to Order Steps | Pasos de Cómo Ordenar
+admin.howToOrder.description = Manage the ordering process steps | Gestiona los pasos del proceso de pedido
+admin.howToOrder.addButton = Add Step | Agregar Paso
+admin.howToOrder.editButton = Edit | Editar
+admin.howToOrder.loading = Loading... | Cargando...
+admin.howToOrder.noSteps = No steps yet. Add your first step to get started! | No hay pasos aún. ¡Agrega tu primer paso para comenzar!
+
+admin.howToOrder.dialog.titleAdd = Add New Step | Agregar Nuevo Paso
+admin.howToOrder.dialog.titleEdit = Edit Step | Editar Paso
+admin.howToOrder.dialog.description = Fill in the step details in both English and Spanish | Completa los detalles del paso en inglés y español
+
+admin.howToOrder.form.stepNumber = Step Number * | Número de Paso *
+admin.howToOrder.form.titleEn = Title (English) * | Título (Inglés) *
+admin.howToOrder.form.titleEnPlaceholder = Step title in English | Título del paso en inglés
+admin.howToOrder.form.titleEs = Title (Spanish) * | Título (Español) *
+admin.howToOrder.form.titleEsPlaceholder = Título del paso en español | Título del paso en español
+admin.howToOrder.form.descriptionEn = Description (English) * | Descripción (Inglés) *
+admin.howToOrder.form.descriptionEnPlaceholder = Step description in English | Descripción del paso en inglés
+admin.howToOrder.form.descriptionEs = Description (Spanish) * | Descripción (Español) *
+admin.howToOrder.form.descriptionEsPlaceholder = Descripción del paso en español | Descripción del paso en español
+admin.howToOrder.form.image = Step Image (Optional) | Imagen del Paso (Opcional)
+admin.howToOrder.form.imageChange = Change Image | Cambiar Imagen
+admin.howToOrder.form.uploading = Uploading | Subiendo
+
+admin.howToOrder.form.cancel = Cancel | Cancelar
+admin.howToOrder.form.save = Save Step | Guardar Paso
+admin.howToOrder.form.saving = Saving... | Guardando...
+
+admin.howToOrder.toast.fillFields = Please fill in all required fields | Por favor completa todos los campos requeridos
+admin.howToOrder.toast.added = Step added successfully! | ¡Paso agregado exitosamente!
+admin.howToOrder.toast.updated = Step updated successfully! | ¡Paso actualizado exitosamente!
+admin.howToOrder.toast.error = Failed to save step | Error al guardar paso
+
+# ===== SECTIONS MANAGER =====
+admin.sections.title = Additional Sections | Secciones Adicionales
+admin.sections.description = Create and manage custom content sections for your website | Crea y gestiona secciones de contenido personalizadas para tu sitio web
+admin.sections.addButton = Add Section | Agregar Sección
+admin.sections.editButton = Edit | Editar
+admin.sections.deleteButton = Delete | Eliminar
+admin.sections.loading = Loading... | Cargando...
+admin.sections.noSections = No additional sections yet. Create your first section to get started! | No hay secciones adicionales aún. ¡Crea tu primera sección para comenzar!
+admin.sections.order = Order | Orden
+admin.sections.blocks = Blocks | Bloques
+admin.sections.visible = Visible | Visible
+admin.sections.hidden = Hidden | Oculto
+
+admin.sections.dialog.titleAdd = Create New Section | Crear Nueva Sección
+admin.sections.dialog.titleEdit = Edit Section | Editar Sección
+admin.sections.dialog.description = Fill in the section details in both English and Spanish | Completa los detalles de la sección en inglés y español
+
+admin.sections.form.titleEn = Title (English) * | Título (Inglés) *
+admin.sections.form.titleEnPlaceholder = Section title in English | Título de la sección en inglés
+admin.sections.form.titleEs = Title (Spanish) * | Título (Español) *
+admin.sections.form.titleEsPlaceholder = Título de la sección en español | Título de la sección en español
+admin.sections.form.descriptionEn = Description (English) * | Descripción (Inglés) *
+admin.sections.form.descriptionEnPlaceholder = Section description in English | Descripción de la sección en inglés
+admin.sections.form.descriptionEs = Description (Spanish) * | Descripción (Español) *
+admin.sections.form.descriptionEsPlaceholder = Descripción de la sección en español | Descripción de la sección en español
+admin.sections.form.image = Section Image (Optional) | Imagen de la Sección (Opcional)
+admin.sections.form.background = Background Image (Optional) | Imagen de Fondo (Opcional)
+admin.sections.form.order = Display Order | Orden de Visualización
+admin.sections.form.visibility = Visibility | Visibilidad
+admin.sections.form.uploading = Uploading | Subiendo
+
+admin.sections.form.cancel = Cancel | Cancelar
+admin.sections.form.save = Save Section | Guardar Sección
+admin.sections.form.saving = Saving... | Guardando...
+
+admin.sections.delete.title = Are you sure? | ¿Estás seguro?
+admin.sections.delete.description = This action cannot be undone. This will permanently delete the section and all its content blocks. | Esta acción no se puede deshacer. Esto eliminará permanentemente la sección y todos sus bloques de contenido.
+admin.sections.delete.cancel = Cancel | Cancelar
+admin.sections.delete.confirm = Delete | Eliminar
+admin.sections.delete.deleting = Deleting... | Eliminando...
+
+admin.sections.toast.fillFields = Please fill in all required fields | Por favor completa todos los campos requeridos
+admin.sections.toast.created = Section created successfully! | ¡Sección creada exitosamente!
+admin.sections.toast.updated = Section updated successfully! | ¡Sección actualizada exitosamente!
+admin.sections.toast.deleted = Section deleted successfully! | ¡Sección eliminada exitosamente!
+admin.sections.toast.error = Failed to save section | Error al guardar sección
+admin.sections.toast.deleteError = Failed to delete section | Error al eliminar sección
+
+# ===== CONTENT BLOCKS MANAGER =====
+admin.contentBlocks.title = Content Blocks Manager | Gestor de Bloques de Contenido
+admin.contentBlocks.description = Add flexible content blocks to your sections | Agrega bloques de contenido flexibles a tus secciones
+admin.contentBlocks.addButton = Add Content Block | Agregar Bloque de Contenido
+admin.contentBlocks.loading = Loading... | Cargando...
+admin.contentBlocks.noSections = No sections available. Create a section first! | No hay secciones disponibles. ¡Crea una sección primero!
+admin.contentBlocks.selectSection = Select a section to view its content blocks | Selecciona una sección para ver sus bloques de contenido
+admin.contentBlocks.noBlocks = No content blocks yet. Add your first block! | No hay bloques de contenido aún. ¡Agrega tu primer bloque!
+
+admin.contentBlocks.dialog.title = Add Content Block | Agregar Bloque de Contenido
+admin.contentBlocks.dialog.description = Create a new content block for the selected section | Crea un nuevo bloque de contenido para la sección seleccionada
+
+admin.contentBlocks.form.section = Section * | Sección *
+admin.contentBlocks.form.sectionPlaceholder = Select a section | Selecciona una sección
+admin.contentBlocks.form.blockType = Block Type * | Tipo de Bloque *
+admin.contentBlocks.form.textBlock = Text Block | Bloque de Texto
+admin.contentBlocks.form.imageBlock = Image Block | Bloque de Imagen
+admin.contentBlocks.form.mixedBlock = Mixed Block | Bloque Mixto
+admin.contentBlocks.form.titleEn = Title (English) * | Título (Inglés) *
+admin.contentBlocks.form.titleEnPlaceholder = Block title in English | Título del bloque en inglés
+admin.contentBlocks.form.titleEs = Title (Spanish) * | Título (Español) *
+admin.contentBlocks.form.titleEsPlaceholder = Título del bloque en español | Título del bloque en español
+admin.contentBlocks.form.contentEn = Content (English) * | Contenido (Inglés) *
+admin.contentBlocks.form.contentEnPlaceholder = Block content in English | Contenido del bloque en inglés
+admin.contentBlocks.form.contentEs = Content (Spanish) * | Contenido (Español) *
+admin.contentBlocks.form.contentEsPlaceholder = Contenido del bloque en español | Contenido del bloque en español
+admin.contentBlocks.form.image = Block Image | Imagen del Bloque
+admin.contentBlocks.form.imageRequired = (Required for Image and Mixed blocks) | (Requerido para bloques de Imagen y Mixtos)
+admin.contentBlocks.form.order = Display Order | Orden de Visualización
+admin.contentBlocks.form.visibility = Visibility | Visibilidad
+admin.contentBlocks.form.visible = Visible | Visible
+admin.contentBlocks.form.hidden = Hidden | Oculto
+admin.contentBlocks.form.uploading = Uploading | Subiendo
+
+admin.contentBlocks.form.cancel = Cancel | Cancelar
+admin.contentBlocks.form.save = Add Block | Agregar Bloque
+admin.contentBlocks.form.saving = Adding... | Agregando...
+
+admin.contentBlocks.toast.selectSection = Please select a section | Por favor selecciona una sección
+admin.contentBlocks.toast.fillFields = Please fill in all required fields | Por favor completa todos los campos requeridos
+admin.contentBlocks.toast.imageRequired = Image is required for Image and Mixed block types | Se requiere imagen para bloques de tipo Imagen y Mixto
+admin.contentBlocks.toast.added = Content block added successfully! | ¡Bloque de contenido agregado exitosamente!
+admin.contentBlocks.toast.error = Failed to add content block | Error al agregar bloque de contenido
+
+# ===== INSTAGRAM FEED MANAGER =====
+admin.instagram.title = Instagram Feed Configuration | Configuración del Feed de Instagram
+admin.instagram.description = Configure the Instagram feed section displayed on your landing page | Configura la sección del feed de Instagram mostrada en tu página de inicio
+admin.instagram.loading = Loading... | Cargando...
+admin.instagram.saveButton = Save Configuration | Guardar Configuración
+admin.instagram.saving = Saving... | Guardando...
+
+admin.instagram.form.display = Display Instagram Section | Mostrar Sección de Instagram
+admin.instagram.form.displayDesc = Show or hide the Instagram feed section on the landing page | Mostrar u ocultar la sección del feed de Instagram en la página de inicio
+admin.instagram.form.titleEn = Title (English) | Título (Inglés)
+admin.instagram.form.titleEnPlaceholder = Follow Us on Instagram | Síguenos en Instagram
+admin.instagram.form.titleEs = Title (Spanish) | Título (Español)
+admin.instagram.form.titleEsPlaceholder = Síguenos en Instagram | Síguenos en Instagram
+admin.instagram.form.descriptionEn = Description (English) | Descripción (Inglés)
+admin.instagram.form.descriptionEnPlaceholder = Stay connected for the latest designs and special offers | Mantente conectado para los últimos diseños y ofertas especiales
+admin.instagram.form.descriptionEs = Description (Spanish) | Descripción (Español)
+admin.instagram.form.descriptionEsPlaceholder = Mantente conectado para los últimos diseños y ofertas especiales | Mantente conectado para los últimos diseños y ofertas especiales
+admin.instagram.form.handle = Instagram Handle (without @) | Usuario de Instagram (sin @)
+admin.instagram.form.handlePlaceholder = aaboxespr | aaboxespr
+admin.instagram.form.handleDesc = Enter your Instagram username without the @ symbol | Ingresa tu nombre de usuario de Instagram sin el símbolo @
+admin.instagram.form.embedCode = Instagram Embed Code (Optional) | Código de Inserción de Instagram (Opcional)
+admin.instagram.form.embedCodePlaceholder = <iframe src="..." ...></iframe> or <blockquote class="instagram-media" ...></blockquote> | <iframe src="..." ...></iframe> o <blockquote class="instagram-media" ...></blockquote>
+admin.instagram.form.embedCodeDesc = Paste the Instagram embed code from Instagram's embed feature. If provided, this will be used instead of the handle link. | Pega el código de inserción de Instagram desde la función de inserción de Instagram. Si se proporciona, se usará en lugar del enlace del usuario.
+admin.instagram.form.displayOrder = Display Order | Orden de Visualización
+admin.instagram.form.displayOrderPlaceholder = 5 | 5
+admin.instagram.form.displayOrderDesc = Lower numbers appear first. Default is 5 (before Contact section). | Los números más bajos aparecen primero. El valor predeterminado es 5 (antes de la sección de Contacto).
+
+admin.instagram.toast.updated = Instagram feed configuration updated successfully! | ¡Configuración del feed de Instagram actualizada exitosamente!
+admin.instagram.toast.error = Failed to update Instagram feed configuration | Error al actualizar la configuración del feed de Instagram
+
+# ===== USER MANAGEMENT PANEL =====
+admin.users.title = User Management | Gestión de Usuarios
+admin.users.description = Manage admin users and their access to the system | Gestiona usuarios administradores y su acceso al sistema
+admin.users.createButton = Create User | Crear Usuario
+admin.users.loading = Loading... | Cargando...
+admin.users.noUsers = No users found. Create your first admin user to get started. | No se encontraron usuarios. Crea tu primer usuario administrador para comenzar.
+
+admin.users.dialog.title = Create New Admin User | Crear Nuevo Usuario Administrador
+admin.users.dialog.description = Add a new user who can access the admin panel | Agrega un nuevo usuario que pueda acceder al panel de administración
+admin.users.form.username = Username | Usuario
+admin.users.form.usernamePlaceholder = Enter username | Ingresa usuario
+admin.users.form.fullName = Full Name | Nombre Completo
+admin.users.form.fullNamePlaceholder = Enter full name | Ingresa nombre completo
+admin.users.form.password = Password | Contraseña
+admin.users.form.passwordPlaceholder = Enter password | Ingresa contraseña
+admin.users.form.createButton = Create User | Crear Usuario
+admin.users.form.creating = Creating... | Creando...
+
+admin.users.table.username = Username | Usuario
+admin.users.table.fullName = Full Name | Nombre Completo
+admin.users.table.status = Status | Estado
+admin.users.table.created = Created | Creado
+admin.users.table.createdBy = Created By | Creado Por
+admin.users.table.active = Active | Activo
+admin.users.table.inactive = Inactive | Inactivo
+
+admin.users.toast.fillFields = Please fill in all fields | Por favor completa todos los campos
+admin.users.toast.created = User created successfully! | ¡Usuario creado exitosamente!
+admin.users.toast.error = Failed to create user | Error al crear usuario

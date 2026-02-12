@@ -1,16 +1,12 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from '@tanstack/react-router';
-import { Menu, X, Languages, Shield } from 'lucide-react';
+import { Menu, X, Languages } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useAdminSession } from '../hooks/useAdminSession';
 
 const Header = () => {
-  const navigate = useNavigate();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { language, setLanguage, t } = useLanguage();
-  const { isAuthenticated } = useAdminSession();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -38,15 +34,6 @@ const Header = () => {
 
   const toggleLanguage = () => {
     setLanguage(language === 'en' ? 'es' : 'en');
-  };
-
-  const handleAdminClick = () => {
-    if (isAuthenticated) {
-      navigate({ to: '/admin' });
-    } else {
-      navigate({ to: '/admin/login' });
-    }
-    setIsMobileMenuOpen(false);
   };
 
   return (
@@ -126,15 +113,6 @@ const Header = () => {
             >
               <Languages className="h-5 w-5" />
             </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleAdminClick}
-              className="border-rose-400 text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/20"
-            >
-              <Shield className="mr-2 h-4 w-4" />
-              Admin
-            </Button>
           </nav>
 
           {/* Mobile Menu Button */}
@@ -204,15 +182,6 @@ const Header = () => {
               >
                 {t('nav.contact')}
               </button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleAdminClick}
-                className="border-rose-400 text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/20 justify-start"
-              >
-                <Shield className="mr-2 h-4 w-4" />
-                Admin
-              </Button>
             </nav>
           </div>
         )}
