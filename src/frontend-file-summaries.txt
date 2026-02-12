@@ -1,5 +1,5 @@
 {
-  "frontend/src/App.tsx": "Main application component with TanStack Router setup, including routes for landing page with Instagram Feed section positioned before Contact, admin login, and admin dashboard with LanguageProvider wrapper and Toaster notifications.",
+  "frontend/src/App.tsx": "Main application component with TanStack Router setup, including routes for landing page with Instagram Feed section positioned before Contact, admin login (/admin/login), and admin dashboard (/admin) with LanguageProvider wrapper, Toaster notifications, and a comment pointing to ADMIN_ROUTES.md documentation.",
   "frontend/src/components/Header.tsx": "Fixed navigation header using custom admin session state instead of Internet Identity for admin button routing and authentication checks.",
   "frontend/src/components/Hero.tsx": "Hero section with bilingual content support, background image overlay, animated floating elements, prominent circular logo display (h-32 w-32 on mobile, h-40 w-40 on desktop) with shadow and ring effects, headline with gradient text, CTAs, and feature cards.",
   "frontend/src/components/Products.tsx": "Updated products section displaying twelve refined products with accurate bilingual names and descriptions from catalog pages 3-5, featuring hover animations and consistent styling.",
@@ -13,8 +13,8 @@
   "frontend/src/contexts/LanguageContext.tsx": "Language context provider with comprehensive English and Spanish translations for all sections including Instagram Feed, with proper bilingual support for all UI elements.",
   "frontend/src/components/Packages.tsx": "New packages section displaying six package types (Basic, Deluxe, Premium, Corporate, Event, Seasonal) with bilingual names, descriptions, tags, hover animations, and image zoom effects.",
   "frontend/src/components/HowToOrder.tsx": "New How to Order section with six-step ordering process in bilingual format, featuring numbered steps with icons, descriptions, call-to-action button, and smooth animations.",
-  "frontend/src/pages/AdminLogin.tsx": "Admin login page with username/password form fields, session validation on mount, error handling, and automatic redirect to dashboard when authenticated.",
-  "frontend/src/pages/AdminDashboard.tsx": "Admin dashboard with custom session-based authentication guard, logout functionality, tabs for all content management including new User Management panel, and proper loading states.",
+  "frontend/src/pages/AdminLogin.tsx": "Admin login page with bounded session validation loading, error state with retry action, actor availability checks, and clear user feedback for all connection states.",
+  "frontend/src/pages/AdminDashboard.tsx": "Admin dashboard with bounded session validation, error state with retry option, proper loading states, and navigation guards that prevent infinite loading.",
   "frontend/src/components/admin/ProductsManager.tsx": "Products management interface with add/edit/delete functionality, bilingual form inputs, image upload with progress tracking, retain existing image on edit, grid display of products, and comprehensive error handling with user-friendly messages.",
   "frontend/src/components/admin/PackagesManager.tsx": "Packages management interface with add, edit, and delete functionality, bilingual form inputs, image upload with progress tracking, and grid display of packages.",
   "frontend/src/components/admin/HowToOrderManager.tsx": "How-to-order steps management interface with add and edit functionality, bilingual form inputs, optional image upload, and ordered list display of steps.",
@@ -25,8 +25,10 @@
   "frontend/src/components/admin/InstagramFeedManager.tsx": "Admin interface for configuring Instagram feed settings including handle, embed code, bilingual titles/descriptions, display order, and visibility toggle.",
   "frontend/src/components/admin/DiagnosticsPanel.tsx": "System diagnostics panel updated to use custom admin session authentication for testing authentication state and CRUD operations.",
   "frontend/src/components/admin/AccessDeniedScreen.tsx": "Reusable admin access denial UI component with clear messaging for authenticated non-admin users, always displaying both \"Return to Home\" and \"Back to Login\" navigation buttons with consistent shadcn-ui styling.",
-  "frontend/src/hooks/useActor.ts": "Actor initialization hook with safe error handling for access control initialization, ensuring hardcoded admins can still authenticate even if secret-based initialization fails.",
+  "frontend/src/hooks/useActor.ts": "Actor initialization hook with retry logic, error state exposure (actorError), and refetch capability (refetchActor) for better error handling in dependent components.",
   "frontend/src/utils/adminSessionStorage.ts": "Utility functions for persisting admin session IDs in localStorage with get, set, and clear operations.",
-  "frontend/src/hooks/useAdminSession.ts": "Custom React hook managing admin authentication state with username/password login, session validation, logout, and localStorage persistence.",
-  "frontend/src/components/admin/UserManagementPanel.tsx": "Admin panel for viewing existing users and creating new admin users with username, full name, and password fields using shadcn-ui Table and Dialog components."
+  "frontend/src/hooks/useAdminSession.ts": "Refactored admin session hook with deterministic validation using refs to prevent loops, 10-second timeout via Promise.race, explicit error states, and retry functionality without depending on extended useActor properties.",
+  "frontend/src/components/admin/UserManagementPanel.tsx": "Admin panel for viewing existing users and creating new admin users with username, full name, and password fields using shadcn-ui Table and Dialog components.",
+  "STRUCTURE.md": "Comprehensive project folder structure documentation covering backend (main.mo), frontend (React/TypeScript with detailed component hierarchy), assets, routes, authentication flow, and content management capabilities with clear notes on read-only vs customizable files.",
+  "frontend/src/ADMIN_ROUTES.md": "Developer documentation explaining that admin routes are defined in App.tsx (not in a separate routes/admin.tsx file), listing the two admin routes (/admin/login and /admin) and their corresponding page components."
 }

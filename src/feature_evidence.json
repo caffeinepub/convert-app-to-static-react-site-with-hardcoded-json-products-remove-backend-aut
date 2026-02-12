@@ -2,13 +2,10 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-disable-the-internet-identity-authentication-flow-for-the-admin-system-ui-so-users-can-no-longer-log-in-to-the-admin-area-using-internet-identity",
-      "featureTitle": "Disable the Internet Identity authentication flow for the admin system UI so users can no longer log in to the admin area using Internet Identity.",
+      "featureId": "feature-ensure-the-admin-route-location-and-paths-are-clearly-documented-for-developers-by-keeping-frontend-src-admin-routes-md-accurate-and-adding-a-short-pointer-comment-in-frontend-src-app-tsx-near-the-admin-route-definitions-indicating-that-admin-routes-live-there-and-referencing-frontend-src-admin-routes-md",
+      "featureTitle": "Ensure the admin route location and paths are clearly documented for developers by keeping `frontend/src/ADMIN_ROUTES.md` accurate and adding a short pointer comment in `frontend/src/App.tsx` near the admin route definitions indicating that admin routes live there and referencing `frontend/src/ADMIN_ROUTES.md`.",
       "files": [
-        "frontend/src/components/Header.tsx",
-        "frontend/src/hooks/useQueries.ts",
-        "frontend/src/pages/AdminDashboard.tsx",
-        "frontend/src/pages/AdminLogin.tsx"
+        "frontend/src/App.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -21,73 +18,6 @@
       ],
       "testIds": [
         "REQ-1"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-add-a-custom-admin-authentication-flow-using-a-username-and-password-with-an-initial-hardcoded-primary-admin-credential-set-username-administrator-and-password-adminaaboxes26",
-      "featureTitle": "Add a custom admin authentication flow using a username and password, with an initial hardcoded primary admin credential set: Username \"Administrator\" and Password \"AdminAAboxes26\".",
-      "files": [
-        "frontend/src/hooks/useAdminSession.ts",
-        "frontend/src/pages/AdminLogin.tsx",
-        "frontend/src/utils/adminSessionStorage.ts"
-      ],
-      "components": [
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "blob-storage@4.0.0",
-        "authorization@4.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-2"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-update-the-admin-dashboard-to-use-the-new-custom-auth-session-and-provide-logout-while-keeping-the-existing-admin-content-management-panels-functional",
-      "featureTitle": "Update the admin dashboard to use the new custom auth session (and provide logout) while keeping the existing admin content management panels functional.",
-      "files": [
-        "frontend/src/components/Header.tsx",
-        "frontend/src/components/admin/DiagnosticsPanel.tsx",
-        "frontend/src/hooks/useQueries.ts",
-        "frontend/src/pages/AdminDashboard.tsx"
-      ],
-      "components": [
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "blob-storage@4.0.0",
-        "authorization@4.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-4"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-add-admin-user-management-capability-so-the-admin-can-create-additional-users-with-username-password-and-role-and-view-the-list-of-existing-users",
-      "featureTitle": "Add admin user management capability so the admin can create additional users with username/password and role, and view the list of existing users.",
-      "files": [
-        "frontend/src/components/admin/UserManagementPanel.tsx",
-        "frontend/src/hooks/useQueries.ts",
-        "frontend/src/pages/AdminDashboard.tsx"
-      ],
-      "components": [
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "blob-storage@4.0.0",
-        "authorization@4.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-5"
       ],
       "confidence": "high"
     }

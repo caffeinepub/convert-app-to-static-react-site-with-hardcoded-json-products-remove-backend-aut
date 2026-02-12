@@ -1,4 +1,3 @@
-import AccessControl "authorization/access-control";
 import Iter "mo:core/Iter";
 import List "mo:core/List";
 import Map "mo:core/Map";
@@ -6,15 +5,18 @@ import Nat "mo:core/Nat";
 import Principal "mo:core/Principal";
 import Runtime "mo:core/Runtime";
 import Storage "blob-storage/Storage";
+import Text "mo:core/Text";
 import Time "mo:core/Time";
 import VarArray "mo:core/VarArray";
-import MixinAuthorization "authorization/MixinAuthorization";
 import MixinStorage "blob-storage/Mixin";
+import MixinAuthorization "authorization/MixinAuthorization";
+import AccessControl "authorization/access-control";
 
 actor {
   include MixinStorage();
 
   let hardcodedAdmins = List.fromArray([Principal.fromText("ix7jl-xlknv-uwyet-3fsxh-x7nqh-zkhvg-keqsk-zs4hv-ihh5p-uytti-6ae")]);
+
   let accessControlState = AccessControl.initState();
   include MixinAuthorization(accessControlState);
 
@@ -23,6 +25,21 @@ actor {
 
   let adminUsers = Map.empty<Text, AdminUser>();
   let activeAdminSessions = Map.empty<Text, AdminUserSession>();
+
+  type Role = {
+    #admin;
+    #user;
+  };
+
+  type Profile = {
+    id : Text;
+    username : Text;
+    role : Role;
+    createdAt : Time.Time;
+    updatedAt : Time.Time;
+  };
+
+  let profiles = Map.empty<Text, Profile>();
 
   // Session timeout: 24 hours in nanoseconds
   let sessionTimeout : Time.Time = 24 * 60 * 60 * 1_000_000_000;
@@ -280,8 +297,13 @@ actor {
     userProfiles.add(caller, profile);
   };
 
-  // Session validation helper
-  func validateAdminSession(sessionId : Text) : AdminUserSession {
+  // Session validation helper - validates session and caller permissions
+  func validateAdminSession(caller: Principal, sessionId : Text) : AdminUserSession {
+    // First check if caller has admin permissions via AccessControl
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can perform this action");
+    };
+
     switch (activeAdminSessions.get(sessionId)) {
       case (?session) {
         let now = Time.now();
@@ -306,8 +328,25 @@ actor {
     };
   };
 
+  // Query-safe session validation - returns Bool instead of trapping
+  func isValidAdminSession(caller: Principal, sessionId : Text) : Bool {
+    // First check if caller has admin permissions via AccessControl
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      return false;
+    };
+
+    switch (activeAdminSessions.get(sessionId)) {
+      case (?session) {
+        let now = Time.now();
+        let timeSinceLastActive = now - session.lastActive;
+        timeSinceLastActive <= sessionTimeout;
+      };
+      case (null) { false };
+    };
+  };
+
   public shared ({ caller }) func createAdditionalSection(sessionId : Text, title : TextContent, description : TextContent, image : ?Storage.ExternalBlob, background : ?Storage.ExternalBlob, order : Nat, isVisible : Bool) : async Text {
-    let _ = validateAdminSession(sessionId);
+    let _ = validateAdminSession(caller, sessionId);
 
     let emptyContentBlocks : [ContentBlock] = [];
     let newId = nextSectionId.toText();
@@ -329,7 +368,7 @@ actor {
   };
 
   public shared ({ caller }) func updateAdditionalSection(sessionId : Text, id : Text, title : TextContent, description : TextContent, image : ?Storage.ExternalBlob, background : ?Storage.ExternalBlob, order : Nat, isVisible : Bool) : async () {
-    let _ = validateAdminSession(sessionId);
+    let _ = validateAdminSession(caller, sessionId);
 
     switch (additionalSections.get(id)) {
       case (?existingSection) {
@@ -350,7 +389,7 @@ actor {
   };
 
   public shared ({ caller }) func deleteAdditionalSection(sessionId : Text, id : Text) : async () {
-    let _ = validateAdminSession(sessionId);
+    let _ = validateAdminSession(caller, sessionId);
 
     switch (additionalSections.get(id)) {
       case (?_) {
@@ -361,7 +400,7 @@ actor {
   };
 
   public shared ({ caller }) func adminDeleteContentBlock(sessionId : Text, sectionId : Text, blockId : Nat) : async () {
-    let _ = validateAdminSession(sessionId);
+    let _ = validateAdminSession(caller, sessionId);
 
     switch (additionalSections.get(sectionId)) {
       case (?section) {
@@ -385,8 +424,8 @@ actor {
     ).toArray();
   };
 
-  public query ({ caller }) func getAllSectionsAdmin(sessionId : Text) : async [SectionContentView] {
-    let _ = validateAdminSession(sessionId);
+  public shared ({ caller }) func getAllSectionsAdmin(sessionId : Text) : async [SectionContentView] {
+    let _ = validateAdminSession(caller, sessionId);
     additionalSections.values().map<SectionContent, SectionContentView>(
       func(section) {
         {
@@ -398,7 +437,7 @@ actor {
   };
 
   public shared ({ caller }) func addContentBlock(sessionId : Text, sectionId : Text, title : TextContent, content : TextContent, image : ?Storage.ExternalBlob, blockType : BlockType, order : Nat, isVisible : Bool) : async ContentBlock {
-    let _ = validateAdminSession(sessionId);
+    let _ = validateAdminSession(caller, sessionId);
 
     switch (additionalSections.get(sectionId)) {
       case (?section) {
@@ -433,8 +472,8 @@ actor {
     block;
   };
 
-  public query ({ caller }) func getVisibleContentBlockAdmin(sessionId : Text, sectionId : Text) : async [ContentBlockView] {
-    let _ = validateAdminSession(sessionId);
+  public shared ({ caller }) func getVisibleContentBlockAdmin(sessionId : Text, sectionId : Text) : async [ContentBlockView] {
+    let _ = validateAdminSession(caller, sessionId);
 
     switch (additionalSections.get(sectionId)) {
       case (?section) {
@@ -446,8 +485,8 @@ actor {
     };
   };
 
-  public query ({ caller }) func getAllContentBlocksAdmin(sessionId : Text, sectionId : Text) : async [ContentBlockView] {
-    let _ = validateAdminSession(sessionId);
+  public shared ({ caller }) func getAllContentBlocksAdmin(sessionId : Text, sectionId : Text) : async [ContentBlockView] {
+    let _ = validateAdminSession(caller, sessionId);
 
     switch (additionalSections.get(sectionId)) {
       case (?section) {
@@ -473,7 +512,7 @@ actor {
   };
 
   public shared ({ caller }) func addProduct(sessionId : Text, title : TextContent, description : TextContent, image : Storage.ExternalBlob, price : TextContent) : async Product {
-    let _ = validateAdminSession(sessionId);
+    let _ = validateAdminSession(caller, sessionId);
 
     let newId = nextProductId.toText();
     let newProduct : Product = {
@@ -489,7 +528,7 @@ actor {
   };
 
   public shared ({ caller }) func editProduct(sessionId : Text, id : Text, title : TextContent, description : TextContent, image : Storage.ExternalBlob, price : TextContent) : async Product {
-    let _ = validateAdminSession(sessionId);
+    let _ = validateAdminSession(caller, sessionId);
 
     switch (products.get(id)) {
       case (?existingProduct) {
@@ -508,7 +547,7 @@ actor {
   };
 
   public shared ({ caller }) func deleteProduct(sessionId : Text, id : Text) : async () {
-    let _ = validateAdminSession(sessionId);
+    let _ = validateAdminSession(caller, sessionId);
 
     switch (products.get(id)) {
       case (?_) {
@@ -523,7 +562,7 @@ actor {
   };
 
   public shared ({ caller }) func addPackage(sessionId : Text, name : TextContent, description : TextContent, image : Storage.ExternalBlob, price : TextContent) : async Package {
-    let _ = validateAdminSession(sessionId);
+    let _ = validateAdminSession(caller, sessionId);
 
     let newId = nextPackageId.toText();
     let newPackage : Package = {
@@ -539,7 +578,7 @@ actor {
   };
 
   public shared ({ caller }) func editPackage(sessionId : Text, id : Text, name : TextContent, description : TextContent, image : Storage.ExternalBlob, price : TextContent) : async Package {
-    let _ = validateAdminSession(sessionId);
+    let _ = validateAdminSession(caller, sessionId);
 
     switch (packages.get(id)) {
       case (?existingPackage) {
@@ -558,7 +597,7 @@ actor {
   };
 
   public shared ({ caller }) func deletePackage(sessionId : Text, id : Text) : async () {
-    let _ = validateAdminSession(sessionId);
+    let _ = validateAdminSession(caller, sessionId);
 
     switch (packages.get(id)) {
       case (?_) {
@@ -573,7 +612,7 @@ actor {
   };
 
   public shared ({ caller }) func addHowToOrderStep(sessionId : Text, stepNumber : Nat, title : TextContent, description : TextContent, image : ?Storage.ExternalBlob) : async HowToOrderStep {
-    let _ = validateAdminSession(sessionId);
+    let _ = validateAdminSession(caller, sessionId);
 
     let newStep : HowToOrderStep = {
       stepNumber;
@@ -590,7 +629,7 @@ actor {
   };
 
   public shared ({ caller }) func editHowToOrderStep(sessionId : Text, stepNumber : Nat, title : TextContent, description : TextContent, image : ?Storage.ExternalBlob) : async HowToOrderStep {
-    let _ = validateAdminSession(sessionId);
+    let _ = validateAdminSession(caller, sessionId);
 
     switch (howToOrderSteps.get(stepNumber)) {
       case (?existingStep) {
@@ -612,7 +651,7 @@ actor {
   };
 
   public shared ({ caller }) func addSocialMediaLink(sessionId : Text, platform : Text, url : Text, icon : ?Storage.ExternalBlob) : async SocialMediaLink {
-    let _ = validateAdminSession(sessionId);
+    let _ = validateAdminSession(caller, sessionId);
 
     let newLink : SocialMediaLink = {
       platform;
@@ -624,7 +663,7 @@ actor {
   };
 
   public shared ({ caller }) func editSocialMediaLink(sessionId : Text, platform : Text, url : Text, icon : ?Storage.ExternalBlob) : async SocialMediaLink {
-    let _ = validateAdminSession(sessionId);
+    let _ = validateAdminSession(caller, sessionId);
 
     switch (socialMediaLinks.get(platform)) {
       case (?existingLink) {
@@ -641,7 +680,7 @@ actor {
   };
 
   public shared ({ caller }) func deleteSocialMediaLink(sessionId : Text, platform : Text) : async () {
-    let _ = validateAdminSession(sessionId);
+    let _ = validateAdminSession(caller, sessionId);
 
     switch (socialMediaLinks.get(platform)) {
       case (?_) {
@@ -652,7 +691,7 @@ actor {
   };
 
   public shared ({ caller }) func updateInstagramFeedConfig(sessionId : Text, instagramHandle : Text, instagramEmbedCode : Text, title : TextContent, description : TextContent, displayOrder : Nat, isVisible : Bool) : async () {
-    let session = validateAdminSession(sessionId);
+    let session = validateAdminSession(caller, sessionId);
 
     let config : InstagramFeedConfig = {
       instagramHandle;
@@ -673,6 +712,12 @@ actor {
   };
 
   public shared ({ caller }) func adminLogin(username : Text, password : Text) : async Text {
+    // Admin login doesn't require existing admin permission - it's the entry point
+    // However, we should check that the caller is not anonymous for security
+    if (caller.isAnonymous()) {
+      Runtime.trap("Anonymous principals cannot login as admin");
+    };
+
     if (username == hardcodedAdminUsername and password == hardcodedAdminPassword) {
       let sessionId = Time.now().toText() # "-" # username;
       let session = {
@@ -708,12 +753,12 @@ actor {
   };
 
   public shared ({ caller }) func adminLogout(sessionId : Text) : async () {
-    let _ = validateAdminSession(sessionId);
+    let _ = validateAdminSession(caller, sessionId);
     activeAdminSessions.remove(sessionId);
   };
 
   public shared ({ caller }) func createAdminUser(sessionId : Text, username : Text, fullName : Text, password : Text) : async () {
-    let session = validateAdminSession(sessionId);
+    let session = validateAdminSession(caller, sessionId);
     
     // Check if username already exists
     switch (adminUsers.get(username)) {
@@ -732,24 +777,17 @@ actor {
     adminUsers.add(username, newUser);
   };
 
-  public query ({ caller }) func getAdminUsers(sessionId : Text) : async [AdminUser] {
-    let _ = validateAdminSession(sessionId);
+  public shared ({ caller }) func getAdminUsers(sessionId : Text) : async [AdminUser] {
+    let _ = validateAdminSession(caller, sessionId);
     adminUsers.values().toArray();
   };
 
   public query ({ caller }) func validateSession(sessionId : Text) : async Bool {
-    switch (activeAdminSessions.get(sessionId)) {
-      case (?session) {
-        let now = Time.now();
-        let timeSinceLastActive = now - session.lastActive;
-        timeSinceLastActive <= sessionTimeout;
-      };
-      case (null) { false };
-    };
+    isValidAdminSession(caller, sessionId);
   };
 
   public query ({ caller }) func isAdmin() : async Bool {
-    if (caller == Principal.fromText("2vxsx-fae")) { return false };
+    if (caller.isAnonymous()) { return false };
     AccessControl.isAdmin(accessControlState, caller);
   };
 };

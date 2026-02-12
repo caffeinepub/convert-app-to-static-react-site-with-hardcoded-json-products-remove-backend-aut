@@ -83,6 +83,7 @@ const indexRoute = createRoute({
   component: LandingPageLayout,
 });
 
+// Admin routes are defined here (see frontend/src/ADMIN_ROUTES.md for documentation)
 const adminLoginRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/admin/login',

@@ -1,91 +1,22 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "Implement a simplified admin authentication system by removing Internet Identity auth and replacing it with custom username/password login, backed by a Supabase profiles table with roles and an admin-only dashboard for user management.",
-  "architectural_notes": [
-    "Auth will not use Internet Identity; replace with custom username/password login.",
-    "User roles stored in Supabase profiles table; /admin protected by role==='admin'.",
-    "Supabase RLS required: admin full CRUD; users read own profile; no unauthenticated access."
-  ],
-  "known_issues": [
-    "Admin access currently failing ('access denied') under Internet Identity; needs to be disabled/replaced per new auth plan."
-  ],
-  "isFixRequest": true,
+  "summary": "New project",
+  "architectural_notes": [],
+  "known_issues": [],
+  "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-disable-the-internet-identity-authentication-flow-for-the-admin-system-ui-so-users-can-no-longer-log-in-to-the-admin-area-using-internet-identity",
-      "title": "Disable the Internet Identity authentication flow for the admin system UI so users can no longer log in to the admin area using Internet Identity.",
+      "id": "feature-ensure-the-admin-route-location-and-paths-are-clearly-documented-for-developers-by-keeping-frontend-src-admin-routes-md-accurate-and-adding-a-short-pointer-comment-in-frontend-src-app-tsx-near-the-admin-route-definitions-indicating-that-admin-routes-live-there-and-referencing-frontend-src-admin-routes-md",
+      "title": "Ensure the admin route location and paths are clearly documented for developers by keeping `frontend/src/ADMIN_ROUTES.md` accurate and adding a short pointer comment in `frontend/src/App.tsx` near the admin route definitions indicating that admin routes live there and referencing `frontend/src/ADMIN_ROUTES.md`.",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
-    },
-    {
-      "id": "feature-add-a-custom-admin-authentication-flow-using-a-username-and-password-with-an-initial-hardcoded-primary-admin-credential-set-username-administrator-and-password-adminaaboxes26",
-      "title": "Add a custom admin authentication flow using a username and password, with an initial hardcoded primary admin credential set: Username \"Administrator\" and Password \"AdminAAboxes26\".",
-      "reqIds": [
-        "REQ-2"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-update-the-admin-dashboard-to-use-the-new-custom-auth-session-and-provide-logout-while-keeping-the-existing-admin-content-management-panels-functional",
-      "title": "Update the admin dashboard to use the new custom auth session (and provide logout) while keeping the existing admin content management panels functional.",
-      "reqIds": [
-        "REQ-4"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-add-admin-user-management-capability-so-the-admin-can-create-additional-users-with-username-password-and-role-and-view-the-list-of-existing-users",
-      "title": "Add admin user management capability so the admin can create additional users with username/password and role, and view the list of existing users.",
-      "reqIds": [
-        "REQ-5"
-      ],
-      "version": 1
     }
   ],
-  "new_feature_requests": [
-    {
-      "id": "AR-1",
-      "summary": "Remove/disable Internet Identity authentication and related UI/providers (no more Internet Identity login)",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-2",
-      "summary": "Implement custom username/password login page with initial hardcoded admin credentials (Administrator / AdminAAboxes26)",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-3",
-      "summary": "Create Supabase profiles table (id uuid PK, username unique, role default 'user', created_at) and seed Administrator as role='admin'",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-4",
-      "summary": "Add protected /admin route accessible only to users with role==='admin' and build Admin User Management (list users, create users with username/password/role)",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-5",
-      "summary": "Enable Supabase RLS on profiles: admins full CRUD; users can read own profile only; unauthenticated users no access",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-8",
-      "summary": "Implement backend support for username/password-based admin sessions and authorization, replacing the current admin authorization reliance on Internet Identity principals for admin-dashboard operations.",
-      "reqIds": [
-        "REQ-3"
-      ],
-      "status": "pending"
-    }
-  ],
-  "projectName": "Disable Internet Identity for Admin Access and Implement Simple Username/Password Admin Login",
+  "new_feature_requests": [],
+  "projectName": "Clarify and document where the admin route is defined",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

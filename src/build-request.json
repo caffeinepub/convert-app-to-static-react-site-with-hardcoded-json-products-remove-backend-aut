@@ -1,108 +1,47 @@
 {
   "kind": "build_request",
-  "title": "Disable Internet Identity for Admin Access and Implement Simple Username/Password Admin Login",
-  "priority": "high",
+  "title": "Clarify and document where the admin route is defined",
+  "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Disable the Internet Identity authentication flow for the admin system UI so users can no longer log in to the admin area using Internet Identity.",
+      "text": "Ensure the admin route location and paths are clearly documented for developers by keeping `frontend/src/ADMIN_ROUTES.md` accurate and adding a short pointer comment in `frontend/src/App.tsx` near the admin route definitions indicating that admin routes live there and referencing `frontend/src/ADMIN_ROUTES.md`.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-last"
+          "msg-3"
         ],
         "quotes": [
-          "El acceso al admin system sigue sin funcionar. Desahibilita que el acceso sea con internet authenticator"
+          "muestrame en el chat cual es la ruta donde esta el admin"
         ]
       },
       "acceptanceCriteria": [
-        "The /admin/login page no longer shows any Internet Identity login button or text referencing Internet Identity.",
-        "Header admin navigation no longer relies on Internet Identity state (e.g., no checks against `useInternetIdentity()` for admin routing).",
-        "No admin access flow requires or triggers Internet Identity authentication."
-      ]
-    },
-    {
-      "id": "REQ-2",
-      "text": "Add a custom admin authentication flow using a username and password, with an initial hardcoded primary admin credential set: Username \"Administrator\" and Password \"AdminAAboxes26\".",
-      "target": "both",
-      "source": {
-        "messageIds": [
-          "msg-last"
-        ],
-        "quotes": [
-          "El acceso al admin system sigue sin funcionar. Desahibilita que el acceso sea con internet authenticator"
-        ]
-      },
-      "acceptanceCriteria": [
-        "The /admin/login page provides Username and Password fields and a submit button.",
-        "Logging in with username \"Administrator\" and password \"AdminAAboxes26\" successfully grants access to /admin.",
-        "Logging in with incorrect credentials shows a clear error message in English and does not grant access.",
-        "Refreshing the page preserves the logged-in admin session until explicit logout (or until cleared by user)."
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "text": "Implement backend support for username/password-based admin sessions and authorization, replacing the current admin authorization reliance on Internet Identity principals for admin-dashboard operations.",
-      "target": "backend",
-      "source": {
-        "messageIds": [
-          "msg-last"
-        ],
-        "quotes": [
-          "Desahibilita que el acceso sea con internet authenticator"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Backend exposes a login method that validates username/password and returns an admin session token (or equivalent session identifier).",
-        "Backend exposes a logout/invalidate method for the current session token.",
-        "All admin-only backend methods used by the admin dashboard enforce authorization based on the session token (not Internet Identity principal).",
-        "Unauthorized calls to admin-only backend methods fail with a consistent error (trap or error result) indicating authorization is required."
-      ]
-    },
-    {
-      "id": "REQ-4",
-      "text": "Update the admin dashboard to use the new custom auth session (and provide logout) while keeping the existing admin content management panels functional.",
-      "target": "both",
-      "source": {
-        "messageIds": [
-          "msg-last"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Visiting /admin while not logged in redirects (or navigates) to /admin/login.",
-        "Visiting /admin while logged in loads the admin dashboard and existing tabs (Products, Packages, How to Order, Instagram, Sections, Content Blocks, Diagnostics) continue to work.",
-        "Logout clears the custom auth session and returns the user to the public website or admin login page."
-      ]
-    },
-    {
-      "id": "REQ-5",
-      "text": "Add admin user management capability so the admin can create additional users with username/password and role, and view the list of existing users.",
-      "target": "both",
-      "source": {
-        "messageIds": [
-          "msg-last"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Admin dashboard includes a User Management panel accessible only when logged in as an admin.",
-        "User Management panel shows a list of existing users including username and role.",
-        "Admin can create a new user by entering Username, Password, and Role (at minimum: 'admin' and 'user').",
-        "Newly created users can log in via the same /admin/login page, and only users with role 'admin' can access /admin."
+        "`frontend/src/ADMIN_ROUTES.md` explicitly states that admin routes are defined in `frontend/src/App.tsx` and lists the admin paths: `/admin/login` and `/admin`.",
+        "`frontend/src/App.tsx` includes a brief comment near the admin route declarations (the `createRoute` blocks for `/admin/login` and `/admin`) pointing maintainers to `frontend/src/ADMIN_ROUTES.md`.",
+        "No changes are made to any files under `frontend/src/hooks/useInternetIdentity.ts`, `frontend/src/hooks/useInternetIdentity.tsx`, `frontend/src/hooks/useActor.ts`, `frontend/src/main.tsx`, or `frontend/src/components/ui`."
       ]
     }
   ],
   "constraints": [
-    "Do not edit immutable frontend paths: frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, frontend/src/components/ui/*.",
-    "Backend must remain single-actor Motoko (all logic in backend/main.mo).",
-    "All user-facing text added/changed by this work must be in English."
+    "Backend must remain single-actor; do not introduce additional canisters/services.",
+    "Do not modify files listed in `frontend.immutablePaths` from SYSTEM_CONTEXT."
   ],
   "nonGoals": [
-    "Do not implement Supabase integration, Supabase tables, or Supabase RLS policies (not supported in this stack).",
-    "Do not add third-party authentication providers (only custom username/password per this request).",
-    "Do not implement real-time features (e.g., websockets) as part of this change."
+    "Changing admin authentication logic or session behavior.",
+    "Adding new admin pages or changing existing admin route URLs."
   ],
   "imageRequirements": {
     "required": [],
     "edits": []
+  },
+  "userProfileUpdate": {
+    "goalsToAdd": [],
+    "goalsToRemove": [],
+    "preferencesToAdd": [],
+    "preferencesToRemove": [],
+    "miscToAdd": [],
+    "miscToRemove": [],
+    "fieldsToSet": {},
+    "fieldsToDelete": []
   }
 }

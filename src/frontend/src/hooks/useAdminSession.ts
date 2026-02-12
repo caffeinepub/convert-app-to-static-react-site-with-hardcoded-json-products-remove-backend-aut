@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useActor } from './useActor';
 import { adminSessionStorage } from '../utils/adminSessionStorage';
 
-type SessionStatus = 'idle' | 'loading' | 'authenticated' | 'error';
+type SessionStatus = 'idle' | 'validating' | 'authenticated' | 'error';
 
 interface UseAdminSessionReturn {
   sessionId: string | null;
@@ -11,47 +11,87 @@ interface UseAdminSessionReturn {
   login: (username: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   isAuthenticated: boolean;
-  isLoading: boolean;
+  isValidating: boolean;
+  retry: () => void;
 }
+
+const VALIDATION_TIMEOUT = 10000; // 10 seconds
 
 export function useAdminSession(): UseAdminSessionReturn {
   const { actor, isFetching: actorFetching } = useActor();
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [status, setStatus] = useState<SessionStatus>('idle');
   const [error, setError] = useState<string | null>(null);
+  const validationAttemptedRef = useRef(false);
+  const validationInProgressRef = useRef(false);
 
-  // Load and validate session on mount
-  useEffect(() => {
-    const validateStoredSession = async () => {
-      if (!actor || actorFetching) return;
+  // Validate session with timeout
+  const validateStoredSession = async () => {
+    // Prevent multiple simultaneous validation attempts
+    if (validationInProgressRef.current) {
+      return;
+    }
 
-      const storedSessionId = adminSessionStorage.get();
-      if (!storedSessionId) {
-        setStatus('idle');
-        return;
-      }
+    if (!actor) {
+      // Actor not ready yet, but don't block the UI
+      return;
+    }
 
-      setStatus('loading');
-      try {
-        const isValid = await actor.validateSession(storedSessionId);
-        if (isValid) {
-          setSessionId(storedSessionId);
-          setStatus('authenticated');
-          setError(null);
-        } else {
-          adminSessionStorage.clear();
-          setSessionId(null);
-          setStatus('idle');
-        }
-      } catch (err: any) {
-        console.error('Session validation error:', err);
+    const storedSessionId = adminSessionStorage.get();
+    if (!storedSessionId) {
+      setStatus('idle');
+      setError(null);
+      validationAttemptedRef.current = true;
+      return;
+    }
+
+    validationInProgressRef.current = true;
+    setStatus('validating');
+    setError(null);
+
+    try {
+      // Race between validation and timeout
+      const validationPromise = actor.validateSession(storedSessionId);
+      const timeoutPromise = new Promise<boolean>((_, reject) => {
+        setTimeout(() => reject(new Error('Session validation timed out')), VALIDATION_TIMEOUT);
+      });
+
+      const isValid = await Promise.race([validationPromise, timeoutPromise]);
+
+      if (isValid) {
+        setSessionId(storedSessionId);
+        setStatus('authenticated');
+        setError(null);
+      } else {
+        // Session is invalid or expired
         adminSessionStorage.clear();
         setSessionId(null);
         setStatus('idle');
+        setError(null);
       }
-    };
+    } catch (err: any) {
+      console.error('Session validation error:', err);
+      const errorMessage = err?.message?.includes('timed out')
+        ? 'Session check timed out. Please try again.'
+        : 'Unable to verify session. Please try again.';
+      
+      // Clear invalid session
+      adminSessionStorage.clear();
+      setSessionId(null);
+      setStatus('error');
+      setError(errorMessage);
+    } finally {
+      validationInProgressRef.current = false;
+      validationAttemptedRef.current = true;
+    }
+  };
 
-    validateStoredSession();
+  // Load and validate session on mount or when actor becomes available
+  useEffect(() => {
+    // Only validate once per actor availability
+    if (!validationAttemptedRef.current && actor && !actorFetching) {
+      validateStoredSession();
+    }
   }, [actor, actorFetching]);
 
   const login = async (username: string, password: string) => {
@@ -59,7 +99,7 @@ export function useAdminSession(): UseAdminSessionReturn {
       throw new Error('Backend not available');
     }
 
-    setStatus('loading');
+    setStatus('validating');
     setError(null);
 
     try {
@@ -95,13 +135,22 @@ export function useAdminSession(): UseAdminSessionReturn {
     }
   };
 
+  const retry = () => {
+    validationAttemptedRef.current = false;
+    validationInProgressRef.current = false;
+    setError(null);
+    setStatus('idle');
+    validateStoredSession();
+  };
+
   return {
     sessionId,
     status,
     error,
     login,
     logout,
+    retry,
     isAuthenticated: status === 'authenticated' && !!sessionId,
-    isLoading: status === 'loading' || actorFetching,
+    isValidating: status === 'validating',
   };
 }

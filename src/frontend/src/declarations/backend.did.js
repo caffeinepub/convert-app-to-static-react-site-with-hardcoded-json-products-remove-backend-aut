@@ -230,7 +230,7 @@ export const idlService = IDL.Service({
       [SocialMediaLink],
       [],
     ),
-  'getAdminUsers' : IDL.Func([IDL.Text], [IDL.Vec(AdminUser)], ['query']),
+  'getAdminUsers' : IDL.Func([IDL.Text], [IDL.Vec(AdminUser)], []),
   'getAllAdditionalSections' : IDL.Func(
       [],
       [IDL.Vec(SectionContentView)],
@@ -239,7 +239,7 @@ export const idlService = IDL.Service({
   'getAllContentBlocksAdmin' : IDL.Func(
       [IDL.Text, IDL.Text],
       [IDL.Vec(ContentBlockView)],
-      ['query'],
+      [],
     ),
   'getAllHowToOrderSteps' : IDL.Func([], [IDL.Vec(HowToOrderStep)], ['query']),
   'getAllPackageIds' : IDL.Func([], [IDL.Vec(IDL.Text)], ['query']),
@@ -248,7 +248,7 @@ export const idlService = IDL.Service({
   'getAllSectionsAdmin' : IDL.Func(
       [IDL.Text],
       [IDL.Vec(SectionContentView)],
-      ['query'],
+      [],
     ),
   'getAllSocialMediaLinks' : IDL.Func(
       [],
@@ -270,7 +270,7 @@ export const idlService = IDL.Service({
   'getVisibleContentBlockAdmin' : IDL.Func(
       [IDL.Text, IDL.Text],
       [IDL.Vec(ContentBlockView)],
-      ['query'],
+      [],
     ),
   'isAdmin' : IDL.Func([], [IDL.Bool], ['query']),
   'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
@@ -541,7 +541,7 @@ export const idlFactory = ({ IDL }) => {
         [SocialMediaLink],
         [],
       ),
-    'getAdminUsers' : IDL.Func([IDL.Text], [IDL.Vec(AdminUser)], ['query']),
+    'getAdminUsers' : IDL.Func([IDL.Text], [IDL.Vec(AdminUser)], []),
     'getAllAdditionalSections' : IDL.Func(
         [],
         [IDL.Vec(SectionContentView)],
@@ -550,7 +550,7 @@ export const idlFactory = ({ IDL }) => {
     'getAllContentBlocksAdmin' : IDL.Func(
         [IDL.Text, IDL.Text],
         [IDL.Vec(ContentBlockView)],
-        ['query'],
+        [],
       ),
     'getAllHowToOrderSteps' : IDL.Func(
         [],
@@ -563,7 +563,7 @@ export const idlFactory = ({ IDL }) => {
     'getAllSectionsAdmin' : IDL.Func(
         [IDL.Text],
         [IDL.Vec(SectionContentView)],
-        ['query'],
+        [],
       ),
     'getAllSocialMediaLinks' : IDL.Func(
         [],
@@ -585,7 +585,7 @@ export const idlFactory = ({ IDL }) => {
     'getVisibleContentBlockAdmin' : IDL.Func(
         [IDL.Text, IDL.Text],
         [IDL.Vec(ContentBlockView)],
-        ['query'],
+        [],
       ),
     'isAdmin' : IDL.Func([], [IDL.Bool], ['query']),
     'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),

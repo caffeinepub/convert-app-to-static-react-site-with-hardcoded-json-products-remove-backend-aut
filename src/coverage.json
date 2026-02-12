@@ -1,110 +1,35 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-11T20:26:03.429Z",
+  "generatedAt": "2026-02-12T16:30:08.360Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 5,
-    "implemented": 4,
+    "total": 1,
+    "implemented": 1,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Disable the Internet Identity authentication flow for the admin system UI so users can no longer log in to the admin area using Internet Identity.",
+        "summary": "Ensure the admin route location and paths are clearly documented for developers by keeping `frontend/src/ADMIN_ROUTES.md` accurate and adding a short pointer comment in `frontend/src/App.tsx` near the admin route definitions indicating that admin routes live there and referencing `frontend/src/ADMIN_ROUTES.md`.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/pages/AdminLogin.tsx",
-          "frontend/src/pages/AdminDashboard.tsx",
-          "frontend/src/components/Header.tsx",
-          "frontend/src/hooks/useQueries.ts"
+          "frontend/src/ADMIN_ROUTES.md",
+          "frontend/src/App.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/pages/AdminLogin.tsx",
-          "frontend/src/pages/AdminDashboard.tsx",
-          "frontend/src/components/Header.tsx",
-          "frontend/src/hooks/useQueries.ts"
-        ]
-      },
-      {
-        "id": "REQ-2",
-        "summary": "Add a custom admin authentication flow using a username and password, with an initial hardcoded primary admin credential set: Username \"Administrator\" and Password \"AdminAAboxes26\".",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/hooks/useAdminSession.ts",
-          "frontend/src/utils/adminSessionStorage.ts",
-          "frontend/src/pages/AdminLogin.tsx",
-          "frontend/src/backend.d.ts"
-        ],
-        "matchedFiles": [
-          "frontend/src/hooks/useAdminSession.ts",
-          "frontend/src/utils/adminSessionStorage.ts",
-          "frontend/src/pages/AdminLogin.tsx",
-          "frontend/src/backend.d.ts"
-        ]
-      },
-      {
-        "id": "REQ-3",
-        "summary": "Implement backend support for username/password-based admin sessions and authorization, replacing the current admin authorization reliance on Internet Identity principals for admin-dashboard operations.",
-        "status": "unknown",
-        "plannedFiles": [],
-        "matchedFiles": []
-      },
-      {
-        "id": "REQ-4",
-        "summary": "Update the admin dashboard to use the new custom auth session (and provide logout) while keeping the existing admin content management panels functional.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/pages/AdminDashboard.tsx",
-          "frontend/src/components/Header.tsx",
-          "frontend/src/hooks/useQueries.ts",
-          "frontend/src/components/admin/DiagnosticsPanel.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/pages/AdminDashboard.tsx",
-          "frontend/src/components/Header.tsx",
-          "frontend/src/hooks/useQueries.ts",
-          "frontend/src/components/admin/DiagnosticsPanel.tsx"
-        ]
-      },
-      {
-        "id": "REQ-5",
-        "summary": "Add admin user management capability so the admin can create additional users with username/password and role, and view the list of existing users.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/admin/UserManagementPanel.tsx",
-          "frontend/src/hooks/useQueries.ts",
-          "frontend/src/pages/AdminDashboard.tsx",
-          "frontend/src/backend.d.ts"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/admin/UserManagementPanel.tsx",
-          "frontend/src/hooks/useQueries.ts",
-          "frontend/src/pages/AdminDashboard.tsx",
-          "frontend/src/backend.d.ts"
+          "frontend/src/App.tsx"
         ]
       }
     ]
   },
   "changedFiles": [
-    "backend/main.mo",
     "build-request.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/backend.d.ts",
-    "frontend/src/backend.ts",
-    "frontend/src/components/Header.tsx",
-    "frontend/src/components/admin/DiagnosticsPanel.tsx",
-    "frontend/src/components/admin/UserManagementPanel.tsx",
-    "frontend/src/declarations/backend.did.d.ts",
-    "frontend/src/declarations/backend.did.js",
-    "frontend/src/hooks/useAdminSession.ts",
-    "frontend/src/hooks/useQueries.ts",
-    "frontend/src/pages/AdminDashboard.tsx",
-    "frontend/src/pages/AdminLogin.tsx",
-    "frontend/src/utils/adminSessionStorage.ts",
+    "frontend/src/App.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

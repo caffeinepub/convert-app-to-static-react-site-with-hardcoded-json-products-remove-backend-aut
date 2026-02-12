@@ -1,131 +1,26 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Replace Internet Identity Admin UI with Username/Password Session Login (Frontend-only)",
+  "title": "Document and annotate where admin routes are defined",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Remove all Internet Identity UI and state reliance from the admin login and admin navigation flow.",
+      "summary": "Keep admin route documentation accurate and add an in-code pointer comment near the admin route declarations in App.tsx referencing ADMIN_ROUTES.md.",
       "acceptanceCriteria": [
-        "The /admin/login page no longer shows any Internet Identity login button or text referencing Internet Identity.",
-        "Header admin navigation no longer relies on Internet Identity state (e.g., no checks against `useInternetIdentity()` for admin routing).",
-        "No admin access flow requires or triggers Internet Identity authentication."
+        "`frontend/src/ADMIN_ROUTES.md` explicitly states that admin routes are defined in `frontend/src/App.tsx` and lists the admin paths: `/admin/login` and `/admin`.",
+        "`frontend/src/App.tsx` includes a brief comment near the admin route declarations (the `createRoute` blocks for `/admin/login` and `/admin`) pointing maintainers to `frontend/src/ADMIN_ROUTES.md`.",
+        "No changes are made to any files under `frontend/src/hooks/useInternetIdentity.ts`, `frontend/src/hooks/useInternetIdentity.tsx`, `frontend/src/hooks/useActor.ts`, `frontend/src/main.tsx`, or `frontend/src/components/ui`."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/AdminLogin.tsx",
+          "path": "frontend/src/ADMIN_ROUTES.md",
           "operation": "modify",
-          "description": "Remove Internet Identity-based login flow and any user-facing references to Internet Identity. Replace with custom username/password UI wiring (actual form behavior covered under REQ-2). Use shadcn-ui Card/Input/Button components for consistent styling. Verify the component's usage instructions before implementing."
+          "description": "Verify the documentation explicitly states that admin routes are defined in `frontend/src/App.tsx` and that it clearly lists the admin paths `/admin/login` and `/admin` (adjust wording/formatting for clarity while keeping the same paths)."
         },
         {
-          "path": "frontend/src/pages/AdminDashboard.tsx",
+          "path": "frontend/src/App.tsx",
           "operation": "modify",
-          "description": "Remove Internet Identity identity/clear usage and any admin gating based on Internet Identity authentication state. Switch gating to custom admin session state (implemented under REQ-4)."
-        },
-        {
-          "path": "frontend/src/components/Header.tsx",
-          "operation": "modify",
-          "description": "Remove `useInternetIdentity()` and `useIsCallerAdmin()`-based checks for admin navigation. Make the Admin button navigate to /admin (or /admin/login) based solely on custom admin session state (implemented under REQ-4)."
-        },
-        {
-          "path": "frontend/src/hooks/useQueries.ts",
-          "operation": "modify",
-          "description": "Remove/stop using Internet Identity-dependent admin checks for controlling admin routing (e.g., stop relying on `isAdmin()` for UI gating). Update admin dashboard data operations to use the custom session id where required (full session wiring under REQ-4)."
-        }
-      ]
-    },
-    {
-      "id": "REQ-2",
-      "summary": "Implement username/password admin login UI that authenticates via backend adminLogin and persists the session across refresh.",
-      "acceptanceCriteria": [
-        "The /admin/login page provides Username and Password fields and a submit button.",
-        "Logging in with username \"Administrator\" and password \"AdminAAboxes26\" successfully grants access to /admin.",
-        "Logging in with incorrect credentials shows a clear error message in English and does not grant access.",
-        "Refreshing the page preserves the logged-in admin session until explicit logout (or until cleared by user)."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/hooks/useAdminSession.ts",
-          "operation": "create",
-          "description": "Create a dedicated admin session hook that: stores/loads a session id from localStorage; calls backend adminLogin(username,password) to obtain a session id; calls backend validateSession(sessionId) on app/page load; provides logout that calls backend adminLogout(sessionId) and clears localStorage; exposes status (loading/authenticated/error)."
-        },
-        {
-          "path": "frontend/src/utils/adminSessionStorage.ts",
-          "operation": "create",
-          "description": "Add small storage utilities for admin session id persistence (get/set/clear) using localStorage to ensure sessions survive refreshes."
-        },
-        {
-          "path": "frontend/src/pages/AdminLogin.tsx",
-          "operation": "modify",
-          "description": "Implement username/password form using shadcn-ui Input/Label/Button/Card; on submit call the useAdminSession login method; show a clear English error message on invalid credentials; on success navigate to /admin; include a 'Back to Website' button. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/backend.d.ts",
-          "operation": "modify",
-          "description": "Update frontend type definitions to reflect username/password admin auth and user management needs in the UI (e.g., ensure adminLogin/adminLogout/validateSession and AdminUser fields used by the new UI are correctly typed)."
-        }
-      ]
-    },
-    {
-      "id": "REQ-4",
-      "summary": "Gate /admin by custom admin session (redirect to /admin/login when not authenticated) and add logout while keeping existing admin panels functional.",
-      "acceptanceCriteria": [
-        "Visiting /admin while not logged in redirects (or navigates) to /admin/login.",
-        "Visiting /admin while logged in loads the admin dashboard and existing tabs (Products, Packages, How to Order, Instagram, Sections, Content Blocks, Diagnostics) continue to work.",
-        "Logout clears the custom auth session and returns the user to the public website or admin login page."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/pages/AdminDashboard.tsx",
-          "operation": "modify",
-          "description": "Use useAdminSession to guard access: if no valid session, navigate to /admin/login; if validating, show loading state; if session is valid, render the dashboard; implement Logout button to call useAdminSession.logout, clear react-query cache, then navigate to / or /admin/login. Ensure all user-facing text remains English."
-        },
-        {
-          "path": "frontend/src/components/Header.tsx",
-          "operation": "modify",
-          "description": "Wire the Admin button to use the custom session state (from useAdminSession) rather than Internet Identity; keep public navigation unchanged. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/hooks/useQueries.ts",
-          "operation": "modify",
-          "description": "Update all admin dashboard data mutations/queries that require authorization to include the custom session id (e.g., product/package/section/content-block/how-to-order/instagram CRUD). Read the session id from adminSessionStorage (or accept it as an argument) and pass it to backend functions that require it; handle authorization failures by surfacing an English error and allowing the dashboard guard to redirect to /admin/login if the session is invalid."
-        },
-        {
-          "path": "frontend/src/components/admin/DiagnosticsPanel.tsx",
-          "operation": "modify",
-          "description": "Adjust diagnostics to validate the custom admin session (via validateSession) and to call admin-only backend functions with the current session id so the diagnostics continue to work with the new auth model."
-        }
-      ]
-    },
-    {
-      "id": "REQ-5",
-      "summary": "Add an admin-only User Management panel to list users and create additional username/password users with roles.",
-      "acceptanceCriteria": [
-        "Admin dashboard includes a User Management panel accessible only when logged in as an admin.",
-        "User Management panel shows a list of existing users including username and role.",
-        "Admin can create a new user by entering Username, Password, and Role (at minimum: 'admin' and 'user').",
-        "Newly created users can log in via the same /admin/login page, and only users with role 'admin' can access /admin."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/components/admin/UserManagementPanel.tsx",
-          "operation": "create",
-          "description": "Create a new admin-only panel that lists existing users and provides a create-user form with Username, Password, Full Name (if required by backend), and Role selection ('admin'|'user'). Use shadcn-ui Table (if present), Card, Input, Select, and Button components for UI consistency. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/hooks/useQueries.ts",
-          "operation": "modify",
-          "description": "Add react-query hooks for user management: fetch user list (getAdminUsers with session id) and create user (createAdminUser with session id and role as required). Ensure errors are shown in English and invalidate the user list query on create success."
-        },
-        {
-          "path": "frontend/src/pages/AdminDashboard.tsx",
-          "operation": "modify",
-          "description": "Add a new 'User Management' tab to the existing admin Tabs, wire it to render UserManagementPanel, and ensure it is only reachable when the admin session is valid (same guard as other panels). Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/backend.d.ts",
-          "operation": "modify",
-          "description": "Align AdminUser typing with User Management UI needs (e.g., include role in AdminUser) and ensure createAdminUser/getAdminUsers signatures match what the UI calls."
+          "description": "Add a short pointer comment immediately adjacent to the admin `createRoute` declarations for `/admin/login` and `/admin` indicating that admin routes live here and referencing `frontend/src/ADMIN_ROUTES.md` for maintainers."
         }
       ]
     }

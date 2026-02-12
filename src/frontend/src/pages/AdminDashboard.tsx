@@ -4,7 +4,7 @@ import { useAdminSession } from '../hooks/useAdminSession';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { LogOut, Package, ShoppingBag, ListOrdered, Loader2, LayoutGrid, Blocks, Instagram, Activity, Users } from 'lucide-react';
+import { LogOut, Package, ShoppingBag, ListOrdered, Loader2, LayoutGrid, Blocks, Instagram, Activity, Users, AlertCircle, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 import ProductsManager from '../components/admin/ProductsManager';
 import PackagesManager from '../components/admin/PackagesManager';
@@ -19,14 +19,14 @@ import { useQueryClient } from '@tanstack/react-query';
 export default function AdminDashboard() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { isAuthenticated, isLoading, logout } = useAdminSession();
+  const { isAuthenticated, isValidating, error, logout, retry } = useAdminSession();
 
-  // Redirect to login if not authenticated
+  // Redirect to login if not authenticated and not validating
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
+    if (!isValidating && !isAuthenticated) {
       navigate({ to: '/admin/login' });
     }
-  }, [isAuthenticated, isLoading, navigate]);
+  }, [isAuthenticated, isValidating, navigate]);
 
   const handleLogout = async () => {
     try {
@@ -40,13 +40,50 @@ export default function AdminDashboard() {
     }
   };
 
-  // Show loading while checking authentication
-  if (isLoading) {
+  // Show error state with retry option
+  if (error && !isValidating) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-rose-50 via-pink-50 to-purple-50 dark:from-rose-950/20 dark:via-pink-950/20 dark:to-purple-950/20 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md shadow-2xl">
+          <CardHeader className="text-center space-y-4">
+            <div className="mx-auto w-16 h-16 bg-gradient-to-br from-rose-400 to-pink-600 rounded-full flex items-center justify-center">
+              <AlertCircle className="w-8 h-8 text-white" />
+            </div>
+            <CardTitle className="text-2xl font-bold">Session Error</CardTitle>
+            <CardDescription className="text-base">
+              {error}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <Button
+              onClick={retry}
+              className="w-full bg-gradient-to-r from-rose-400 to-pink-600 hover:from-rose-500 hover:to-pink-700 text-white"
+              size="lg"
+            >
+              <RefreshCw className="mr-2 h-5 w-5" />
+              Try Again
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => navigate({ to: '/admin/login' })}
+              className="w-full"
+            >
+              Back to Login
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Show bounded loading state during validation
+  if (isValidating) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-rose-50 via-pink-50 to-purple-50 dark:from-rose-950/20 dark:via-pink-950/20 dark:to-purple-950/20 flex items-center justify-center">
         <div className="text-center space-y-4">
           <Loader2 className="w-12 h-12 animate-spin mx-auto text-rose-500" />
-          <p className="text-muted-foreground">Loading admin panel...</p>
+          <p className="text-muted-foreground">Verifying session...</p>
+          <p className="text-sm text-muted-foreground/70">This should only take a moment</p>
         </div>
       </div>
     );
