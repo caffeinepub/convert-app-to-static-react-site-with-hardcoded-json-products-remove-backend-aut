@@ -1,7 +1,7 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-12T22:56:23.228Z",
+  "generatedAt": "2026-02-13T20:40:52.920Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
@@ -12,30 +12,30 @@
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Add a user-accessible download option that provides the current plain-text UI translations file as a direct file download in the browser (same format as `frontend/src/texts/ui-texts.txt`: `KEY = English | Spanish`).",
+        "summary": "Extract the primary pink color from the uploaded AABoxes logo screenshot (image-12.png) and define it as a reusable theme token (e.g., a CSS custom property or Tailwind-safe variable) that can be applied as a page background color.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/texts/uiTextsSource.ts",
-          "frontend/src/contexts/LanguageContext.tsx",
-          "frontend/src/utils/downloadUiTexts.ts",
-          "frontend/src/components/Footer.tsx"
+          "frontend/src/index.css",
+          "frontend/tailwind.config.js"
         ],
         "matchedFiles": [
-          "frontend/src/texts/uiTextsSource.ts",
-          "frontend/src/contexts/LanguageContext.tsx",
-          "frontend/src/utils/downloadUiTexts.ts",
-          "frontend/src/components/Footer.tsx"
+          "frontend/src/index.css",
+          "frontend/tailwind.config.js"
         ]
       },
       {
         "id": "REQ-2",
-        "summary": "Update the plain-text workflow documentation to include clear instructions on how to download the translations text file from the app UI and where that file maps in the repository.",
+        "summary": "Set the application background to the extracted AABoxes pink on every route/page except the Home (\"Inicio\") route ('/'). The Home route must keep its current background behavior.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/UI_TEXT_PLAIN_TEXT_WORKFLOW.md"
+          "frontend/src/App.tsx",
+          "frontend/src/pages/AdminLogin.tsx",
+          "frontend/src/pages/AdminDashboard.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/UI_TEXT_PLAIN_TEXT_WORKFLOW.md"
+          "frontend/src/App.tsx",
+          "frontend/src/pages/AdminLogin.tsx",
+          "frontend/src/pages/AdminDashboard.tsx"
         ]
       }
     ]
@@ -45,11 +45,11 @@
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/UI_TEXT_PLAIN_TEXT_WORKFLOW.md",
-    "frontend/src/components/Footer.tsx",
-    "frontend/src/contexts/LanguageContext.tsx",
-    "frontend/src/texts/uiTextsSource.ts",
-    "frontend/src/utils/downloadUiTexts.ts",
+    "frontend/src/App.tsx",
+    "frontend/src/index.css",
+    "frontend/src/pages/AdminDashboard.tsx",
+    "frontend/src/pages/AdminLogin.tsx",
+    "frontend/tailwind.config.js",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

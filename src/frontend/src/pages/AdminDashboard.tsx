@@ -22,7 +22,7 @@ export default function AdminDashboard() {
   const { t } = useLanguage();
   const navigate = useNavigate();
   const { actor, isFetching: actorFetching } = useActor();
-  const { isAuthenticated, isValidating, error, sessionId, logout, retry } = useAdminSession();
+  const { isAuthenticated, isValidating, error, logout, retry } = useAdminSession();
 
   useEffect(() => {
     if (!isValidating && !isAuthenticated && !actorFetching) {
@@ -33,7 +33,7 @@ export default function AdminDashboard() {
   // Show loading state while actor is initializing or session is validating
   if (actorFetching || isValidating) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-rose-50 via-pink-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+      <div className="min-h-screen flex items-center justify-center">
         <Card className="w-full max-w-md">
           <CardContent className="flex flex-col items-center justify-center py-12">
             <Loader2 className="h-8 w-8 animate-spin text-rose-500 mb-4" />
@@ -47,7 +47,7 @@ export default function AdminDashboard() {
   // Show error state if actor failed to initialize
   if (!actor) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-rose-50 via-pink-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 p-4">
+      <div className="min-h-screen flex items-center justify-center p-4">
         <Card className="w-full max-w-md">
           <CardContent className="py-8">
             <Alert variant="destructive">
@@ -67,15 +67,31 @@ export default function AdminDashboard() {
   // Show error state if session validation failed
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-rose-50 via-pink-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 p-4">
-        <AccessDeniedScreen message={error} onRetry={retry} />
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <Card className="w-full max-w-md">
+          <CardContent className="py-8">
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>{t('admin.dashboard.sessionError')}</AlertTitle>
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+            <div className="flex gap-2 mt-4">
+              <Button onClick={retry} className="flex-1" variant="outline">
+                {t('admin.dashboard.retry')}
+              </Button>
+              <Button onClick={() => navigate({ to: '/admin/login' })} className="flex-1">
+                {t('admin.dashboard.backToLogin')}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     );
   }
 
-  // If not authenticated after validation, redirect (handled by useEffect)
-  if (!isAuthenticated || !sessionId) {
-    return null;
+  // Show access denied if not authenticated
+  if (!isAuthenticated) {
+    return <AccessDeniedScreen />;
   }
 
   const handleLogout = async () => {
@@ -84,69 +100,64 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-rose-50 via-pink-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-      <div className="container mx-auto p-6 space-y-6">
-        <div className="flex items-center justify-between">
+    <div className="min-h-screen p-4 md:p-8">
+      <div className="max-w-7xl mx-auto">
+        <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-3xl font-bold bg-gradient-to-r from-rose-600 to-pink-600 bg-clip-text text-transparent">
               {t('admin.dashboard.title')}
             </h1>
-            <p className="text-muted-foreground">{t('admin.dashboard.welcome')}</p>
+            <p className="text-muted-foreground mt-1">{t('admin.dashboard.subtitle')}</p>
           </div>
-          <Button
-            onClick={handleLogout}
-            variant="outline"
-            className="border-rose-200 hover:bg-rose-50 dark:border-rose-800 dark:hover:bg-rose-950"
-          >
-            <LogOut className="mr-2 h-4 w-4" />
+          <Button onClick={handleLogout} variant="outline" className="gap-2">
+            <LogOut className="h-4 w-4" />
             {t('admin.dashboard.logout')}
           </Button>
         </div>
 
         <Tabs defaultValue="products" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 lg:grid-cols-8 gap-2">
-            <TabsTrigger value="products">{t('admin.dashboard.tab.products')}</TabsTrigger>
-            <TabsTrigger value="packages">{t('admin.dashboard.tab.packages')}</TabsTrigger>
-            <TabsTrigger value="howToOrder">{t('admin.dashboard.tab.howToOrder')}</TabsTrigger>
-            <TabsTrigger value="sections">{t('admin.dashboard.tab.sections')}</TabsTrigger>
-            <TabsTrigger value="contentBlocks">{t('admin.dashboard.tab.contentBlocks')}</TabsTrigger>
-            <TabsTrigger value="instagram">{t('admin.dashboard.tab.instagram')}</TabsTrigger>
-            <TabsTrigger value="users">{t('admin.dashboard.tab.users')}</TabsTrigger>
-            <TabsTrigger value="diagnostics">{t('admin.dashboard.tab.diagnostics')}</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-2 lg:grid-cols-7 gap-2">
+            <TabsTrigger value="products">{t('admin.dashboard.tabs.products')}</TabsTrigger>
+            <TabsTrigger value="packages">{t('admin.dashboard.tabs.packages')}</TabsTrigger>
+            <TabsTrigger value="howtoorder">{t('admin.dashboard.tabs.howToOrder')}</TabsTrigger>
+            <TabsTrigger value="sections">{t('admin.dashboard.tabs.sections')}</TabsTrigger>
+            <TabsTrigger value="contentblocks">{t('admin.dashboard.tabs.contentBlocks')}</TabsTrigger>
+            <TabsTrigger value="instagram">{t('admin.dashboard.tabs.instagram')}</TabsTrigger>
+            <TabsTrigger value="users">{t('admin.dashboard.tabs.users')}</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="products">
+          <TabsContent value="products" className="space-y-4">
             <ProductsManager />
           </TabsContent>
 
-          <TabsContent value="packages">
+          <TabsContent value="packages" className="space-y-4">
             <PackagesManager />
           </TabsContent>
 
-          <TabsContent value="howToOrder">
+          <TabsContent value="howtoorder" className="space-y-4">
             <HowToOrderManager />
           </TabsContent>
 
-          <TabsContent value="sections">
+          <TabsContent value="sections" className="space-y-4">
             <SectionsManager />
           </TabsContent>
 
-          <TabsContent value="contentBlocks">
+          <TabsContent value="contentblocks" className="space-y-4">
             <ContentBlocksManager />
           </TabsContent>
 
-          <TabsContent value="instagram">
+          <TabsContent value="instagram" className="space-y-4">
             <InstagramFeedManager />
           </TabsContent>
 
-          <TabsContent value="users">
+          <TabsContent value="users" className="space-y-4">
             <UserManagementPanel />
           </TabsContent>
-
-          <TabsContent value="diagnostics">
-            <DiagnosticsPanel />
-          </TabsContent>
         </Tabs>
+
+        <div className="mt-8">
+          <DiagnosticsPanel />
+        </div>
       </div>
     </div>
   );

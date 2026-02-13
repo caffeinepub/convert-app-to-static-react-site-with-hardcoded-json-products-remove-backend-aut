@@ -65,7 +65,8 @@ export default {
                     'accent-foreground': 'oklch(var(--sidebar-accent-foreground))',
                     border: 'oklch(var(--sidebar-border))',
                     ring: 'oklch(var(--sidebar-ring))'
-                }
+                },
+                aaboxesPink: 'oklch(var(--aaboxes-pink))'
             },
             borderRadius: {
                 lg: 'var(--radius)',

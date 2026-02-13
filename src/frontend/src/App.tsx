@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { createRouter, RouterProvider, createRoute, createRootRoute, Outlet } from '@tanstack/react-router';
+import { createRouter, RouterProvider, createRoute, createRootRoute, Outlet, useLocation } from '@tanstack/react-router';
 import { LanguageProvider } from './contexts/LanguageContext';
 import { Toaster } from '@/components/ui/sonner';
 import Header from './components/Header';
@@ -65,11 +65,14 @@ function LandingPageLayout() {
 }
 
 function RootLayout() {
+  const location = useLocation();
+  const isHomePage = location.pathname === '/';
+
   return (
-    <>
+    <div className={isHomePage ? '' : 'min-h-screen bg-aaboxesPink'}>
       <Outlet />
       <Toaster />
-    </>
+    </div>
   );
 }
 

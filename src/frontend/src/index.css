@@ -28,6 +28,7 @@
     --success-foreground: oklch(98% 0.01 145);
     --warning: oklch(70% 0.18 65);
     --warning-foreground: oklch(20% 0.02 65);
+    --aaboxes-pink: oklch(60% 0.25 340);
   }
 
   .dark {
@@ -54,6 +55,7 @@
     --success-foreground: oklch(95% 0.01 145);
     --warning: oklch(65% 0.18 65);
     --warning-foreground: oklch(95% 0.01 65);
+    --aaboxes-pink: oklch(60% 0.25 340);
   }
 }
 

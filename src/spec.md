@@ -1,11 +1,11 @@
 # Specification
 
 ## Summary
-**Goal:** Let users download the app’s current plain-text UI translations file directly from the UI, and document how to do it.
+**Goal:** Use the AABoxes logo’s primary pink as the background color across all non-Home pages to eliminate unintended black backgrounds.
 
 **Planned changes:**
-- Add a user-accessible UI control that triggers a browser download of the current UI translations as a `.txt` file in the existing `KEY = English | Spanish` format.
-- Ensure the downloaded file content matches `frontend/src/texts/ui-texts.txt` exactly (including comments and section headers) and works in production builds.
-- Update `frontend/src/UI_TEXT_PLAIN_TEXT_WORKFLOW.md` with step-by-step instructions for downloading the file from the UI, and document the mapping to `frontend/src/texts/ui-texts.txt` plus the expected downloaded filename.
+- Sample the primary pink color directly from the provided AABoxes logo screenshot (image-12.png) and define it as a single reusable theme token in frontend styling.
+- Apply this AABoxes pink background on every route except Home (“Inicio”) at `/`, which must keep its current background behavior.
+- Ensure admin routes (e.g., `/admin/login`, `/admin`) and other non-Home pages no longer show any black page background.
 
-**User-visible outcome:** A user can click an in-app download option to get a `.txt` translations file that matches the app’s current UI text source, and can follow documentation to locate and understand the source file in the repository.
+**User-visible outcome:** All pages other than Home display the AABoxes pink page background (including admin pages), while Home remains unchanged and no route shows an unintended black background.

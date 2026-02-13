@@ -2,13 +2,11 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-add-a-user-accessible-download-option-that-provides-the-current-plain-text-ui-translations-file-as-a-direct-file-download-in-the-browser-same-format-as-frontend-src-texts-ui-texts-txt-key-english-spanish",
-      "featureTitle": "Add a user-accessible download option that provides the current plain-text UI translations file as a direct file download in the browser (same format as `frontend/src/texts/ui-texts.txt`: `KEY = English | Spanish`).",
+      "featureId": "feature-extract-the-primary-pink-color-from-the-uploaded-aaboxes-logo-screenshot-image-12-png-and-define-it-as-a-reusable-theme-token-e-g-a-css-custom-property-or-tailwind-safe-variable-that-can-be-applied-as-a-page-background-color",
+      "featureTitle": "Extract the primary pink color from the uploaded AABoxes logo screenshot (image-12.png) and define it as a reusable theme token (e.g., a CSS custom property or Tailwind-safe variable) that can be applied as a page background color.",
       "files": [
-        "frontend/src/components/Footer.tsx",
-        "frontend/src/contexts/LanguageContext.tsx",
-        "frontend/src/texts/uiTextsSource.ts",
-        "frontend/src/utils/downloadUiTexts.ts"
+        "frontend/src/index.css",
+        "frontend/tailwind.config.js"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -25,10 +23,12 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-update-the-plain-text-workflow-documentation-to-include-clear-instructions-on-how-to-download-the-translations-text-file-from-the-app-ui-and-where-that-file-maps-in-the-repository",
-      "featureTitle": "Update the plain-text workflow documentation to include clear instructions on how to download the translations text file from the app UI and where that file maps in the repository.",
+      "featureId": "feature-set-the-application-background-to-the-extracted-aaboxes-pink-on-every-route-page-except-the-home-inicio-route-the-home-route-must-keep-its-current-background-behavior",
+      "featureTitle": "Set the application background to the extracted AABoxes pink on every route/page except the Home (\"Inicio\") route ('/'). The Home route must keep its current background behavior.",
       "files": [
-        "frontend/src/UI_TEXT_PLAIN_TEXT_WORKFLOW.md"
+        "frontend/src/App.tsx",
+        "frontend/src/pages/AdminDashboard.tsx",
+        "frontend/src/pages/AdminLogin.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
